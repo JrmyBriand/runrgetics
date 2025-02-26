@@ -20,19 +20,19 @@ cost_running_sprint <- function(acceleration, velocity) {
   # Set negative accelerations to zero
   acc_modified <- pmax(acceleration,0)
 
-  # Calculate Energy Similarity number (dimensionless acceleration)
-  ES <- acc_modified / 9.8
+  # Calculate Effective Slope
+  effective_slope <- acc_modified / 9.8
 
-  # Calculate Mechanical Effectiveness
-  EM <- sqrt(ES^2 + 1)
+  # Calculate effective mass
+  effective_mass<- sqrt(effective_slope^2 + 1)
 
   # Calculate base metabolic cost using piecewise model
-  cr <- ifelse(ES >= 0.45,
+  cr <- ifelse(effective_slope >= 0.45,
                # High acceleration phase (linear model)
-               (55.65 * ES - 5.61) * EM,
+               (55.65 * effective_slope - 5.61) * effective_mass,
                # Low acceleration phase (polynomial model)
-               (155.4 * ES^5 - 30.4 * ES^4 - 43.3 * ES^3 +
-                  46.3 * ES^2 + 19.5*ES + 3.8) * EM
+               (155.4 * effective_slope^5 - 30.4 * effective_slope^4 - 43.3 * effective_slope^3 +
+                  46.3 * effective_slope^2 + 19.5*effective_slope + 3.8) * effective_mass
   )
 
   # Add wind resistance component
@@ -63,19 +63,19 @@ cost_running_sprint <- function(acceleration, velocity) {
 #'
 cost_running <- function(acceleration, velocity) {
 
-  # Calculate Energy Similarity number (dimensionless acceleration)
-  ES <- acceleration / 9.8
+  # Calculate effective slope
+  effective_slope <- acceleration / 9.8
 
-  # Calculate Mechanical Effectiveness
-  EM <- sqrt(ES^2 + 1)
+  # Calculate effective mass
+  effective_mass <- sqrt(effective_slope^2 + 1)
 
   # Calculate base metabolic cost using piecewise model
-  cr <- ifelse(ES >= 0.45,
+  cr <- ifelse(effective_slope >= 0.45,
                # High acceleration phase (linear model)
-               (55.65 * ES - 5.61) * EM,
+               (55.65 * effective_slope - 5.61) * effective_mass,
                # Low acceleration phase (polynomial model)
-               (155.4 * ES^5 - 30.4 * ES^4 - 43.3 * ES^3 +
-                  46.3 * ES^2 + 19.5*ES + 3.8) * EM
+               (155.4 * effective_slope^5 - 30.4 * effective_slope^4 - 43.3 * effective_slope^3 +
+                  46.3 * effective_slope^2 + 19.5*effective_slope + 3.8) * effective_mass
   )
 
   # Add wind resistance component
