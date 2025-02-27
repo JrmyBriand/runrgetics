@@ -2,3 +2,6 @@
 
 export(cost_running)
 export(cost_running_sprint)
+export(find_terminal_velocity)
+export(find_time_velocity)
+export(middle_point)
