@@ -61,5 +61,205 @@ find_terminal_velocity <- function(splits, velocity, distance, reaction_time){
 }
 
 
+#' Instantaneous Velocity During Running Acceleration
+#'
+#' Estimates the instantaneous velocity during the acceleration phase of a sprint run. If the reaction time is known,
+#' it can be included in the model. The model is based on an exponential rise in velocity.
+#'
+#' @param time A vector of time points (in s)
+#' @param tau A double representing the time constant of the exponential rise in velocity (in s)
+#' @param maximal_velocity A double representing the maximal velocity (in m/s)
+#' @param reaction_time A double representing the reaction time (in s) Default value is 0
+#'
+#' @returns A vector of instantaneous velocities (in m/s)
+#' @export
+#'
+#' @examples
+#' acc_velocity_model(1:10, 0.5, 10)
+#' acc_velocity_model(1:10, 0.5, 10, reaction_time = 0.1)
+acc_velocity_model <-  function(time, tau, maximal_velocity, reaction_time = 0) {
+  maximal_velocity * (1 - exp(-(time-reaction_time) / tau))
+}
 
 
+
+#' Instantaneous Distance During Running Acceleration
+#'
+#' Estimates the instantaneous distance during the acceleration phase of a sprint run. The model is based on an exponential rise in velocity.
+#'
+#'
+#' @param time A vector of time points (in s)
+#' @param tau A double representing the time constant of the exponential rise in velocity (in s)
+#' @param maximal_velocity A double representing the maximal velocity (in m/s)
+#'
+#' @returns A vector of instantaneous distances (in m)
+#' @export
+#'
+#' @examples
+#' acc_distance_model(1:10, 0.5, 10)
+acc_distance_model <- function(time, tau, maximal_velocity) {
+
+  maximal_velocity * (time - tau * (1 - exp(-time/tau)))
+}
+
+
+
+#' Instantaneous Velocity During Sprint Running Deceleration Phase
+#'
+#' Estimates the instantaneous velocity during the deceleration phase of a sprint run. The model is based on a constant rate of deceleration.
+#'
+#' @param time A vector of time points (in s)
+#' @param maximal_velocity A double representing the maximal velocity (in m/s)
+#' @param time_maximal_velocity A double representing the time at which maximal velocity is reached (in s)
+#' @param decel_rate A double representing the rate of deceleration (in m/s^2)
+#'
+#' @returns A vector of instantaneous velocities (in m/s)
+#' @export
+#'
+#' @examples
+#' dec_velocity_model(6:10, 10, 6, 0.1)
+dec_velocity_model <- function(time, maximal_velocity, time_maximal_velocity, decel_rate) {
+  maximal_velocity - decel_rate * (time - time_maximal_velocity)
+}
+
+
+
+#' Instantaneous Distance During Sprint Running Decceleration Phase
+#'
+#' Estimates the instantaneous distance during the deceleration phase of a sprint run. The model is based on a constant rate of deceleration.
+#'
+#' @param time A vector of time points (in s)
+#' @param maximal_velocity A double representing the maximal velocity (in m/s)
+#' @param time_maximal_velocity A double representing the time at which maximal velocity is reached (in s)
+#' @param distance_maximal_velocity A double representing the distance at which maximal velocity is reached (in m)
+#' @param decel_rate A double representing the rate of deceleration (in m/s^2)
+#'
+#' @returns A vector of instantaneous distances (in m)
+#' @export
+#'
+#' @examples
+#' dec_distance_model(6:10, 10, 6, 60, 0.1)
+dec_distance_model <- function(time, maximal_velocity,  time_maximal_velocity, distance_maximal_velocity, decel_rate) {
+
+  v_decel <- dec_velocity_model(time, maximal_velocity, time_maximal_velocity, decel_rate)
+
+  dist <- (maximal_velocity + v_decel) * (time - time_maximal_velocity)/2 + distance_maximal_velocity
+
+  return(dist)
+}
+
+
+
+#' Instantaneous Velocity During Sprint Running (Acceleration and Deceleration phases)
+#'
+#'
+#' Estimates the instantaneous velocity during the acceleration and deceleration phases of a sprint run.
+#' The calculation is based on an exponential rise in velocity during the acceleration phase and a constant rate of deceleration during the deceleration phase.
+#'
+#' @param time A vector of time points (in s)
+#' @param time_maximal_velocity A double representing the time at which maximal velocity is reached (in s)
+#' @param maximal_velocity A double representing the maximal velocity (in m/s)
+#' @param tau A double representing the time constant of the exponential rise in velocity (in s)
+#' @param fitted_maximal_velocity A double representing the maximal velocity fitted using the model for instantaneous velocity in acceleration phase (in m/s)
+#' @param decel_rate A double representing the rate of deceleration (in m/s^2)
+#'
+#' @returns A vector of instantaneous velocities (in m/s)
+#' @export
+#'
+#' @examples
+#' velocity_sprint_model(1:10, 5, 10, 1.5, 10, 0.1)
+#'
+#'
+velocity_sprint_model <- function(time, time_maximal_velocity, maximal_velocity, tau, fitted_maximal_velocity, decel_rate) {
+  # Create a vector of the same length as time
+  result <- numeric(length(time))
+
+  # Apply acceleration model to times <= time_maximal_velocity
+  acc_indices <- which(time <= time_maximal_velocity)
+  if (length(acc_indices) > 0) {
+    result[acc_indices] <- acc_velocity_model(time[acc_indices], tau, fitted_maximal_velocity, reaction_time = 0)
+  }
+
+  # Apply deceleration model to times > time_maximal_velocity
+  decel_indices <- which(time > time_maximal_velocity)
+  if (length(decel_indices) > 0) {
+    result[decel_indices] <- dec_velocity_model(time[decel_indices], maximal_velocity, time_maximal_velocity, decel_rate)
+  }
+
+  return(result)
+}
+
+
+#' Instantaneous Acceleration During Sprint Running (Acceleration and Deceleration phases)
+#'
+#' Estimates the instantaneous acceleration during the acceleration and deceleration phases of a sprint run.
+#' The calculation is based on an exponential rise in velocity during the acceleration phase and a constant rate of deceleration during the deceleration phase.
+#'
+#' @param time A vector of time points (in s)
+#' @param time_maximal_velocity A double representing the time at which maximal velocity is reached (in s)
+#' @param fitted_maximal_velocity A double representing the maximal velocity fitted using the model for instantaneous velocity in acceleration phase (in m/s)
+#' @param tau A double representing the time constant of the exponential rise in velocity (in s)
+#' @param decel_rate A double representing the rate of deceleration (in m/s^2)
+#'
+#' @returns A vector of instantaneous accelerations (in m/s^2)
+#' @export
+#'
+#' @examples
+#' acceleration_sprint_model(1:10, 5, 10, 1.5, 0.1)
+#'
+acceleration_sprint_model <- function(time, time_maximal_velocity, fitted_maximal_velocity, tau, decel_rate) {
+  # Create a vector of the same length as time
+  result <- numeric(length(time))
+
+  # Calculate acceleration for times <= time_maximal_velocity
+  acc_indices <- which(time <= time_maximal_velocity)
+  if (length(acc_indices) > 0) {
+    result[acc_indices] <- (fitted_maximal_velocity - fitted_maximal_velocity *
+                              (1 - exp(-(time[acc_indices])/tau)))/tau
+  }
+
+  # Apply constant deceleration for times > time_maximal_velocity
+  decel_indices <- which(time > time_maximal_velocity)
+  if (length(decel_indices) > 0) {
+    result[decel_indices] <- -decel_rate
+  }
+
+  return(result)
+}
+
+
+#' Instantaneous Distance During Sprint Running (Acceleration and Deceleration phases)
+#'
+#' @param time A vector of time points (in s)
+#' @param time_maximal_velocity A double representing the time at which maximal velocity is reached (in s)
+#' @param maximal_velocity A double representing the maximal velocity (in m/s)
+#' @param distance_maximal_velocity  A double representing the distance at which maximal velocity is reached (in m)
+#' @param fitted_maximal_velocity A double representing the maximal velocity fitted using the model for instantaneous velocity in acceleration phase (in m/s)
+#' @param tau tau A double representing the time constant of the exponential rise in velocity (in s)
+#' @param decel_rate A double representing the rate of deceleration (in m/s^2)
+#'
+#' @returns A vector of instantaneous distances (in m)
+#' @export
+#'
+#' @examples
+#' distance_sprint_model(1:10, 5, 10, 50, 10, 1.5, 0.1)
+#'
+distance_sprint_model <- function(time, time_maximal_velocity, maximal_velocity, distance_maximal_velocity, fitted_maximal_velocity, tau, decel_rate) {
+  # Create a vector of the same length as time
+  result <- numeric(length(time))
+
+  # Apply acceleration distance model to times <= time_maximal_velocity
+  acc_indices <- which(time <= time_maximal_velocity)
+  if (length(acc_indices) > 0) {
+    result[acc_indices] <- acc_distance_model(time[acc_indices], tau, fitted_maximal_velocity)
+  }
+
+  # Apply deceleration distance model to times > time_maximal_velocity
+  decel_indices <- which(time > time_maximal_velocity)
+  if (length(decel_indices) > 0) {
+    result[decel_indices] <- dec_distance_model(time[decel_indices], maximal_velocity,
+                                                 time_maximal_velocity, distance_maximal_velocity, decel_rate)
+  }
+
+  return(result)
+}
