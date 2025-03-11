@@ -31,8 +31,5 @@ test_that("cost_running_sprint returns a vector of the same length as the input"
 
 
 test_that("cost_running_sprint negative acceleration returns a negative acceleration", {
-    expect_equal(cost_running_sprint(acceleration = -1, velocity = 1), 3.81)
-  })
-
-
-
+  expect_equal(cost_running_sprint(acceleration = -1, velocity = 1), 3.81)
+})

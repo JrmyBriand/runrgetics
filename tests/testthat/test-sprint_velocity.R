@@ -1,5 +1,3 @@
-
-
 test_that("find_time_velocity works with typical sprint data", {
   splits <- c(0, 1.88, 2.88, 3.78, 4.64, 5.47, 6.29, 7.10, 7.92, 8.74, 9.58)
   reaction_time <- 0.173
@@ -32,18 +30,18 @@ test_that("acc_velocity_model calculates correct velocities", {
   # Test basic functionality
   expect_equal(
     acc_velocity_model(time = 5, tau = 1, maximal_velocity = 10),
-    10 * (1 - exp(-5/1))
+    10 * (1 - exp(-5 / 1))
   )
 
   # Test with reaction time
   expect_equal(
     acc_velocity_model(time = 5, tau = 1, maximal_velocity = 10, reaction_time = 1),
-    10 * (1 - exp(-(5-1)/1))
+    10 * (1 - exp(-(5 - 1) / 1))
   )
 
   # Test vectorized input
   times <- c(1, 2, 3)
-  expected <- 10 * (1 - exp(-times/1))
+  expected <- 10 * (1 - exp(-times / 1))
   expect_equal(
     acc_velocity_model(times, tau = 1, maximal_velocity = 10),
     expected
@@ -61,12 +59,12 @@ test_that("acc_distance_model calculates correct distances", {
   # Test basic functionality
   expect_equal(
     acc_distance_model(time = 5, tau = 1, maximal_velocity = 10),
-    10 * (5 - 1 * (1 - exp(-5/1)))
+    10 * (5 - 1 * (1 - exp(-5 / 1)))
   )
 
   # Test vectorized input
   times <- c(1, 2, 3)
-  expected <- 10 * (times - 1 * (1 - exp(-times/1)))
+  expected <- 10 * (times - 1 * (1 - exp(-times / 1)))
   expect_equal(
     acc_distance_model(times, tau = 1, maximal_velocity = 10),
     expected
@@ -112,7 +110,7 @@ test_that("dec_distance_model calculates correct distances", {
   decel_rate <- 0.5
 
   v_decel <- dec_velocity_model(time, maximal_velocity, time_maximal_velocity, decel_rate)
-  expected <- (maximal_velocity + v_decel) * (time - time_maximal_velocity)/2 + distance_maximal_velocity
+  expected <- (maximal_velocity + v_decel) * (time - time_maximal_velocity) / 2 + distance_maximal_velocity
 
   expect_equal(
     dec_distance_model(time, maximal_velocity, time_maximal_velocity, distance_maximal_velocity, decel_rate),
@@ -122,7 +120,7 @@ test_that("dec_distance_model calculates correct distances", {
   # Test vectorized input
   times <- c(7, 8, 9)
   v_decels <- dec_velocity_model(times, maximal_velocity, time_maximal_velocity, decel_rate)
-  expected <- (maximal_velocity + v_decels) * (times - time_maximal_velocity)/2 + distance_maximal_velocity
+  expected <- (maximal_velocity + v_decels) * (times - time_maximal_velocity) / 2 + distance_maximal_velocity
 
   expect_equal(
     dec_distance_model(times, maximal_velocity, time_maximal_velocity, distance_maximal_velocity, decel_rate),
@@ -236,7 +234,7 @@ test_that("acceleration_sprint_model handles vector inputs correctly", {
   # Test acceleration phase
   acc_times <- times[times <= time_maximal_velocity]
   acc_results <- results[times <= time_maximal_velocity]
-  expected_acc <- (fitted_maximal_velocity - fitted_maximal_velocity * (1 - exp(-acc_times/tau)))/tau
+  expected_acc <- (fitted_maximal_velocity - fitted_maximal_velocity * (1 - exp(-acc_times / tau))) / tau
   expect_equal(acc_results, expected_acc)
 
   # Test deceleration phase
@@ -248,7 +246,7 @@ test_that("acceleration_sprint_model handles vector inputs correctly", {
   # At transition point
   expect_equal(
     acceleration_sprint_model(time_maximal_velocity, time_maximal_velocity, fitted_maximal_velocity, tau, decel_rate),
-    (fitted_maximal_velocity - fitted_maximal_velocity * (1 - exp(-time_maximal_velocity/tau)))/tau
+    (fitted_maximal_velocity - fitted_maximal_velocity * (1 - exp(-time_maximal_velocity / tau))) / tau
   )
 
   # Well after transition
@@ -305,4 +303,3 @@ test_that("distance_sprint_model handles vector inputs correctly", {
     dec_distance_model(8, maximal_velocity, time_maximal_velocity, distance_maximal_velocity, decel_rate)
   )
 })
-
