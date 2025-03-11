@@ -22,6 +22,6 @@ The observed slowdown in sprints is not due to a change in the runner's
 inclination of the center of mass but rather the inability to generate the required power.
 }
 \examples{
-cost_running_sprint(acceleration = c(2, 4, 5), velocity = c(2,4,5))
+cost_running_sprint(acceleration = c(2, 4, 5), velocity = c(2, 4, 5))
 
 }

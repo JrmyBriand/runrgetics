@@ -63,7 +63,7 @@ athlete <- "Merritt"
 
 event <- "Men's 400 m"
 
-merritt_400m <- dplyr::tibble(distance = distance, splits = splits, reaction_time = reaction_time, maximal_velocity = maximal_velocity, athlete = athlete, event = event)
+merritt_400m <- dplyr::tibble(distance = distance, splits = splits, velocity = velocity, reaction_time = reaction_time, maximal_velocity = maximal_velocity, athlete = athlete, event = event)
 
 
 # Fraser-Price 100 m -----
@@ -79,7 +79,7 @@ reaction_time <- 0.146
 
 maximal_velocity <- 10.58
 
-athlete <- "Fraser-Price"
+athlete <- "Fraser-Pryce"
 
 event <- "Women's 100 m"
 

@@ -259,3 +259,84 @@ distance_sprint_model <- function(time, time_maximal_velocity, maximal_velocity,
 
   return(result)
 }
+
+
+
+
+
+#' Average Velocity From Splits
+#'
+#'
+#' Computes average velocity over time intervals based on recorded time splits and their
+#' associated distances.
+#'
+#' @param splits a vector of time splits (in s)
+#' @param distances a vector of distances (in m)
+#'
+#' @returns a vector of average velocities (in m/s)
+#' @export
+#'
+#' @examples average_velocity_from_splits(c(0, 1.8), c(0, 10))
+average_velocity_from_splits <- function(splits, distances) {
+  # Calculate time intervals
+  time_intervals <- diff(splits)
+
+  # Calculate distance intervals
+  distance_intervals <- diff(distances)
+
+
+  velocities <- c(0,distance_intervals / time_intervals)
+
+  return(velocities)
+}
+
+
+
+
+#' Finding Acceleration Exponential Rise Time-Constant (tau)
+#'
+#' Computes the time constant of the exponential rise in velocity during the acceleration phase of a sprint run
+#' using vectors of assumed instantaneous velocities and times throughout the sprint acceleration.
+#'
+#' @param time A vector of time points (in s)
+#' @param velocity A vector of velocities (in s)
+#' @param reaction_time A double representing the reaction time (in s)
+#'
+#' @returns A double representing the time constant of the exponential rise in velocity (in s)
+#' @importFrom minpack.lm nlsLM
+#' @importFrom stats coef
+#' @export
+#'
+#' @examples find_tau(1:10, 1:10, 0.1)
+find_tau <- function(time, velocity, reaction_time){
+
+  mod_velocity <- minpack.lm::nlsLM(
+    velocity ~ acc_velocity_model(time, tau, vf, reaction_time = reaction_time),
+    start = list(tau = 0.5, vf = 12),
+    data = data.frame(time = time, velocity = velocity)
+  )
+
+  # extract value of tau
+  tau <- stats::coef(mod_velocity)[1]
+
+  return(tau)
+
+}
+
+
+#' Predicted Sprint Maximal Velocity
+#'
+#' @param maximal_velocity A double representing the maximal velocity (in m/s)
+#' @param tau A double representing the time constant of the exponential rise in velocity (in s)
+#' @param time_end_acceleration A double representing the time at which the acceleration phase ends (in s)
+#'
+#' @returns A double representing the predicted maximal velocity (in m/s)
+#' @export
+#'
+#' @examples predicted_maximal_velocity(10, 1.5, 5)
+predicted_maximal_velocity <- function(maximal_velocity, tau, time_end_acceleration){
+  predicted_maximal_velocity <- acc_velocity_model(time_end_acceleration, tau, maximal_velocity, reaction_time = 0)
+
+  return(predicted_maximal_velocity)
+}
+

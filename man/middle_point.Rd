@@ -20,5 +20,4 @@ Calculates the midpoint time within a given time interval.
 \examples{
 middle_point(2, 4)
 
-
 }

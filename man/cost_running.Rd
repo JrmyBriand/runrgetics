@@ -23,6 +23,6 @@ on gps data derived from athletes performing changes of directions in a team spo
 as in di Prampero and Osgnach (2018).
 }
 \examples{
-cost_running(acceleration = c(2, 4, 5), velocity = c(2,4,5))
+cost_running(acceleration = c(2, 4, 5), velocity = c(2, 4, 5))
 
 }
