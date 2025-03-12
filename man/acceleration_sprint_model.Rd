@@ -7,7 +7,7 @@
 acceleration_sprint_model(
   time,
   time_maximal_velocity,
-  fitted_maximal_velocity,
+  maximal_velocity,
   tau,
   decel_rate
 )
@@ -17,11 +17,11 @@ acceleration_sprint_model(
 
 \item{time_maximal_velocity}{A double representing the time at which maximal velocity is reached (in s)}
 
-\item{fitted_maximal_velocity}{A double representing the maximal velocity fitted using the model for instantaneous velocity in acceleration phase (in m/s)}
-
 \item{tau}{A double representing the time constant of the exponential rise in velocity (in s)}
 
 \item{decel_rate}{A double representing the rate of deceleration (in m/s^2)}
+
+\item{fitted_maximal_velocity}{A double representing the maximal velocity fitted using the model for instantaneous velocity in acceleration phase (in m/s)}
 }
 \value{
 A vector of instantaneous accelerations (in m/s^2)

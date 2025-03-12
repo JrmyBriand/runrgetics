@@ -4,14 +4,14 @@
 \alias{predicted_maximal_velocity}
 \title{Predicted Sprint Maximal Velocity}
 \usage{
-predicted_maximal_velocity(maximal_velocity, tau, time_end_acceleration)
+predicted_maximal_velocity(maximal_velocity, tau, time_maximal_velocity)
 }
 \arguments{
 \item{maximal_velocity}{A double representing the maximal velocity (in m/s)}
 
 \item{tau}{A double representing the time constant of the exponential rise in velocity (in s)}
 
-\item{time_end_acceleration}{A double representing the time at which the acceleration phase ends (in s)}
+\item{time_maximal_velocity}{A double representing the time at which the acceleration phase ends (in s)}
 }
 \value{
 A double representing the predicted maximal velocity (in m/s)

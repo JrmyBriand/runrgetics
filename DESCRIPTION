@@ -25,4 +25,5 @@ Depends:
 LazyData: true
 Imports: 
     minpack.lm,
-    stats
+    stats,
+    tibble

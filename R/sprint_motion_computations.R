@@ -171,13 +171,13 @@ velocity_sprint_model <- function(time, time_maximal_velocity, maximal_velocity,
   # Apply acceleration model to times <= time_maximal_velocity
   acc_indices <- which(time <= time_maximal_velocity)
   if (length(acc_indices) > 0) {
-    result[acc_indices] <- acc_velocity_model(time[acc_indices], tau, fitted_maximal_velocity, reaction_time = 0)
+    result[acc_indices] <- acc_velocity_model(time[acc_indices], tau, maximal_velocity, reaction_time = 0)
   }
 
   # Apply deceleration model to times > time_maximal_velocity
   decel_indices <- which(time > time_maximal_velocity)
   if (length(decel_indices) > 0) {
-    result[decel_indices] <- dec_velocity_model(time[decel_indices], maximal_velocity, time_maximal_velocity, decel_rate)
+    result[decel_indices] <- dec_velocity_model(time[decel_indices], fitted_maximal_velocity, time_maximal_velocity, decel_rate)
   }
 
   return(result)
@@ -201,14 +201,14 @@ velocity_sprint_model <- function(time, time_maximal_velocity, maximal_velocity,
 #' @examples
 #' acceleration_sprint_model(1:10, 5, 10, 1.5, 0.1)
 #'
-acceleration_sprint_model <- function(time, time_maximal_velocity, fitted_maximal_velocity, tau, decel_rate) {
+acceleration_sprint_model <- function(time, time_maximal_velocity, maximal_velocity, tau, decel_rate) {
   # Create a vector of the same length as time
   result <- numeric(length(time))
 
   # Calculate acceleration for times <= time_maximal_velocity
   acc_indices <- which(time <= time_maximal_velocity)
   if (length(acc_indices) > 0) {
-    result[acc_indices] <- (fitted_maximal_velocity - fitted_maximal_velocity *
+    result[acc_indices] <- (maximal_velocity - maximal_velocity *
       (1 - exp(-(time[acc_indices]) / tau))) / tau
   }
 
@@ -245,14 +245,14 @@ distance_sprint_model <- function(time, time_maximal_velocity, maximal_velocity,
   # Apply acceleration distance model to times <= time_maximal_velocity
   acc_indices <- which(time <= time_maximal_velocity)
   if (length(acc_indices) > 0) {
-    result[acc_indices] <- acc_distance_model(time[acc_indices], tau, fitted_maximal_velocity)
+    result[acc_indices] <- acc_distance_model(time[acc_indices], tau, maximal_velocity)
   }
 
   # Apply deceleration distance model to times > time_maximal_velocity
   decel_indices <- which(time > time_maximal_velocity)
   if (length(decel_indices) > 0) {
     result[decel_indices] <- dec_distance_model(
-      time[decel_indices], maximal_velocity,
+      time[decel_indices], fitted_maximal_velocity,
       time_maximal_velocity, distance_maximal_velocity, decel_rate
     )
   }
@@ -328,14 +328,14 @@ find_tau <- function(time, velocity, reaction_time){
 #'
 #' @param maximal_velocity A double representing the maximal velocity (in m/s)
 #' @param tau A double representing the time constant of the exponential rise in velocity (in s)
-#' @param time_end_acceleration A double representing the time at which the acceleration phase ends (in s)
+#' @param time_maximal_velocity A double representing the time at which the acceleration phase ends (in s)
 #'
 #' @returns A double representing the predicted maximal velocity (in m/s)
 #' @export
 #'
 #' @examples predicted_maximal_velocity(10, 1.5, 5)
-predicted_maximal_velocity <- function(maximal_velocity, tau, time_end_acceleration){
-  predicted_maximal_velocity <- acc_velocity_model(time_end_acceleration, tau, maximal_velocity, reaction_time = 0)
+predicted_maximal_velocity <- function(maximal_velocity, tau, time_maximal_velocity){
+  predicted_maximal_velocity <- acc_velocity_model(time_maximal_velocity, tau, maximal_velocity, reaction_time = 0)
 
   return(predicted_maximal_velocity)
 }

@@ -149,14 +149,14 @@ test_that("velocity_sprint_model combines acceleration and deceleration models c
 
   expect_equal(
     velocity_sprint_model(time, time_maximal_velocity, maximal_velocity, tau, fitted_maximal_velocity, decel_rate),
-    dec_velocity_model(time, maximal_velocity, time_maximal_velocity, decel_rate)
+    dec_velocity_model(time, fitted_maximal_velocity, time_maximal_velocity, decel_rate)
   )
 
   # Test at transition point
   time <- time_maximal_velocity
 
-  acc_value <- acc_velocity_model(time, tau, fitted_maximal_velocity)
-  decc_value <- dec_velocity_model(time, maximal_velocity, time_maximal_velocity, decel_rate)
+  acc_value <- acc_velocity_model(time, tau, maximal_velocity)
+  decc_value <- dec_velocity_model(time, fitted_maximal_velocity, time_maximal_velocity, decel_rate)
 
   # Verify smooth transition (values should be approximately equal at transition point)
   expect_equal(
@@ -190,20 +190,20 @@ test_that("velocity_sprint_model handles vector inputs correctly", {
   # Test acceleration phase
   acc_times <- times[times <= time_maximal_velocity]
   acc_results <- results[times <= time_maximal_velocity]
-  expected_acc <- acc_velocity_model(acc_times, tau, fitted_maximal_velocity, reaction_time = 0)
+  expected_acc <- acc_velocity_model(acc_times, tau, maximal_velocity, reaction_time = 0)
   expect_equal(acc_results, expected_acc)
 
   # Test deceleration phase
   decel_times <- times[times > time_maximal_velocity]
   decel_results <- results[times > time_maximal_velocity]
-  expected_decel <- dec_velocity_model(decel_times, maximal_velocity, time_maximal_velocity, decel_rate)
+  expected_decel <- dec_velocity_model(decel_times, fitted_maximal_velocity, time_maximal_velocity, decel_rate)
   expect_equal(decel_results, expected_decel)
 
   # Test single value inputs (edge cases)
   # At transition point
   expect_equal(
-    velocity_sprint_model(time_maximal_velocity, time_maximal_velocity, maximal_velocity, tau, fitted_maximal_velocity, decel_rate),
-    acc_velocity_model(time_maximal_velocity, tau, fitted_maximal_velocity, reaction_time = 0)
+    velocity_sprint_model(time_maximal_velocity, time_maximal_velocity, fitted_maximal_velocity, tau, fitted_maximal_velocity, decel_rate),
+    acc_velocity_model(time_maximal_velocity, tau, maximal_velocity, reaction_time = 0)
   )
 
   # Well before transition
@@ -223,12 +223,12 @@ test_that("acceleration_sprint_model handles vector inputs correctly", {
   # Setup test parameters
   times <- seq(1, 10, by = 0.5)
   time_maximal_velocity <- 5
-  fitted_maximal_velocity <- 10
+  maximal_velocity <- 10
   tau <- 1.5
   decel_rate <- 0.1
 
   # Get results
-  results <- acceleration_sprint_model(times, time_maximal_velocity, fitted_maximal_velocity, tau, decel_rate)
+  results <- acceleration_sprint_model(times, time_maximal_velocity, maximal_velocity, tau, decel_rate)
 
   # Test length of results matches input
   expect_equal(length(results), length(times))
@@ -236,7 +236,7 @@ test_that("acceleration_sprint_model handles vector inputs correctly", {
   # Test acceleration phase
   acc_times <- times[times <= time_maximal_velocity]
   acc_results <- results[times <= time_maximal_velocity]
-  expected_acc <- (fitted_maximal_velocity - fitted_maximal_velocity * (1 - exp(-acc_times / tau))) / tau
+  expected_acc <- (maximal_velocity - maximal_velocity * (1 - exp(-acc_times / tau))) / tau
   expect_equal(acc_results, expected_acc)
 
   # Test deceleration phase
@@ -247,13 +247,13 @@ test_that("acceleration_sprint_model handles vector inputs correctly", {
   # Test single value inputs (edge cases)
   # At transition point
   expect_equal(
-    acceleration_sprint_model(time_maximal_velocity, time_maximal_velocity, fitted_maximal_velocity, tau, decel_rate),
-    (fitted_maximal_velocity - fitted_maximal_velocity * (1 - exp(-time_maximal_velocity / tau))) / tau
+    acceleration_sprint_model(time_maximal_velocity, time_maximal_velocity, maximal_velocity, tau, decel_rate),
+    (maximal_velocity - maximal_velocity * (1 - exp(-time_maximal_velocity / tau))) / tau
   )
 
   # Well after transition
   expect_equal(
-    acceleration_sprint_model(8, time_maximal_velocity, fitted_maximal_velocity, tau, decel_rate),
+    acceleration_sprint_model(8, time_maximal_velocity, maximal_velocity, tau, decel_rate),
     -decel_rate
   )
 })
@@ -397,9 +397,9 @@ test_that("predicted_maximal_velocity calculates correctly", {
   }
 
   # Define a local predicted_maximal_velocity that uses our mock
-  test_env$predicted_maximal_velocity <- function(maximal_velocity, tau, time_end_acceleration) {
+  test_env$predicted_maximal_velocity <- function(maximal_velocity, tau, time_maximal_velocity) {
     predicted_maximal_velocity <- test_env$acc_velocity_model(
-      time_end_acceleration, tau, maximal_velocity, reaction_time = 0
+      time_maximal_velocity, tau, maximal_velocity, reaction_time = 0
     )
     return(predicted_maximal_velocity)
   }
@@ -479,9 +479,9 @@ test_that("functions handle edge cases properly", {
     return(vf * (1 - exp(-(time - reaction_time)/tau)))
   }
 
-  local_predicted_maximal_velocity <- function(maximal_velocity, tau, time_end_acceleration) {
+  local_predicted_maximal_velocity <- function(maximal_velocity, tau, time_maximal_velocity) {
     predicted_maximal_velocity <- local_acc_velocity_model(
-      time_end_acceleration, tau, maximal_velocity, reaction_time = 0
+      time_maximal_velocity, tau, maximal_velocity, reaction_time = 0
     )
     return(predicted_maximal_velocity)
   }
