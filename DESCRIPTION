@@ -24,6 +24,9 @@ Depends:
     R (>= 3.5)
 LazyData: true
 Imports: 
+    ggplot2,
     minpack.lm,
+    patchwork,
     stats,
-    tibble
+    tibble,
+    utils

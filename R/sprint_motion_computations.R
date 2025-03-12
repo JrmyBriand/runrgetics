@@ -191,7 +191,7 @@ velocity_sprint_model <- function(time, time_maximal_velocity, maximal_velocity,
 #'
 #' @param time A vector of time points (in s)
 #' @param time_maximal_velocity A double representing the time at which maximal velocity is reached (in s)
-#' @param fitted_maximal_velocity A double representing the maximal velocity fitted using the model for instantaneous velocity in acceleration phase (in m/s)
+#' @param maximal_velocity A double representing the maximal velocity fitted using the model for instantaneous velocity in acceleration phase (in m/s)
 #' @param tau A double representing the time constant of the exponential rise in velocity (in s)
 #' @param decel_rate A double representing the rate of deceleration (in m/s^2)
 #'
