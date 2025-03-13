@@ -1,0 +1,170 @@
+---
+title: "Sprint Motion Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Sprint Motion Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(runrgetics)
+library(dplyr)
+library(ggplot2)
+```
+
+# Sprint Motion Analysis
+
+Ajuster la taille de sortie des graphiques....
+
+The goal of this vignette is to provide a brief overview on the use of `runergetics` to analyze sprint motion based on Graubner and Nixdorf (2011) following the methodology detailed in a recent paper by Briand et al. (2025). (properly cite the package).
+
+## Sprint Data
+
+The package already includes s dataset `graubner_nixdorf_sprint` that contains the sprint data for the men's and women's 100, 200 and 400 m events at the Berlin 2009 World athletics championships. The same data sere used in the analysis by Briand et al. (2025) to propose a novel bioenergetic model of sprint running.
+
+```{r}
+head(graubner_nixdorf_sprints)
+```
+
+Data can be filtered depending on the event of interest. For example, to extract the data for Bolt's 100m. 
+
+```{r}
+bolt_100m <- graubner_nixdorf_sprints |> 
+  dplyr::filter(
+    athlete == "Bolt",
+    event == "Men's 100 m"
+  )
+
+bolt_100m
+```
+
+## Sprint Motion Analysis
+
+From the data by Grabner and Nixdrof (2011) present time-splits recorded over different distance intervals for the different sprint events. di Prampero et al. (2005, 2018) have proposed a method to estimate the instantaneous cost of running based on velocity and acceleration data. This method is useful to evaluate the energy cost of accelerated running by making an analogy between accelerated running and running up an "Equivalent-Slope" and using the energy cost of uphill as proposed by Minetti (2002). 
+From the energy cost of running the metabolic power can be computed as the product of the energy cost and running velocity. 
+To apply this method, we need to estimate the instantaneous velocity and acceleration of the runner using the avalailable information from Graubner and Nixdorf (2011). A simple model to obtain the instanatenous vlocity and acceleration during a sprint has been described by di Prampero et al. (2018) and Briand et al. (2025). The function `sprint_motion_model_data` can be used to extract intantaneous distance, velocity, acceleration and metabolic power from `graubner_nixdorf_sprints` data. the following code chunk shows how to extract the data for Bolt's 100m event.
+
+
+```{r}
+
+bolt_100m_motion_data <- sprint_motion_model_data(
+  mean_velocity_splits = bolt_100m$velocity,
+  time_splits = bolt_100m$splits,
+  distance = bolt_100m$distance,
+  reaction_time = bolt_100m$reaction_time[1],
+  maximal_velocity = bolt_100m$maximal_velocity[1]
+)
+
+head(bolt_100m_motion_data)
+
+
+```
+
+The function can be applied to any other event in the `graubner_nixdorf_sprints` dataset and to any external data sets that follow the same structure.
+
+The sprint analysis can be ploted. The following code chunk allows to visualize Bolt's 100m event modeled distance, velocity, acceleration and metabolic power, along with the actual data provided in the `graubner_nixdorf_sprints` dataset.
+
+```{r}
+plot_sprint_motion_analysis( mean_velocity_splits = bolt_100m$velocity,
+  time_splits = bolt_100m$splits,
+  distance = bolt_100m$distance,
+  reaction_time = bolt_100m$reaction_time[1],
+  maximal_velocity = bolt_100m$maximal_velocity[1])
+```
+
+The 100 m events in the Graubner and Nixdorf are the only events where a maximal velocity is recorded. For the 200 and 400 m events, the maximal velocity is not available in the `graubner_nixdorf_sprints` dataset. It is referred to an `NA`. It can be left empty in the function call, and the function will estimate the maximal velocity based on the available data. 
+
+Here is an exemple of the sprint motion data and plot analysis for the Men's 400 m.
+
+```{r}
+# filter Merrit's performance
+merritt_400m <- graubner_nixdorf_sprints  |> 
+  filter(
+    athlete == "Merritt",
+    event == "Men's 400 m")
+
+# extract sprint motion data
+merritt_400m_motion_data <- sprint_motion_model_data(
+  mean_velocity_splits = merritt_400m$velocity,
+  time_splits = merritt_400m$splits,
+  distance = merritt_400m$distance,
+  reaction_time = merritt_400m$reaction_time[1]
+)
+
+# Visualize sprint motion analysis
+
+plot_sprint_motion_analysis(
+  mean_velocity_splits = merritt_400m$velocity,
+  time_splits = merritt_400m$splits,
+  distance = merritt_400m$distance,
+  reaction_time = merritt_400m$reaction_time[1])
+
+```
+## Instantaneous Velocity and Power Sex Comparison
+
+In our article (Briand et al. 2025) proposing a novel bioenergetic model of sprint running, we generated plots comparing the instantaneous velocity and power for men's and women's 100, 200 and 400 m events, along with the velocity data from the Graubner and Nixdorf dataset. The functions `sex_comparison_plot_velocity` and `sex_comparison_plot_power` can be used to generate these plots.
+
+```{r}
+# Sex comparison plots for the 100 m
+
+# Extract the data for the 100 m
+men_100 <- graubner_nixdorf_sprints  |> 
+  filter(event == "Men's 100 m")
+
+women_100 <- graubner_nixdorf_sprints  |> 
+  filter(event == "Women's 100 m")
+
+# Get the sprint motion data for both men and women
+
+sprint_data_men_100 <- sprint_motion_model_data(
+  mean_velocity_splits = men_100$velocity,
+  time_splits = men_100$splits,
+  distance = men_100$distance,
+  reaction_time = men_100$reaction_time[1],
+  maximal_velocity = men_100$maximal_velocity[1]
+)
+
+sprint_data_women_100 <- sprint_motion_model_data(
+  mean_velocity_splits = women_100$velocity,
+  time_splits = women_100$splits,
+  distance = women_100$distance,
+  reaction_time = women_100$reaction_time[1],
+  maximal_velocity = women_100$maximal_velocity[1]
+)
+
+
+#Generate the plots
+
+sex_comparison_plot_velocity(
+  sprint_data_male = sprint_data_men_100,
+  sprint_data_female = sprint_data_women_100,
+  observed_data_male = men_100,
+  observed_data_female = women_100,
+  color = "darkgreen") + ggplot2::ggtitle("Sex Comparison of the 100 m Instantaneous Velocity")
+
+sex_comparison_plot_power(
+  sprint_data_male = sprint_data_men_100,
+  sprint_data_female = sprint_data_women_100
+) + ggplot2::ggtitle("Sex Comparison of the 100 m Instantaneous Metabolic Power")
+
+
+```
+
+The round points and solid line corresponds to the men's event, while the triangle points and dashed lines correspond to the women's event.
+
+The same approach can be repeated for the 200 and 400 m events, or any other events as long as data used have the correct structure.
+
+Now that we can analyze the sprint motion and the instanatneous metabolic power, we can move to the development of the sprint bioenergetic model to quantify instantaneous metabolic contributions from the anaeobic alactic, lactic and aerobic metabolisms.
+
+
+## References
+
+

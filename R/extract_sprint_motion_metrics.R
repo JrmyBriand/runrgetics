@@ -1,7 +1,7 @@
 
 
 
-#' Modeling Sprint Data (Motion metrics, cost of running and metbolic power)
+#' Sprint motion model data (motion metrics, cost of running and metbolic power)
 #'
 #' Compute the velocity, acceleration, distance, cost of running
 #' and power for a sprint event. Based on available time splits and velocity data
@@ -18,14 +18,14 @@
 #' @importFrom tibble tibble
 #' @export
 #'
-#' @examples sprint_model_data(mean_velocity_splits = c(0, 5.77, 9.99),
+#' @examples sprint_motion_model_data(mean_velocity_splits = c(0, 5.77, 9.99),
 #'                             time_splits = c(0, 1.88, 2.88),
 #'                             distance = c(0, 10, 20),
 #'                             reaction_time = 0.146,
 #'                             maximal_velocity = 12.34)
 #'
 #'
-sprint_model_data <- function(mean_velocity_splits, time_splits, distance, reaction_time , maximal_velocity = NA, dt = 0.01){
+sprint_motion_model_data <- function(mean_velocity_splits, time_splits, distance, reaction_time , maximal_velocity = NA, dt = 0.01){
 
   # 1. Times associated with velocities
 
@@ -69,7 +69,7 @@ sprint_model_data <- function(mean_velocity_splits, time_splits, distance, react
 
   # 9. calculate the velocity at each time point
 
-  modeled_velocity <- velocity_sprint_model(time_seq,
+  modeled_velocity <- sprint_velocity_model(time_seq,
                                             time_maximal_velocity = time_maximal_velocity,
                                             maximal_velocity = v_max,
                                             tau = tau,
@@ -78,7 +78,7 @@ sprint_model_data <- function(mean_velocity_splits, time_splits, distance, react
 
   # 10. Calculate the acceleration at each time point
 
-  modeled_acceleration <- acceleration_sprint_model(time_seq,
+  modeled_acceleration <- sprint_acceleration_model(time_seq,
                                                     time_maximal_velocity = time_maximal_velocity,
                                                     tau = tau,
                                                    maximal_velocity = v_max,
@@ -86,12 +86,12 @@ sprint_model_data <- function(mean_velocity_splits, time_splits, distance, react
 
   # 10.5 Calculate distance at wichi maximal velocity is attained
 
-  dist_max_velocity <- acc_distance_model(time_maximal_velocity, tau, v_max)
+  dist_max_velocity <- sprint_acc_distance_model(time_maximal_velocity, tau, v_max)
 
 
   # 11. Calculate the distance at each time point
 
-  modeled_distance <- distance_sprint_model(time_seq,
+  modeled_distance <- sprint_distance_model(time_seq,
                                             time_maximal_velocity = time_maximal_velocity,
                                             maximal_velocity = v_max,
                                             distance_maximal_velocity = dist_max_velocity,
