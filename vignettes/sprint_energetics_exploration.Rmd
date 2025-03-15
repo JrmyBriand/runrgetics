@@ -99,16 +99,68 @@ energy_total(acceleration_data)
 
 The total energy in the acceleration (~590 J/kg) is greater than the range of estimated maximal alactic capacity (310-390 J/kg) for World class male sprinters. This suggests that the anaerobic alactic energy system is not the only source of energy during the acceleration phase.
 
-### Adding aAerobic Contribution
+### Adding Aerobic Contribution
 
 While the aerobic contribution is small during the sprint acceleration phase, it nonetheless contributes to the total energy expanded. As in Briand et al. (2025), we can assume aerobic power to follow an exponentially rising function.
 
 $$
 P_{aer} = (MAP - BMR) \left(1 - e^{-\frac{t}{k_{aer}}}\right)
 $$
-Where $MAP$ corresponds to maximal aerobic power and can be fixed at 24.5 W/kg for males and 21 W/kg as in Briand et al. (2025). $BMR$ is the basal metabolic rate and can be fixed at 1.2 W/kg. $k_{aer}$ is the time constant of the exponential function and can be fixed at 23 s (cite di prampero etc.).
+Where $MAP$ corresponds to maximal aerobic power and can be fixed at 24.5 W/kg for males and 21 W/kg as in Briand et al. (2025). $BMR$ is the basal metabolic rate and can be fixed at 1.2 W/kg. $k_{aer}$ is the time constant of the exponential function and can be fixed at 23 s (cite di prampero etc.). The aerobic power contribution can be estimated using `sprint_approx_aerobic_power` function.
+
 
 The following chunk of computes the aerobic and anaerobic (difference between aerobic and total) power contribution to the total metabolic power of the acceleration. 
+
+```{r}
+# compute the aerobic power contribution
+
+acceleration_data <- acceleration_data |>
+  dplyr::mutate(
+    power_aerobic = sprint_approx_aerobic_power(time = time), 
+    power_anaerobic = power - power_aerobic
+  )
+
+
+# Compute the aerobic and anaerobic power contribution
+
+energy_aerobic <- energy_aerobic(acceleration_data)
+energy_anaerobic <- energy_anaerobic(acceleration_data)
+
+
+```
+
+During the acceleration phase, the aerobic energy expenditure is esimated to be `round(energy_aerobic, 2)` J/kg, while the anaerobic energy expenditure is estimated to be `round(energy_anaerobic, 2)` J/kg. The anaerobic energy expenditure is greater than the maximal anaerobic alactic capacity, suggesting that the anaerobic is not exclusively coming from alactic sources, but also from anaerobic lactic sources.
+
+### Considering Approximate Anaerobic Lactic Contribution
+
+Based on previous ork modelling energy contributions in sprint running, it can be assumed that anaerobic lactic power follows an exponential rising function in the sprint acceleration phase (see Briand et al. 2025). The maximum ($P_{an,max}$) of this rising function is attained at the end of the acceleration, around 5 s. It therefore has a very short time constant ($k_{an}$) of 2 s. 
+
+$$
+P_{an,accel} = P_{an,max} \left(1 - e^{-\frac{t}{k_{an}}}\right)
+$$
+The anaerobic lactic contribution can be estimated using the `sprint_acceleration_approx_lactic_power` function.
+
+The alactic contribution can be computed as the difference between the lactic contribution and the anaerobic contribution.
+
+```{r}
+
+# compute the aerobic power contribution
+
+acceleration_data <- acceleration_data |>
+  dplyr::mutate(
+    power_lactic = , 
+    power_alactic = power - power_aerobic,
+    
+  )
+
+
+# Compute the aerobic and anaerobic power contribution
+
+energy_aerobic <- energy_aerobic(acceleration_data)
+energy_anaerobic <- energy_anaerobic(acceleration_data)
+
+
+```
 
 
 

@@ -82,22 +82,51 @@ sprint_motion_deceleration_data <- function(sprint_motion_data){
 }
 
 
-# simple approaximate aerobic model
 
-sprint_approx_aerobic_power <- function(){
 
+#' Sprint Approximate Aerobic Power
+#'
+#' @param time A vector of time points (s)
+#' @param k_aer A double. Time constant of the exponential rise to the maximal aerobic power (s). Default is 23 s.
+#' @param maximal_aerobic_power A double. Maximal aerobic power (W/kg). Default is 24.5 W/kg corresponding to World class male sprinter observed MAP. The equivalent for female is 21 W/kg
+#' @param basal_metabolic_rate A double. Basal metabolic rate (W/kg). Default is 1.2 W/kg
+#'
+#' @returns A vector of the approximate aerobic power (W/kg) at each time point
+#' @export
+#'
+#' @examples
+#'
+#' sprint_approx_aerobic_power(time = seq(0, 10, by = 0.1))
+#'
+#'
+sprint_approx_aerobic_power <- function(time, k_aer = 23, maximal_aerobic_power = 24.5, basel_metabolic_rate = 1.2){
+
+  return((MAP-BMR) * (1 - exp(-time/k_aer)))
 
 }
 
-# simple approximate anaerobic lactic model
 
-sprint_acceleration_approx_lactic_power <- function(){
+#' Sprint Approximate Anaerobic Lactic Power (Acceleration)
+#'
+#' @param time A vector of time points (s)
+#' @param maximal_lactic_power A double corresponding to the maximal anaerobic lactic power (W/kg).
+#' @param k_an A double corresponding to th time constant (s) of the exponential rise to the approximate maximal lactic power. Default is 2 s.
+#'
+#' @returns A vector of the approximate anaerobic lactic power (W/kg) at each time point
+#' @export
+#'
+#' @examples
+#'
+#' sprint_acceleration_approx_lactic_power(time = seq(0, 10, by = 0.1), maximal_lactic_power = 10)
+#'
+sprint_acceleration_approx_lactic_power <- function(time, maximal_lactic_power, k_an = 2){
 
+
+  return(maximal_lactic_power * (1 - exp(-time/k_an)))
 
 }
 
 
-# Computation of the approximate contributions
 
 sprint_acceleration_approx_contributions <- function(){
 
