@@ -62,3 +62,42 @@ test_that("sprint_motion_model_data works with NA maximal_velocity", {
     NA  # Expect no error
   )
 })
+
+
+test_that("sprint_maximum_metabolic_power works correctly", {
+  # Test case 1: Basic data with obvious maximum
+  basic_data <- tibble::tibble(
+    time = c(1, 2, 3),
+    velocity = c(1, 2, 3),
+    acceleration = c(1, 1, 1),
+    distance = c(1, 3, 6),
+    cost_of_running = c(1, 2, 3),
+    power = c(10, 20, 30)
+  )
+
+  expect_equal(sprint_maximum_metabolic_power(basic_data), 30)
+
+  # Test case 2: Data with maximum not at the end
+  unordered_data <- tibble::tibble(
+    time = c(1, 2, 3),
+    velocity = c(1, 2, 3),
+    acceleration = c(1, 1, 1),
+    distance = c(1, 3, 6),
+    cost_of_running = c(1, 2, 3),
+    power = c(20, 40, 10)
+  )
+
+  expect_equal(sprint_maximum_metabolic_power(unordered_data), 40)
+
+  # Test case 3: All same values
+  constant_data <- tibble::tibble(
+    time = c(1, 2, 3),
+    velocity = c(1, 1, 1),
+    acceleration = c(0, 0, 0),
+    distance = c(1, 2, 3),
+    cost_of_running = c(5, 5, 5),
+    power = c(25, 25, 25)
+  )
+
+  expect_equal(sprint_maximum_metabolic_power(constant_data), 25)
+})

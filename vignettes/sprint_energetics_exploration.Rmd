@@ -1,0 +1,114 @@
+---
+title: "Sprint Energetics Exploration"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Sprint Energetics Exploration}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(runrgetics)
+library(dplyr)
+```
+
+# Sprint Energetics Exploration
+
+The goal of this vignette is to explore simple functions that explore sprint metabolic power to gradually develop a sprint bioenergetic model.
+
+`runrgetics` provides functions to estimate instantaneous metabolic power from sprint data, such as the `graubner_nixdorf_sprints`dataset, which contains time splits and average velocities over different distance intervals from the 100 m, 200 m, and 400 m sprint events at the 2009 World Athletics Championships in Berlin.
+
+A visual representation of the sprint motion data reveals metabolic peak powers attained within the first second of the sprint. These peaks are presumed to result from anaerobic alactic energy sources. The following chunk shows the metabolic power contribution as a function of time for the men's 100 m sprint event. 
+
+```{r}
+men_100 <- graubner_nixdorf_sprints  |>
+  dplyr::filter(event == "Men's 100 m")
+
+plot_sprint_metabolic_power(
+  mean_velocity_splits = men_100$velocity,
+  time_splits = men_100$splits,
+  distance = men_100$distance,
+  reaction_time = men_100$reaction_time[1],
+  maximal_velocity = men_100$maximal_velocity[1]
+)
+
+
+```
+
+For the men's 100 m, the metabolic power peak reaches nearly 160 W/kg
+
+```{r}
+
+# extract sprint motion data for the 100 m
+sprint_data_100 <- sprint_motion_model_data(
+  mean_velocity_splits = men_100$velocity,
+  time_splits = men_100$splits,
+  distance = men_100$distance,
+  reaction_time = men_100$reaction_time[1],
+  maximal_velocity = men_100$maximal_velocity[1]
+)
+
+# calculate maximal power  
+maximal_power_100 <- sprint_maximum_metabolic_power(sprint_data_100)
+maximal_power_100
+```
+
+To model the energy contribution of the anaerobic alactic, lactic and aerobic metabolism, we can start with some exploration to define the approximate contribution of the energy system over a sprint. 
+
+## Assumptions of the Maximal Anaerobic Alactic and Anaerobic Lactic Capacity
+
+To drive this exploration, estimations have to be made on the maximal anaerobic lactic and maximal anerobic alactic capacities. For world class male and female elite sprinters, we can estimate the maximal anaerobic alactic capacity to range between 310 and 390 J/kg for male and between 230 and 290 J/kg for female athletes. The maximal anaerobic lactic capacity can be estimated to be in the magnitude of 1250 J/kg for male and 1150 J/kg for female, corresponding to a blood lactatate accumulation of 20 mmol/L. The derivation of these estimates is provided in ful lenght in the articles by Briand et al. (2025) and di Prampero and Osgnach (2018).
+
+## Approximate Energy Distribution of the Sprint Acceleration Phase
+
+The use of anaerobic alactic energy is mostly present in the sprint acceleration. It is therefore worth analysing the acceleration and deceleration phase of the sprint separately. 
+
+The following chunk of code shows how functions from `runergetics`can be used to separate the sprint motion data (instantaneous distance, velocity, acceleration and power) into two distinct data frames, one for the acceleration and one for the deceleration.
+
+```{r}
+# extract acceleration data
+
+acceleration_data <- sprint_motion_acceleration_data(sprint_data_100)
+head(acceleration_data)
+
+# extract deceleration data
+
+deceleration_data <- sprint_motion_deceleration_data(sprint_data_100)
+head(deceleration_data)
+
+```
+
+### add plot of acceleration and deceleration phases...
+
+
+We can now make the assumption that all the energy expanded during the acceleration comes form anaerobic alactic sources. We can estimate this quantity by taking the intergal of the acceleration metabolic power using the `runergetics` function `energy_total`.
+
+```{r}
+# Estimate the total energy expanded during the acceleration phase
+
+energy_total(acceleration_data)
+
+```
+
+The total energy in the acceleration (~590 J/kg) is greater than the range of estimated maximal alactic capacity (310-390 J/kg) for World class male sprinters. This suggests that the anaerobic alactic energy system is not the only source of energy during the acceleration phase.
+
+### Adding aAerobic Contribution
+
+While the aerobic contribution is small during the sprint acceleration phase, it nonetheless contributes to the total energy expanded. As in Briand et al. (2025), we can assume aerobic power to follow an exponentially rising function.
+
+$$
+P_{aer} = (MAP - BMR) \left(1 - e^{-\frac{t}{k_{aer}}}\right)
+$$
+Where $MAP$ corresponds to maximal aerobic power and can be fixed at 24.5 W/kg for males and 21 W/kg as in Briand et al. (2025). $BMR$ is the basal metabolic rate and can be fixed at 1.2 W/kg. $k_{aer}$ is the time constant of the exponential function and can be fixed at 23 s (cite di prampero etc.).
+
+The following chunk of computes the aerobic and anaerobic (difference between aerobic and total) power contribution to the total metabolic power of the acceleration. 
+
+
+

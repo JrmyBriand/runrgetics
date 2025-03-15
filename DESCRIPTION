@@ -30,6 +30,7 @@ Imports:
     ggplot2,
     minpack.lm,
     patchwork,
+    pracma,
     stats,
     tibble,
     utils

@@ -119,3 +119,35 @@ sprint_motion_model_data <- function(mean_velocity_splits, time_splits, distance
 
 }
 
+
+#' Maximum Matebolic Power
+#'
+#' Computes the maximal metabolic power generated during a sprint event.
+#'
+#' @param sprint_motion_data A tibble with the following columns: time, velocity, acceleration, distance, cost of running and power
+#'
+#' @returns A double with the maximal metabolic power (W/kg)
+#' @export
+#'
+#' @examples
+#' # Extract the data for the 100 m
+#' men_100 <- graubner_nixdorf_sprints  |>
+#'   dplyr::filter(event == "Men's 100 m")
+#'
+#'
+#' # Get the sprint motion data for both men and women
+#'
+#' sprint_data <- sprint_motion_model_data(
+#'   mean_velocity_splits = men_100$velocity,
+#'   time_splits = men_100$splits,
+#'   distance = men_100$distance,
+#'   reaction_time = men_100$reaction_time[1],
+#'   maximal_velocity = men_100$maximal_velocity[1]
+#' )
+#'
+#' sprint_maximum_metabolic_power(sprint_data)
+#'
+sprint_maximum_metabolic_power <- function(sprint_motion_data){
+  max(sprint_motion_data$power)
+}
+
