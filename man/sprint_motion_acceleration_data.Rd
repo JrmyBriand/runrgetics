@@ -20,7 +20,7 @@ to the sprint acceleration phase. The sprint motion data can be computed with th
 \examples{
 
 # Extract the data for the 100 m
-men_100 <- graubner_nixdorf_sprints  |>
+men_100 <- graubner_nixdorf_sprints |>
   dplyr::filter(event == "Men's 100 m")
 
 
@@ -35,6 +35,5 @@ sprint_data <- sprint_motion_model_data(
 )
 
 sprint_motion_acceleration_data(sprint_data)
-
 
 }

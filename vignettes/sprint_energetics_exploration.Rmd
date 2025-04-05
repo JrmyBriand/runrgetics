@@ -129,7 +129,7 @@ energy_anaerobic <- energy_anaerobic(acceleration_data)
 
 ```
 
-During the acceleration phase, the aerobic energy expenditure is esimated to be `round(energy_aerobic, 2)` J/kg, while the anaerobic energy expenditure is estimated to be `round(energy_anaerobic, 2)` J/kg. The anaerobic energy expenditure is greater than the maximal anaerobic alactic capacity, suggesting that the anaerobic is not exclusively coming from alactic sources, but also from anaerobic lactic sources.
+During the acceleration phase, the aerobic energy expenditure is estimated to be `r round(energy_aerobic, 2)` J/kg, while the anaerobic energy expenditure is estimated to be `r round(energy_anaerobic, 2)` J/kg. The anaerobic energy expenditure is greater than the maximal anaerobic alactic capacity, suggesting that the anaerobic is not exclusively coming from alactic sources, but also from anaerobic lactic sources.
 
 ### Considering Approximate Anaerobic Lactic Contribution
 
@@ -143,24 +143,51 @@ The anaerobic lactic contribution can be estimated using the `sprint_acceleratio
 The alactic contribution can be computed as the difference between the lactic contribution and the anaerobic contribution.
 
 ```{r}
+#estimate the maximal lactic power as the anaerobic power at the end of the acceleration
 
+maximal_lactic_power <- acceleration_data$power_anaerobic[nrow(acceleration_data)]
 # compute the aerobic power contribution
 
 acceleration_data <- acceleration_data |>
   dplyr::mutate(
-    power_lactic = , 
-    power_alactic = power - power_aerobic,
+    power_lactic = sprint_acceleration_approx_lactic_power(time = time, maximal_lactic_power = maximal_lactic_power), 
+    power_alactic = power_anaerobic - power_lactic,
     
   )
 
 
 # Compute the aerobic and anaerobic power contribution
 
-energy_aerobic <- energy_aerobic(acceleration_data)
-energy_anaerobic <- energy_anaerobic(acceleration_data)
+energy_lactic <- energy_lactic(acceleration_data)
+energy_alactic <- energy_alactic(acceleration_data)
 
 
 ```
+
+Folowing the previous calculations, during the acceleration phase, the anaerobic lactic energy expenditure is estimated to be `r round(energy_lactic, 2)` J/kg, while the anaerobic alactic energy expenditure is estimated to be `r round(energy_alactic, 2)` J/kg. The anaerobic alactic expenditure is within the estimated maximal alactic capacity, suggesting that the proposed energy distribution for the 3 metabolisms is realistic.
+
+## Approximate Distribution of the Deceleration Phase
+
+Following the acceleration, the aerobic power contribution is expected to continue increasing following the same exponentially rising function. We can assume that the anaerobic alactic power contribution decreases and reach a null contribution at the end of the race. The anaerobic lactic contribution presents the remaining power of the total metabolic power. 
+
+Following these assumptions, the function `sprint_approx_distribution`calculates both the acceleration and deceleration phases aprroximate distributions to provide a global approximate distribution of the energy systems to total power over the whole sprint.
+
+```{r}
+# compute the approximate distribution of the energy systems
+
+sprint_approx_power_distribution <- sprint_approx_power_distributions(sprint_data_100)
+head(sprint_approx_power_distribution)
+
+```
+
+We can compute the aprroximate energy contribution from the three metabolic pathways. 
+
+```{r}
+energy_lactic <- energy_lactic(sprint_approx_power_distribution)
+energy_alactic <- energy_alactic(sprint_approx_power_distribution)
+energy_aerobic <- energy_aerobic(sprint_approx_power_distribution)
+```
+
 
 
 

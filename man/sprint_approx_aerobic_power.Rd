@@ -8,7 +8,7 @@ sprint_approx_aerobic_power(
   time,
   k_aer = 23,
   maximal_aerobic_power = 24.5,
-  basel_metabolic_rate = 1.2
+  basal_metabolic_rate = 1.2
 )
 }
 \arguments{
@@ -16,7 +16,7 @@ sprint_approx_aerobic_power(
 
 \item{k_aer}{A double. Time constant of the exponential rise to the maximal aerobic power (s). Default is 23 s.}
 
-\item{maximal_aerobic_power}{A double. Maximal aerobic power (W/kg). Default is 24.5 W/kg corresponding to World class male sprinter observed MAP. The equivalent for female is 21 W/kg}
+\item{maximal_aerobic_power}{A double. Maximal aerobic power or MAP (W/kg). Default is 24.5 W/kg corresponding to World class male sprinter observed MAP. The equivalent for female is 21 W/kg}
 
 \item{basal_metabolic_rate}{A double. Basal metabolic rate (W/kg). Default is 1.2 W/kg}
 }
@@ -29,6 +29,5 @@ Sprint Approximate Aerobic Power
 \examples{
 
 sprint_approx_aerobic_power(time = seq(0, 10, by = 0.1))
-
 
 }

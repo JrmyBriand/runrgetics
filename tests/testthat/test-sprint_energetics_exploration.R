@@ -1,4 +1,5 @@
 # test-sprint-motion-data.R
+library(mockery)
 
 test_that("sprint_motion_acceleration_data works correctly", {
   # Create sample data
@@ -121,6 +122,61 @@ test_that("functions respond to parameter changes", {
   fast_rise <- sprint_acceleration_approx_lactic_power(time = 2, maximal_lactic_power = 10, k_an = 1)
   slow_rise <- sprint_acceleration_approx_lactic_power(time = 2, maximal_lactic_power = 10, k_an = 3)
   expect_true(fast_rise > slow_rise)
+})
+
+test_that("sprint_approx_power_distributions basic functionality", {
+  # Create minimal test data - just one row to minimize complexity
+  mock_data <- tibble::tibble(
+    time = 1,
+    velocity = 1,
+    acceleration = 1,
+    distance = 1,
+    cost_of_running = 10,
+    power = 20
+  )
+
+  # For single-row data, both acceleration and deceleration should use the same row
+  mockery::stub(sprint_approx_power_distributions, "sprint_motion_acceleration_data",
+                function(data) {
+                  data$power_aerobic <- 10
+                  data$power_anaerobic <- 10
+                  return(data)
+                })
+
+  # Make sure deceleration data has the time column and all needed properties
+  mockery::stub(sprint_approx_power_distributions, "sprint_motion_deceleration_data",
+                function(data) {
+                  # Return a tibble with all necessary columns
+                  return(tibble::tibble(
+                    time = 1,
+                    velocity = 1,
+                    acceleration = 1,
+                    distance = 1,
+                    cost_of_running = 10,
+                    power = 20,
+                    power_aerobic = 10,
+                    power_anaerobic = 10
+                  ))
+                })
+
+  mockery::stub(sprint_approx_power_distributions, "sprint_approx_aerobic_power",
+                function(...) 10)
+
+  mockery::stub(sprint_approx_power_distributions, "sprint_acceleration_approx_lactic_power",
+                function(...) 5)
+
+  # Run the function with error handling
+  result <- tryCatch({
+    sprint_approx_power_distributions(mock_data)
+  }, error = function(e) {
+    # Return the error message for debugging
+    return(paste("ERROR:", e$message))
+  })
+
+  # We just want to check if the function runs without error
+  # If it's a character string, it's an error message
+  expect_false(is.character(result),
+               info = ifelse(is.character(result), result, "Function ran successfully"))
 })
 
 
