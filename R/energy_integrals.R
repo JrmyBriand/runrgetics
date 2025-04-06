@@ -24,7 +24,7 @@
 #'
 energy_total <- function(data) {
   # Ensure the data are sorted by time
-  data <- data %>% arrange(time)
+  data <- data |>  arrange(time)
 
   # Use the trapezoidal rule to calculate the integral of power over time
   integral <- pracma::trapz(data$time, data$power)
@@ -53,7 +53,7 @@ energy_total <- function(data) {
 #'
 energy_aerobic <- function(data) {
   # Ensure the data are sorted by time
-  data <- data %>% arrange(time)
+  data <- data |>  arrange(time)
 
   # Use the trapezoidal rule to calculate the integral of power over time
   integral <- pracma::trapz(data$time, data$power_aerobic)
@@ -82,7 +82,7 @@ energy_aerobic <- function(data) {
 #'
 energy_anaerobic <- function(data) {
   # Ensure the data are sorted by time
-  data <- data %>% arrange(time)
+  data <- data |>  arrange(time)
 
   # Use the trapezoidal rule to calculate the integral of power over time
   integral <- pracma::trapz(data$time, data$power_anaerobic)
@@ -112,7 +112,7 @@ energy_anaerobic <- function(data) {
 #'
 energy_lactic <- function(data) {
   # Ensure the data are sorted by time
-  data <- data %>% arrange(time)
+  data <- data |>  arrange(time)
 
   # Use the trapezoidal rule to calculate the integral of power over time
   integral <- pracma::trapz(data$time, data$power_lactic)
@@ -142,7 +142,7 @@ energy_lactic <- function(data) {
 #'
 energy_alactic <- function(data) {
   # Ensure the data are sorted by time
-  data <- data %>% arrange(time)
+  data <- data |> arrange(time)
 
   # Use the trapezoidal rule to calculate the integral of power over time
   integral <- pracma::trapz(data$time, data$power_alactic)
@@ -150,6 +150,142 @@ energy_alactic <- function(data) {
   return(integral)
 }
 
+
+#' Alactic Energy Percentage
+#'
+#' Computes the percentage of the total energy expenditure that is attributed to anaerobic alactic energy pathway.
+#'
+#' @param data A tibble with a time series of alactic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_alactic (W/kg)
+#'
+#' @returns A double representing the percentage (%) of anaerobic alactic energy expenditure relative to total energy expenditure.
+#' @export
+#'
+#'
+#' @examples
+#'
+#' data <- tibble::tibble(
+#' time = c(0, 1, 2, 3, 4),
+#' power = c(0, 1, 2, 1, 0),
+#' power_alactic = c(0, 0.5, 1, 0.5, 0))
+#'
+#' alactic_energy_percentage(data)
+#'
+#'
+alactic_energy_percentage <- function(data){
+  # Calculate the total energy expenditure
+  total_energy <- energy_total(data)
+
+  # Calculate the anaerobic alactic energy expenditure
+  alactic_energy <- energy_alactic(data)
+
+  # Calculate the percentage of anaerobic alactic energy
+  percentage <- (alactic_energy / total_energy) * 100
+
+  return(percentage)
+
+}
+
+#' Lactic Energy Percentage
+#'
+#' Computes the percentage of the total energy expenditure that is attributed to anaerobic lactic energy pathway.
+#'
+#' @param data A tibble with a time series of alactic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_lactic (W/kg)
+#'
+#' @returns A double representing the percentage (%) of anaerobic lactic energy expenditure relative to total energy expenditure.
+#' @export
+#'
+#'
+#' @examples
+#'
+#' data <- tibble::tibble(
+#' time = c(0, 1, 2, 3, 4),
+#' power = c(0, 1, 2, 1, 0),
+#' power_lactic = c(0, 0.5, 1, 0.5, 0))
+#'
+#' lactic_energy_percentage(data)
+#'
+#'
+lactic_energy_percentage <- function(data){
+  # Calculate the total energy expenditure
+  total_energy <- energy_total(data)
+
+  # Calculate the anaerobic lactic energy expenditure
+  lactic_energy <- energy_lactic(data)
+
+  # Calculate the percentage of anaerobic lactic energy
+  percentage <- (lactic_energy / total_energy) * 100
+
+  return(percentage)
+
+}
+
+#' Anaerobic Energy Percentage
+#'
+#' Computes the percentage of the total energy expenditure that is attributed to anaerobic energy pathways.
+#'
+#' @param data A tibble with a time series of anaerobic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_anaerobic (W/kg)
+#'
+#' @returns A double representing the percentage (%) of anaerobic energy expenditure relative to total energy expenditure.
+#' @export
+#'
+#'
+#' @examples
+#'
+#' data <- tibble::tibble(
+#' time = c(0, 1, 2, 3, 4),
+#' power = c(0, 1, 2, 1, 0),
+#' power_anaerobic = c(0, 0.5, 1, 0.5, 0))
+#'
+#' anaerobic_energy_percentage(data)
+#'
+#'
+anaerobic_energy_percentage <- function(data){
+  # Calculate the total energy expenditure
+  total_energy <- energy_total(data)
+
+  # Calculate the anaerobic energy expenditure
+  anaerobic_energy <- energy_anaerobic(data)
+
+  # Calculate the percentage of anaerobic energy
+  percentage <- (anaerobic_energy / total_energy) * 100
+
+  return(percentage)
+
+}
+
+#' Aerobic Energy Percentage
+#'
+#' Computes the percentage of the total energy expenditure that is attributed to aerobic energy pathway.
+#'
+#' @param data A tibble with a time series of aerobic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_aerobic (W/kg)
+#'
+#' @returns A double representing the percentage (%) of anaerobic aerobic energy expenditure relative to total energy expenditure.
+#' @export
+#'
+#'
+#' @examples
+#'
+#' data <- tibble::tibble(
+#' time = c(0, 1, 2, 3, 4),
+#' power = c(0, 1, 2, 1, 0),
+#' power_aerobic = c(0, 0.5, 1, 0.5, 0))
+#'
+#' aerobic_energy_percentage(data)
+#'
+#'
+aerobic_energy_percentage <- function(data){
+  # Calculate the total energy expenditure
+  total_energy <- energy_total(data)
+
+  # Calculate the aerobic energy expenditure
+  aerobic_energy <- energy_aerobic(data)
+
+  # Calculate the percentage of aerobic energy
+  percentage <- (aerobic_energy / total_energy) * 100
+
+  return(percentage)
+
+}
 
 
 

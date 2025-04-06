@@ -195,7 +195,19 @@ plot approximate power distribution ......
 
 ### Relative Energy Contributions
 
-Calcluate relative energy contributions in percentages.....
+The percentage of the anaerobic alactic, anaerobic lactic, anaerobic and aerobic energy expenditure relative to the total energy expenditure can be calculated using the `alactic_energy_percentgae`, `lactic_energy_percentage`, `anaerobic_energy_percentage` and `aerobic_energy_percentage` functions. 
+
+```{r}
+# compute the relative energy contributions
+alactic_energy_percentage <- alactic_energy_percentage(sprint_approx_power_distribution)
+lactic_energy_percentage <- lactic_energy_percentage(sprint_approx_power_distribution)
+anaerobic_energy_percentage <- anaerobic_energy_percentage(sprint_approx_power_distribution)
+
+aerobic_energy_percentage <- aerobic_energy_percentage(sprint_approx_power_distribution)
+
+```
+
+The anaerobic alactic energy expenditure is estimated to be `r round(alactic_energy_percentage, 2)` % of the total energy expenditure, while the anaerobic lactic energy expenditure is estimated to be `r round(lactic_energy_percentage, 2)` % of the total energy expenditure. The aerobic energy expenditure is estimated to be `r round(aerobic_energy_percentage, 2)` % of the total energy expenditure. The anaerobic energy pathways energy expenditure is estimated to be `r round(anaerobic_energy_percentage, 2)` % of the total energy expenditure.
 
 
 ## Alactic Power Model

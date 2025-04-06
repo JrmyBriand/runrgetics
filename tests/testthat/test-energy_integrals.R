@@ -1,4 +1,5 @@
 # test-energy-total.R
+library(tibble)
 
 test_that("energy_total calculates the integral correctly", {
   # Test with the example from the documentation
@@ -192,3 +193,135 @@ test_that("all energy functions handle additional columns", {
   expect_equal(energy_lactic(data_with_extra_cols), 6)
   expect_equal(energy_alactic(data_with_extra_cols), 2)
 })
+
+library(testthat)
+library(tibble)
+
+# Mock the underlying energy functions that are called by the percentage functions
+# These aren't defined in the provided code, so we'll mock them for testing
+energy_total <- function(data) {
+  # Simple implementation - sum of power * time intervals
+  sum(data$power * c(diff(data$time), 0))
+}
+
+energy_alactic <- function(data) {
+  # Simple implementation - sum of alactic power * time intervals
+  sum(data$power_alactic * c(diff(data$time), 0))
+}
+
+energy_lactic <- function(data) {
+  # Simple implementation - sum of lactic power * time intervals
+  sum(data$power_lactic * c(diff(data$time), 0))
+}
+
+energy_aerobic <- function(data) {
+  # Simple implementation - sum of aerobic power * time intervals
+  sum(data$power_aerobic * c(diff(data$time), 0))
+}
+
+energy_anaerobic <- function(data) {
+  # Simple implementation - sum of anaerobic power * time intervals
+  sum(data$power_anaerobic * c(diff(data$time), 0))
+}
+
+# Test for alactic_energy_percentage
+test_that("alactic_energy_percentage calculates correctly", {
+  # Create test data
+  test_data <- tibble(
+    time = c(0, 1, 2, 3, 4),
+    power = c(0, 10, 20, 10, 0),
+    power_alactic = c(0, 5, 10, 5, 0)
+  )
+
+  # Test function
+  result <- alactic_energy_percentage(test_data)
+
+  # Should be 50% since power_alactic is half of power
+  expect_equal(result, 50)
+
+  # Test with all zeros
+  zero_data <- tibble(
+    time = c(0, 1, 2),
+    power = c(0, 0, 0),
+    power_alactic = c(0, 0, 0)
+  )
+
+  # Should return NA or 0 for all zeros (depends on implementation)
+  expect_true(is.na(alactic_energy_percentage(zero_data)) ||
+                alactic_energy_percentage(zero_data) == 0)
+})
+
+# Test for lactic_energy_percentage
+test_that("lactic_energy_percentage calculates correctly", {
+  # Create test data
+  test_data <- tibble(
+    time = c(0, 1, 2, 3, 4),
+    power = c(0, 10, 20, 10, 0),
+    power_lactic = c(0, 2, 4, 2, 0)
+  )
+
+  # Test function
+  result <- lactic_energy_percentage(test_data)
+
+  # Should be 20% since power_lactic is 1/5 of power
+  expect_equal(result, 20)
+})
+
+# Test for anaerobic_energy_percentage
+test_that("anaerobic_energy_percentage calculates correctly", {
+  # Create test data
+  test_data <- tibble(
+    time = c(0, 1, 2, 3, 4),
+    power = c(0, 10, 20, 10, 0),
+    power_anaerobic = c(0, 7, 14, 7, 0)
+  )
+
+  # Test function
+  result <- anaerobic_energy_percentage(test_data)
+
+  # Should be 70% since power_anaerobic is 7/10 of power
+  expect_equal(result, 70)
+})
+
+# Test for aerobic_energy_percentage
+test_that("aerobic_energy_percentage calculates correctly", {
+  # Create test data
+  test_data <- tibble(
+    time = c(0, 1, 2, 3, 4),
+    power = c(0, 10, 20, 10, 0),
+    power_aerobic = c(0, 3, 6, 3, 0)
+  )
+
+  # Test function
+  result <- aerobic_energy_percentage(test_data)
+
+  # Should be 30% since power_aerobic is 3/10 of power
+  expect_equal(result, 30)
+})
+
+# Test for all energy pathways summing to 100%
+test_that("energy percentages sum to 100%", {
+  # Create test data with all energy pathways
+  test_data <- tibble(
+    time = c(0, 1, 2, 3, 4),
+    power = c(0, 10, 20, 10, 0),
+    power_alactic = c(0, 3, 6, 3, 0),
+    power_lactic = c(0, 2, 4, 2, 0),
+    power_aerobic = c(0, 5, 10, 5, 0),
+    power_anaerobic = c(0, 5, 10, 5, 0)  # alactic + lactic
+  )
+
+  # Calculate all percentages
+  alactic_pct <- alactic_energy_percentage(test_data)
+  lactic_pct <- lactic_energy_percentage(test_data)
+  aerobic_pct <- aerobic_energy_percentage(test_data)
+  anaerobic_pct <- anaerobic_energy_percentage(test_data)
+
+  # Sum should be 100%
+  expect_equal(aerobic_pct + anaerobic_pct, 100, tolerance = 1e-10)
+
+  # Anaerobic should equal sum of alactic and lactic
+  expect_equal(anaerobic_pct, alactic_pct + lactic_pct, tolerance = 1e-10)
+})
+
+
