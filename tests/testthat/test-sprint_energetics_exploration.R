@@ -73,11 +73,11 @@ test_that("sprint_motion_functions handle edge cases correctly", {
 
 # Fixed function definitions to use in tests
 sprint_approx_aerobic_power <- function(time, k_aer = 23, maximal_aerobic_power = 24.5, basal_metabolic_rate = 1.2) {
-  return((maximal_aerobic_power - basal_metabolic_rate) * (1 - exp(-time/k_aer)) + basal_metabolic_rate)
+  return((maximal_aerobic_power - basal_metabolic_rate) * (1 - exp(-time / k_aer)) + basal_metabolic_rate)
 }
 
 sprint_acceleration_approx_lactic_power <- function(time, maximal_lactic_power, k_an = 2) {
-  return(maximal_lactic_power * (1 - exp(-time/k_an)))
+  return(maximal_lactic_power * (1 - exp(-time / k_an)))
 }
 
 # Very basic tests for sprint_approx_aerobic_power
@@ -86,14 +86,14 @@ test_that("sprint_approx_aerobic_power basic functionality", {
   result <- sprint_approx_aerobic_power(time = 10)
   expect_type(result, "double")
   expect_length(result, 1)
-  expect_true(result > 1.2)  # Greater than basal rate
-  expect_true(result < 24.5)  # Less than maximal power
+  expect_true(result > 1.2) # Greater than basal rate
+  expect_true(result < 24.5) # Less than maximal power
 
   # Test vector input
   times <- c(0, 5, 10)
   results <- sprint_approx_aerobic_power(times)
   expect_length(results, 3)
-  expect_equal(results[1], 1.2)  # At t=0, should equal basal rate
+  expect_equal(results[1], 1.2) # At t=0, should equal basal rate
 })
 
 # Very basic tests for sprint_acceleration_approx_lactic_power
@@ -102,14 +102,14 @@ test_that("sprint_acceleration_approx_lactic_power basic functionality", {
   result <- sprint_acceleration_approx_lactic_power(time = 5, maximal_lactic_power = 10)
   expect_type(result, "double")
   expect_length(result, 1)
-  expect_true(result > 0)  # Greater than zero
-  expect_true(result < 10)  # Less than maximal power
+  expect_true(result > 0) # Greater than zero
+  expect_true(result < 10) # Less than maximal power
 
   # Test vector input
   times <- c(0, 5, 10)
   results <- sprint_acceleration_approx_lactic_power(times, maximal_lactic_power = 8)
   expect_length(results, 3)
-  expect_equal(results[1], 0)  # At t=0, should equal 0
+  expect_equal(results[1], 0) # At t=0, should equal 0
 })
 
 # Test parameter changes
@@ -137,47 +137,59 @@ test_that("sprint_approx_power_distributions basic functionality", {
   )
 
   # For single-row data, both acceleration and deceleration should use the same row
-  mockery::stub(sprint_approx_power_distributions, "sprint_motion_acceleration_data",
-                function(data) {
-                  data$power_aerobic <- 10
-                  data$power_anaerobic <- 10
-                  return(data)
-                })
+  mockery::stub(
+    sprint_approx_power_distributions, "sprint_motion_acceleration_data",
+    function(data) {
+      data$power_aerobic <- 10
+      data$power_anaerobic <- 10
+      return(data)
+    }
+  )
 
   # Make sure deceleration data has the time column and all needed properties
-  mockery::stub(sprint_approx_power_distributions, "sprint_motion_deceleration_data",
-                function(data) {
-                  # Return a tibble with all necessary columns
-                  return(tibble::tibble(
-                    time = 1,
-                    velocity = 1,
-                    acceleration = 1,
-                    distance = 1,
-                    cost_of_running = 10,
-                    power = 20,
-                    power_aerobic = 10,
-                    power_anaerobic = 10
-                  ))
-                })
+  mockery::stub(
+    sprint_approx_power_distributions, "sprint_motion_deceleration_data",
+    function(data) {
+      # Return a tibble with all necessary columns
+      return(tibble::tibble(
+        time = 1,
+        velocity = 1,
+        acceleration = 1,
+        distance = 1,
+        cost_of_running = 10,
+        power = 20,
+        power_aerobic = 10,
+        power_anaerobic = 10
+      ))
+    }
+  )
 
-  mockery::stub(sprint_approx_power_distributions, "sprint_approx_aerobic_power",
-                function(...) 10)
+  mockery::stub(
+    sprint_approx_power_distributions, "sprint_approx_aerobic_power",
+    function(...) 10
+  )
 
-  mockery::stub(sprint_approx_power_distributions, "sprint_acceleration_approx_lactic_power",
-                function(...) 5)
+  mockery::stub(
+    sprint_approx_power_distributions, "sprint_acceleration_approx_lactic_power",
+    function(...) 5
+  )
 
   # Run the function with error handling
-  result <- tryCatch({
-    sprint_approx_power_distributions(mock_data)
-  }, error = function(e) {
-    # Return the error message for debugging
-    return(paste("ERROR:", e$message))
-  })
+  result <- tryCatch(
+    {
+      sprint_approx_power_distributions(mock_data)
+    },
+    error = function(e) {
+      # Return the error message for debugging
+      return(paste("ERROR:", e$message))
+    }
+  )
 
   # We just want to check if the function runs without error
   # If it's a character string, it's an error message
   expect_false(is.character(result),
-               info = ifelse(is.character(result), result, "Function ran successfully"))
+    info = ifelse(is.character(result), result, "Function ran successfully")
+  )
 })
 
 library(testthat)
@@ -265,8 +277,8 @@ test_that("sprint_approx_alactic_power_model produces expected output", {
 test_that("fit_approx_lactic_power_model returns expected structure", {
   # Create test data - simple approximation of expected pattern
   test_times <- seq(0.1, 20, by = 0.1)
-  k_norm <- (2.5 + 35)/(35 * (2.5/(2.5 + 35))^(2.5/35))
-  test_powers <- 60 * k_norm * (1 - exp(-test_times/2.5)) * exp(-test_times/35)
+  k_norm <- (2.5 + 35) / (35 * (2.5 / (2.5 + 35))^(2.5 / 35))
+  test_powers <- 60 * k_norm * (1 - exp(-test_times / 2.5)) * exp(-test_times / 35)
 
   test_data <- tibble(
     time = test_times,
@@ -274,15 +286,18 @@ test_that("fit_approx_lactic_power_model returns expected structure", {
   )
 
   # Test function with some error handling
-  result <- tryCatch({
-    fit_approx_lactic_power_model(test_data)
-  }, error = function(e) {
-    # Return NA if there's a fitting error
-    return(NA)
-  })
+  result <- tryCatch(
+    {
+      fit_approx_lactic_power_model(test_data)
+    },
+    error = function(e) {
+      # Return NA if there's a fitting error
+      return(NA)
+    }
+  )
 
   # Only check if we got a result (might fail due to fitting issues)
-  if(!is.na(result[1])) {
+  if (!is.na(result[1])) {
     expect_type(result, "list")
     expect_named(result, c("p_la_max", "k1", "k2"))
     expect_type(result$p_la_max, "double")
@@ -332,4 +347,3 @@ test_that("sprint_approx_lactic_power_model produces expected output", {
   expect_equal(result_vector[1], 0) # At t=0, should be 0
   expect_true(result_vector[4] < result_vector[2]) # At large t, should decay
 })
-

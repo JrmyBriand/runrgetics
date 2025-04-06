@@ -261,15 +261,14 @@ sprint_approx_power_distributions <- function(sprint_motion_data, maximal_aerobi
 #'
 #' fit_approx_alactic_power_model(sprint_approx_power_distributions)
 #'
-#'
 fit_approx_alactic_power_model <- function(sprint_approx_power_distribution) {
+  log_norm_dist <- minpack.lm::nlsLM(power_alactic ~ pal_max * exp(-(log(time) - mu)^2 / (2 * sigma^2)), data = sprint_approx_power_distribution, start = list(pal_max = 160, sigma = 1, mu = 1))
 
-  log_norm_dist <- minpack.lm::nlsLM(power_alactic ~ pal_max*exp(-(log(time) - mu)^2/(2*sigma^2)), data = sprint_approx_power_distribution, start = list(pal_max = 160, sigma = 1 , mu = 1) )
-
-  return( list(
+  return(list(
     pal_max = coef(log_norm_dist)[1],
     sigma = coef(log_norm_dist)[2],
-    mu = coef(log_norm_dist)[3])  )
+    mu = coef(log_norm_dist)[3]
+  ))
 }
 
 #' Sprint Alactic Power Model (on Approximate Alactic Power Distribution)
@@ -291,18 +290,15 @@ fit_approx_alactic_power_model <- function(sprint_approx_power_distribution) {
 #' mu <- 1
 #' sigma <- 1
 #'
-#' time <- seq(1,10, 0.1)
+#' time <- seq(1, 10, 0.1)
 #'
 #' sprint_approx_alactic_power_model(time, maximal_alactic_power, mu, sigma)
-#'
 #'
 sprint_approx_alactic_power_model <- function(time,
                                               maximal_alactic_power,
                                               mu,
                                               sigma) {
-
   return(maximal_alactic_power * exp(-(log(time) - mu)^2 / (2 * sigma^2)))
-
 }
 
 
@@ -345,20 +341,22 @@ sprint_approx_alactic_power_model <- function(time,
 #' fit_approx_lactic_power_model(sprint_approx_power_distributions)
 #'
 fit_approx_lactic_power_model <- function(sprint_approx_power_distribution) {
+  bi_exp_dist <- minpack.lm::nlsLM(
+    power_lactic ~ sprint_approx_lactic_power_model(
+      time = time,
+      maximal_lactic_power = p_la_max,
+      k1 = k1,
+      k2 = k2
+    ),
+    data = sprint_approx_power_distribution, start = list(p_la_max = 60, k1 = 2.5, k2 = 35)
+  )
 
-  bi_exp_dist <- minpack.lm::nlsLM(power_lactic ~ sprint_approx_lactic_power_model(time = time,
-                                                                                   maximal_lactic_power = p_la_max,
-                                                                                   k1 = k1,
-                                                                                   k2 = k2
-                                                                                   ),
-  data = sprint_approx_power_distribution, start = list(p_la_max = 60, k1 = 2.5 , k2 = 35) )
 
-
-  return( list(
+  return(list(
     p_la_max = coef(bi_exp_dist)[1],
     k1 = coef(bi_exp_dist)[2],
-    k2 = coef(bi_exp_dist)[3])  )
-
+    k2 = coef(bi_exp_dist)[3]
+  ))
 }
 
 #' Sprint Lactic Power Model (on Approximate Lactic Power Distribution)
@@ -381,18 +379,12 @@ fit_approx_lactic_power_model <- function(sprint_approx_power_distribution) {
 #' k1 <- 2.5
 #' k2 <- 35
 #'
-#' time <- seq(1,10, 0.1)
+#' time <- seq(1, 10, 0.1)
 #'
 #' sprint_approx_lactic_power_model(time, maximal_lactic_power, k1, k2)
 #'
-#'
 sprint_approx_lactic_power_model <- function(time, maximal_lactic_power, k1, k2) {
+  k_norm <- (k1 + k2) / (k2 * (k1 / (k1 + k2))^(k1 / k2))
 
-  k_norm <- (k1+k2)/(k2*(k1/(k1+k2))^(k1/k2))
-
-  return(maximal_lactic_power *k_norm* (1 - exp(-time/k1))* exp(-time/k2))
-
-
+  return(maximal_lactic_power * k_norm * (1 - exp(-time / k1)) * exp(-time / k2))
 }
-
-

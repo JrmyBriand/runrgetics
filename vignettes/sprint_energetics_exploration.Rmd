@@ -28,7 +28,7 @@ The goal of this vignette is to explore simple functions that explore sprint met
 A visual representation of the sprint motion data reveals metabolic peak powers attained within the first second of the sprint. These peaks are presumed to result from anaerobic alactic energy sources. The following chunk shows the metabolic power contribution as a function of time for the men's 100 m sprint event. 
 
 ```{r}
-men_100 <- graubner_nixdorf_sprints  |>
+men_100 <- graubner_nixdorf_sprints |>
   dplyr::filter(event == "Men's 100 m")
 
 plot_sprint_metabolic_power(
@@ -38,14 +38,11 @@ plot_sprint_metabolic_power(
   reaction_time = men_100$reaction_time[1],
   maximal_velocity = men_100$maximal_velocity[1]
 )
-
-
 ```
 
 For the men's 100 m, the metabolic power peak reaches nearly 160 W/kg
 
 ```{r}
-
 # extract sprint motion data for the 100 m
 sprint_data_100 <- sprint_motion_model_data(
   mean_velocity_splits = men_100$velocity,
@@ -55,7 +52,7 @@ sprint_data_100 <- sprint_motion_model_data(
   maximal_velocity = men_100$maximal_velocity[1]
 )
 
-# calculate maximal power  
+# calculate maximal power
 maximal_power_100 <- sprint_maximum_metabolic_power(sprint_data_100)
 maximal_power_100
 ```
@@ -82,7 +79,6 @@ head(acceleration_data)
 
 deceleration_data <- sprint_motion_deceleration_data(sprint_data_100)
 head(deceleration_data)
-
 ```
 
 ### add plot of acceleration and deceleration phases...
@@ -94,7 +90,6 @@ We can now make the assumption that all the energy expanded during the accelerat
 # Estimate the total energy expanded during the acceleration phase
 
 energy_total(acceleration_data)
-
 ```
 
 The total energy in the acceleration (~590 J/kg) is greater than the range of estimated maximal alactic capacity (310-390 J/kg) for World class male sprinters. This suggests that the anaerobic alactic energy system is not the only source of energy during the acceleration phase.
@@ -116,7 +111,7 @@ The following chunk of computes the aerobic and anaerobic (difference between ae
 
 acceleration_data <- acceleration_data |>
   dplyr::mutate(
-    power_aerobic = sprint_approx_aerobic_power(time = time), 
+    power_aerobic = sprint_approx_aerobic_power(time = time),
     power_anaerobic = power - power_aerobic
   )
 
@@ -125,8 +120,6 @@ acceleration_data <- acceleration_data |>
 
 energy_aerobic <- energy_aerobic(acceleration_data)
 energy_anaerobic <- energy_anaerobic(acceleration_data)
-
-
 ```
 
 During the acceleration phase, the aerobic energy expenditure is estimated to be `r round(energy_aerobic, 2)` J/kg, while the anaerobic energy expenditure is estimated to be `r round(energy_anaerobic, 2)` J/kg. The anaerobic energy expenditure is greater than the maximal anaerobic alactic capacity, suggesting that the anaerobic is not exclusively coming from alactic sources, but also from anaerobic lactic sources.
@@ -143,16 +136,15 @@ The anaerobic lactic contribution can be estimated using the `sprint_acceleratio
 The alactic contribution can be computed as the difference between the lactic contribution and the anaerobic contribution.
 
 ```{r}
-#estimate the maximal lactic power as the anaerobic power at the end of the acceleration
+# estimate the maximal lactic power as the anaerobic power at the end of the acceleration
 
 maximal_lactic_power <- acceleration_data$power_anaerobic[nrow(acceleration_data)]
 # compute the aerobic power contribution
 
 acceleration_data <- acceleration_data |>
   dplyr::mutate(
-    power_lactic = sprint_acceleration_approx_lactic_power(time = time, maximal_lactic_power = maximal_lactic_power), 
+    power_lactic = sprint_acceleration_approx_lactic_power(time = time, maximal_lactic_power = maximal_lactic_power),
     power_alactic = power_anaerobic - power_lactic,
-    
   )
 
 
@@ -160,8 +152,6 @@ acceleration_data <- acceleration_data |>
 
 energy_lactic <- energy_lactic(acceleration_data)
 energy_alactic <- energy_alactic(acceleration_data)
-
-
 ```
 
 Folowing the previous calculations, during the acceleration phase, the anaerobic lactic energy expenditure is estimated to be `r round(energy_lactic, 2)` J/kg, while the anaerobic alactic energy expenditure is estimated to be `r round(energy_alactic, 2)` J/kg. The anaerobic alactic expenditure is within the estimated maximal alactic capacity, suggesting that the proposed energy distribution for the 3 metabolisms is realistic.
@@ -177,7 +167,6 @@ Following these assumptions, the function `sprint_approx_distribution`calculates
 
 sprint_approx_power_distribution <- sprint_approx_power_distributions(sprint_data_100)
 head(sprint_approx_power_distribution)
-
 ```
 
 We can compute the approximate energy contribution from the three metabolic pathways. 
@@ -204,7 +193,6 @@ lactic_energy_percentage <- lactic_energy_percentage(sprint_approx_power_distrib
 anaerobic_energy_percentage <- anaerobic_energy_percentage(sprint_approx_power_distribution)
 
 aerobic_energy_percentage <- aerobic_energy_percentage(sprint_approx_power_distribution)
-
 ```
 
 The anaerobic alactic energy expenditure is estimated to be `r round(alactic_energy_percentage, 2)` % of the total energy expenditure, while the anaerobic lactic energy expenditure is estimated to be `r round(lactic_energy_percentage, 2)` % of the total energy expenditure. The aerobic energy expenditure is estimated to be `r round(aerobic_energy_percentage, 2)` % of the total energy expenditure. The anaerobic energy pathways energy expenditure is estimated to be `r round(anaerobic_energy_percentage, 2)` % of the total energy expenditure.
@@ -223,13 +211,11 @@ Where $P_{al,max}(T)$ is the maximal alactic power for a race of duration $T$, $
 ```{r}
 # Fiting the alactic power model to the approximate distributions
 
-alactic_parameters <- fit_approx_alactic_power_model(sprint_approx_power_distribution
-)
+alactic_parameters <- fit_approx_alactic_power_model(sprint_approx_power_distribution)
 
 p_al_max <- alactic_parameters$pal_max
 mu_al <- alactic_parameters$mu
 sigma_al <- alactic_parameters$sigma
-
 ```
 
 After fitting the alactic power model to the approximate alactic power distribution, a the maximal alactic power over the sprint is estimated to be `r round(p_al_max, 2)` W/kg. The peak of the log-normal distribution is estimated to be `r round(mu_al, 2)` and the decay of the distribution is estimated to be `r round(sigma_al, 2)`. 
@@ -239,7 +225,7 @@ The alactic power can be calculated using the alacic power model.
 ```{r}
 # compute the alactic power from the model
 
-sprint_approx_power_distribution <- sprint_approx_power_distribution |> 
+sprint_approx_power_distribution <- sprint_approx_power_distribution |>
   dplyr::mutate(
     power_alactic_model = sprint_approx_alactic_power_model(
       time = time,
@@ -248,13 +234,11 @@ sprint_approx_power_distribution <- sprint_approx_power_distribution |>
       sigma = sigma_al
     )
   )
-
 ```
 
 The alactic power computed using the model can now be compared to the approximate distribution. 
 
 ```{r}
-
 ```
 
  plot approximate distribution compared to power calculated using the model .....
@@ -271,8 +255,7 @@ Where $P_{la,max}(T)$ is the maximal lactic power for a sprint race of duration 
 ```{r}
 # Fiting the alactic power model to the approximate distributions
 
-lactic_parameters <- fit_approx_lactic_power_model(sprint_approx_power_distribution
-)
+lactic_parameters <- fit_approx_lactic_power_model(sprint_approx_power_distribution)
 
 p_la_max <- lactic_parameters$p_la_max
 k1 <- lactic_parameters$k1
@@ -286,7 +269,7 @@ The lactic power can be calculated using the lacic power model.
 ```{r}
 # compute the alactic power from the model
 
-sprint_approx_power_distribution <- sprint_approx_power_distribution |> 
+sprint_approx_power_distribution <- sprint_approx_power_distribution |>
   dplyr::mutate(
     power_lactic_model = sprint_approx_lactic_power_model(
       time = time,
@@ -295,13 +278,11 @@ sprint_approx_power_distribution <- sprint_approx_power_distribution |>
       k2 = k2
     )
   )
-
 ```
 
 The lactic power computed using the model can now be compared to the approximate distribution. 
 
 ```{r}
-
 ```
 
  plot approximate distribution compared to power calculated using the model .....

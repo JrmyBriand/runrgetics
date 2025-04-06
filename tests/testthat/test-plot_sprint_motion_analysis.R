@@ -1,4 +1,3 @@
-
 library(ggplot2)
 
 # Test data - simple example values based on the examples in your function documentation
@@ -118,17 +117,20 @@ test_that("sex_comparison_plot_velocity returns a ggplot object", {
     skip("find_time_velocity function not available")
   }
 
-  plot <- tryCatch({
-    sex_comparison_plot_velocity(
-      sprint_data_male = mock_sprint_data_male,
-      sprint_data_female = mock_sprint_data_female,
-      observed_data_male = mock_observed_male,
-      observed_data_female = mock_observed_female
-    )
-  }, error = function(e) {
-    skip(paste("Error in sex_comparison_plot_velocity:", e$message))
-    NULL
-  })
+  plot <- tryCatch(
+    {
+      sex_comparison_plot_velocity(
+        sprint_data_male = mock_sprint_data_male,
+        sprint_data_female = mock_sprint_data_female,
+        observed_data_male = mock_observed_male,
+        observed_data_female = mock_observed_female
+      )
+    },
+    error = function(e) {
+      skip(paste("Error in sex_comparison_plot_velocity:", e$message))
+      NULL
+    }
+  )
 
   if (!is.null(plot)) {
     expect_s3_class(plot, "ggplot")
@@ -190,16 +192,19 @@ test_that("plot functions accept custom colors", {
 test_that("plot functions handle different input lengths", {
   # Instead of expecting errors, let's test what actually happens
   # Option 1: The function might return NULL or NA
-  result <- tryCatch({
-    plot_sprint_velocity(
-      mean_velocity_splits = c(0, 5.77), # One element short
-      time_splits = test_time_splits,
-      distance = test_distance,
-      reaction_time = test_reaction_time
-    )
-  }, error = function(e) {
-    e
-  })
+  result <- tryCatch(
+    {
+      plot_sprint_velocity(
+        mean_velocity_splits = c(0, 5.77), # One element short
+        time_splits = test_time_splits,
+        distance = test_distance,
+        reaction_time = test_reaction_time
+      )
+    },
+    error = function(e) {
+      e
+    }
+  )
 
   # If the function throws an error, this test will pass
   if (inherits(result, "error")) {

@@ -100,7 +100,6 @@ plot_sprint_distance <- function(mean_velocity_splits, time_splits, distance, re
 #'   maximal_velocity = 12.34
 #' )
 #'
-#'
 plot_sprint_velocity <- function(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = NA, dt = 0.01, color = "darkred") {
   # get sprint motion metrics
 
@@ -165,7 +164,7 @@ plot_sprint_velocity <- function(mean_velocity_splits, time_splits, distance, re
 #' @import ggplot2
 #' @export
 #'
-#' @examples  plot_sprint_acceleration(
+#' @examples plot_sprint_acceleration(
 #'   mean_velocity_splits = c(0, 5.77, 9.99),
 #'   time_splits = c(0, 1.88, 2.88),
 #'   distance = c(0, 10, 20),
@@ -289,7 +288,6 @@ plot_sprint_metabolic_power <- function(mean_velocity_splits, time_splits, dista
 #'   maximal_velocity = 12.34
 #' )
 #'
-#'
 plot_sprint_motion_analysis <- function(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = NA, dt = 0.01) {
   dist_plot <- plot_sprint_distance(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = maximal_velocity)
   velocity_plot <- plot_sprint_velocity(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = maximal_velocity)
@@ -325,10 +323,10 @@ plot_sprint_motion_analysis <- function(mean_velocity_splits, time_splits, dista
 #' @examples
 #'
 #' # Extract the data for the 100 m
-#' men_100 <- graubner_nixdorf_sprints  |>
+#' men_100 <- graubner_nixdorf_sprints |>
 #'   dplyr::filter(event == "Men's 100 m")
 #'
-#' women_100 <- graubner_nixdorf_sprints  |>
+#' women_100 <- graubner_nixdorf_sprints |>
 #'   dplyr::filter(event == "Women's 100 m")
 #'
 #' # Get the sprint motion data for both men and women
@@ -350,17 +348,16 @@ plot_sprint_motion_analysis <- function(mean_velocity_splits, time_splits, dista
 #' )
 #'
 #'
-#' #Generate the plots
+#' # Generate the plots
 #'
 #' sex_comparison_plot_velocity(
 #'   sprint_data_male = sprint_data_men_100,
 #'   sprint_data_female = sprint_data_women_100,
 #'   observed_data_male = men_100,
 #'   observed_data_female = women_100,
-#'   color = "darkgreen") + ggplot2::ggtitle("Sex Comparison of the 100 m Instantaneous Velocity")
-
-sex_comparison_plot_velocity <- function(sprint_data_male, sprint_data_female, observed_data_male, observed_data_female, color = "darkgreen" ){
-
+#'   color = "darkgreen"
+#' ) + ggplot2::ggtitle("Sex Comparison of the 100 m Instantaneous Velocity")
+sex_comparison_plot_velocity <- function(sprint_data_male, sprint_data_female, observed_data_male, observed_data_female, color = "darkgreen") {
   # modify the time of the male and female observed data
 
   # male reaction time
@@ -373,32 +370,42 @@ sex_comparison_plot_velocity <- function(sprint_data_male, sprint_data_female, o
   # female reaction time
   rt_f <- observed_data_female$reaction_time[1]
 
-  observed_data_female <-  observed_data_female |>
+  observed_data_female <- observed_data_female |>
     dplyr::mutate(time = find_time_velocity(splits, rt_f) - rt_f)
 
   # Velocity plot
   plot <- ggplot2::ggplot() +
     # Male predictions
-    ggplot2::geom_line(data = sprint_data_male,
-              aes(x = time, y = velocity),
-              color = color, linetype = "solid") +
+    ggplot2::geom_line(
+      data = sprint_data_male,
+      aes(x = time, y = velocity),
+      color = color, linetype = "solid"
+    ) +
     # Female predictions
-    ggplot2::geom_line(data = sprint_data_female,
-              aes(x = time, y = velocity),
-              color = color, linetype = "dashed") +
+    ggplot2::geom_line(
+      data = sprint_data_female,
+      aes(x = time, y = velocity),
+      color = color, linetype = "dashed"
+    ) +
     # Male observed data
-    ggplot2::geom_point(data = observed_data_male,
-               aes(x = time, y = velocity),
-               shape = 16, size = 2, color = color) +
+    ggplot2::geom_point(
+      data = observed_data_male,
+      aes(x = time, y = velocity),
+      shape = 16, size = 2, color = color
+    ) +
     # Female observed data
-    ggplot2::geom_point(data = observed_data_female,
-               aes(x = time, y = velocity),
-               shape = 17, size = 2, color = color)+
+    ggplot2::geom_point(
+      data = observed_data_female,
+      aes(x = time, y = velocity),
+      shape = 17, size = 2, color = color
+    ) +
     ggplot2::theme_minimal() +
     ggplot2::labs(x = "Time (s)", y = "Velocity (m/s)") +
     ggplot2::scale_y_continuous(limits = c(0, max(observed_data_male$velocity + 0.2))) +
-    ggplot2::theme(axis.title = element_text(size = 16),
-          axis.text = element_text(size = 14))
+    ggplot2::theme(
+      axis.title = element_text(size = 16),
+      axis.text = element_text(size = 14)
+    )
 
   return(plot)
 }
@@ -419,10 +426,10 @@ sex_comparison_plot_velocity <- function(sprint_data_male, sprint_data_female, o
 #'
 #' @examples
 #' # Extract the data for the 100 m
-#' men_100 <- graubner_nixdorf_sprints  |>
+#' men_100 <- graubner_nixdorf_sprints |>
 #'   dplyr::filter(event == "Men's 100 m")
 #'
-#' women_100 <- graubner_nixdorf_sprints  |>
+#' women_100 <- graubner_nixdorf_sprints |>
 #'   dplyr::filter(event == "Women's 100 m")
 #'
 #' # Get the sprint motion data for both men and women
@@ -446,33 +453,33 @@ sex_comparison_plot_velocity <- function(sprint_data_male, sprint_data_female, o
 #' # Generate the plot
 #'
 #' sex_comparison_plot_power(
-#' sprint_data_male = sprint_data_men_100,
-#' sprint_data_female = sprint_data_women_100
+#'   sprint_data_male = sprint_data_men_100,
+#'   sprint_data_female = sprint_data_women_100
 #' ) + ggplot2::ggtitle("Sex Comparison of the 100 m Instantaneous Metabolic Power")
 
-
 #'
-sex_comparison_plot_power <- function(sprint_data_male, sprint_data_female, color = "darkgreen"){
-
+sex_comparison_plot_power <- function(sprint_data_male, sprint_data_female, color = "darkgreen") {
   # Metabolic Power plot
   plot <- ggplot2::ggplot() +
     # Male predictions
-    ggplot2::geom_line(data = sprint_data_male,
-              aes(x = time, y = power),
-              color = color, linetype = "solid", linewidth = 1) +  # Increased line width
+    ggplot2::geom_line(
+      data = sprint_data_male,
+      aes(x = time, y = power),
+      color = color, linetype = "solid", linewidth = 1
+    ) + # Increased line width
     # Female predictions
-    ggplot2::geom_line(data = sprint_data_female,
-              aes(x = time, y = power),
-              color = color, linetype = "dashed", linewidth = 1) +  # Increased line width
+    ggplot2::geom_line(
+      data = sprint_data_female,
+      aes(x = time, y = power),
+      color = color, linetype = "dashed", linewidth = 1
+    ) + # Increased line width
     ggplot2::labs(x = "Time (s)", y = "Power (W/kg)") +
     ggplot2::scale_y_continuous(limits = c(0, max(sprint_data_male$power + 10))) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
       axis.title = element_text(size = 16),
       axis.text = element_text(size = 14)
-      )
+    )
 
   return(plot)
-
-
 }

@@ -37,7 +37,7 @@ head(graubner_nixdorf_sprints)
 Data can be filtered depending on the event of interest. For example, to extract the data for Bolt's 100m. 
 
 ```{r}
-bolt_100m <- graubner_nixdorf_sprints |> 
+bolt_100m <- graubner_nixdorf_sprints |>
   dplyr::filter(
     athlete == "Bolt",
     event == "Men's 100 m"
@@ -54,7 +54,6 @@ To apply this method, we need to estimate the instantaneous velocity and acceler
 
 
 ```{r}
-
 bolt_100m_motion_data <- sprint_motion_model_data(
   mean_velocity_splits = bolt_100m$velocity,
   time_splits = bolt_100m$splits,
@@ -64,8 +63,6 @@ bolt_100m_motion_data <- sprint_motion_model_data(
 )
 
 head(bolt_100m_motion_data)
-
-
 ```
 
 The function can be applied to any other event in the `graubner_nixdorf_sprints` dataset and to any external data sets that follow the same structure.
@@ -73,11 +70,13 @@ The function can be applied to any other event in the `graubner_nixdorf_sprints`
 The sprint analysis can be ploted. The following code chunk allows to visualize Bolt's 100m event modeled distance, velocity, acceleration and metabolic power, along with the actual data provided in the `graubner_nixdorf_sprints` dataset.
 
 ```{r}
-plot_sprint_motion_analysis( mean_velocity_splits = bolt_100m$velocity,
+plot_sprint_motion_analysis(
+  mean_velocity_splits = bolt_100m$velocity,
   time_splits = bolt_100m$splits,
   distance = bolt_100m$distance,
   reaction_time = bolt_100m$reaction_time[1],
-  maximal_velocity = bolt_100m$maximal_velocity[1])
+  maximal_velocity = bolt_100m$maximal_velocity[1]
+)
 ```
 
 The 100 m events in the Graubner and Nixdorf are the only events where a maximal velocity is recorded. For the 200 and 400 m events, the maximal velocity is not available in the `graubner_nixdorf_sprints` dataset. It is referred to an `NA`. It can be left empty in the function call, and the function will estimate the maximal velocity based on the available data. 
@@ -86,10 +85,11 @@ Here is an exemple of the sprint motion data and plot analysis for the Men's 400
 
 ```{r}
 # filter Merrit's performance
-merritt_400m <- graubner_nixdorf_sprints  |> 
+merritt_400m <- graubner_nixdorf_sprints |>
   filter(
     athlete == "Merritt",
-    event == "Men's 400 m")
+    event == "Men's 400 m"
+  )
 
 # extract sprint motion data
 merritt_400m_motion_data <- sprint_motion_model_data(
@@ -105,8 +105,8 @@ plot_sprint_motion_analysis(
   mean_velocity_splits = merritt_400m$velocity,
   time_splits = merritt_400m$splits,
   distance = merritt_400m$distance,
-  reaction_time = merritt_400m$reaction_time[1])
-
+  reaction_time = merritt_400m$reaction_time[1]
+)
 ```
 ## Instantaneous Velocity and Power Sex Comparison
 
@@ -116,10 +116,10 @@ In our article (Briand et al. 2025) proposing a novel bioenergetic model of spri
 # Sex comparison plots for the 100 m
 
 # Extract the data for the 100 m
-men_100 <- graubner_nixdorf_sprints  |> 
+men_100 <- graubner_nixdorf_sprints |>
   filter(event == "Men's 100 m")
 
-women_100 <- graubner_nixdorf_sprints  |> 
+women_100 <- graubner_nixdorf_sprints |>
   filter(event == "Women's 100 m")
 
 # Get the sprint motion data for both men and women
@@ -141,21 +141,20 @@ sprint_data_women_100 <- sprint_motion_model_data(
 )
 
 
-#Generate the plots
+# Generate the plots
 
 sex_comparison_plot_velocity(
   sprint_data_male = sprint_data_men_100,
   sprint_data_female = sprint_data_women_100,
   observed_data_male = men_100,
   observed_data_female = women_100,
-  color = "darkgreen") + ggplot2::ggtitle("Sex Comparison of the 100 m Instantaneous Velocity")
+  color = "darkgreen"
+) + ggplot2::ggtitle("Sex Comparison of the 100 m Instantaneous Velocity")
 
 sex_comparison_plot_power(
   sprint_data_male = sprint_data_men_100,
   sprint_data_female = sprint_data_women_100
 ) + ggplot2::ggtitle("Sex Comparison of the 100 m Instantaneous Metabolic Power")
-
-
 ```
 
 The round points and solid line corresponds to the men's event, while the triangle points and dashed lines correspond to the women's event.

@@ -1,5 +1,3 @@
-
-
 test_that("sprint_motion_model_data runs without errors", {
   # Create simple test data
   mean_velocity_splits <- c(0, 5.77, 9.99)
@@ -22,7 +20,7 @@ test_that("sprint_motion_model_data runs without errors", {
       reaction_time = reaction_time,
       maximal_velocity = maximal_velocity
     ),
-    NA  # Expect no error
+    NA # Expect no error
   )
 })
 
@@ -41,8 +39,10 @@ test_that("sprint_motion_model_data returns a tibble with correct columns", {
 
   # Basic structure tests
   expect_true(tibble::is_tibble(result))
-  expect_true(all(c("time", "distance", "velocity", "acceleration",
-                    "cost_running", "power") %in% names(result)))
+  expect_true(all(c(
+    "time", "distance", "velocity", "acceleration",
+    "cost_running", "power"
+  ) %in% names(result)))
   expect_true(nrow(result) > 0)
 })
 
@@ -59,7 +59,7 @@ test_that("sprint_motion_model_data works with NA maximal_velocity", {
       reaction_time = 0.146,
       maximal_velocity = NA
     ),
-    NA  # Expect no error
+    NA # Expect no error
   )
 })
 

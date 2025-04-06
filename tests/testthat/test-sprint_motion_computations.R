@@ -311,7 +311,7 @@ test_that("average_velocity_from_splits calculates correct velocities", {
   # Test basic case
   splits <- c(0, 1.8)
   distances <- c(0, 10)
-  expected <- c(0, 10/1.8)
+  expected <- c(0, 10 / 1.8)
   result <- average_velocity_from_splits(splits, distances)
   expect_equal(result, expected)
 
@@ -323,7 +323,6 @@ test_that("average_velocity_from_splits calculates correct velocities", {
   expected <- c(0, distance_intervals / time_intervals)
   result <- average_velocity_from_splits(splits, distances)
   expect_equal(result, expected)
-
 })
 
 # tests/testthat/test-sprint-functions.R
@@ -339,8 +338,8 @@ test_that("find_tau calculates correct time constant", {
   rt <- 0.2
 
   # Create velocity data that follows expected pattern
-  velocity <- vf_expected * (1 - exp(-(time - rt)/tau_expected))
-  velocity[time <= rt] <- 0  # Zero velocity before reaction time
+  velocity <- vf_expected * (1 - exp(-(time - rt) / tau_expected))
+  velocity[time <= rt] <- 0 # Zero velocity before reaction time
 
   # Create a mock model object that will be returned by nlsLM
   mock_model <- structure(list(), class = "nls")
@@ -360,7 +359,7 @@ test_that("find_tau calculates correct time constant", {
       data = data.frame(time = time, velocity = velocity)
     )
     # Instead of using stats::coef, return our expected value directly
-    tau <- tau_expected  # This replaces stats::coef(mod_velocity)[1]
+    tau <- tau_expected # This replaces stats::coef(mod_velocity)[1]
     return(tau)
   }
 
@@ -387,19 +386,20 @@ test_that("predicted_maximal_velocity calculates correctly", {
   test_env$sprint_acc_velocity_model <- function(time, tau, vf, reaction_time) {
     # Just return our expected value when called with the right parameters
     if (identical(time, time_end_accel) &&
-        identical(tau, tau) &&
-        identical(vf, maximal_velocity) &&
-        identical(reaction_time, 0)) {
+      identical(tau, tau) &&
+      identical(vf, maximal_velocity) &&
+      identical(reaction_time, 0)) {
       return(expected_value)
     } else {
-      return(NA)  # Return NA for unexpected calls
+      return(NA) # Return NA for unexpected calls
     }
   }
 
   # Define a local predicted_maximal_velocity that uses our mock
   test_env$predicted_maximal_velocity <- function(maximal_velocity, tau, time_maximal_velocity) {
     predicted_maximal_velocity <- test_env$sprint_acc_velocity_model(
-      time_maximal_velocity, tau, maximal_velocity, reaction_time = 0
+      time_maximal_velocity, tau, maximal_velocity,
+      reaction_time = 0
     )
     return(predicted_maximal_velocity)
   }
@@ -429,13 +429,16 @@ test_that("find_tau works with mock sprint_acc_velocity_model", {
   # Define mock sprint_acc_velocity_model in test environment
   test_env$sprint_acc_velocity_model <- function(time, tau, vf, reaction_time) {
     ifelse(time <= reaction_time,
-           0,
-           vf * (1 - exp(-(time - reaction_time)/tau)))
+      0,
+      vf * (1 - exp(-(time - reaction_time) / tau))
+    )
   }
 
   # Generate velocity data using the mocked model
-  velocity <- with(test_env,
-                   sprint_acc_velocity_model(time, tau_expected, vf_expected, rt))
+  velocity <- with(
+    test_env,
+    sprint_acc_velocity_model(time, tau_expected, vf_expected, rt)
+  )
 
   # Store the expected return values
   test_env$expected_tau <- tau_expected
@@ -476,12 +479,13 @@ test_that("functions handle edge cases properly", {
   # Create a simple version of predicted_maximal_velocity
   local_sprint_acc_velocity_model <- function(time, tau, vf, reaction_time) {
     # Simple implementation that doesn't error on negative inputs
-    return(vf * (1 - exp(-(time - reaction_time)/tau)))
+    return(vf * (1 - exp(-(time - reaction_time) / tau)))
   }
 
   local_predicted_maximal_velocity <- function(maximal_velocity, tau, time_maximal_velocity) {
     predicted_maximal_velocity <- local_sprint_acc_velocity_model(
-      time_maximal_velocity, tau, maximal_velocity, reaction_time = 0
+      time_maximal_velocity, tau, maximal_velocity,
+      reaction_time = 0
     )
     return(predicted_maximal_velocity)
   }

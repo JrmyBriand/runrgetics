@@ -248,7 +248,7 @@ test_that("alactic_energy_percentage calculates correctly", {
 
   # Should return NA or 0 for all zeros (depends on implementation)
   expect_true(is.na(alactic_energy_percentage(zero_data)) ||
-                alactic_energy_percentage(zero_data) == 0)
+    alactic_energy_percentage(zero_data) == 0)
 })
 
 # Test for lactic_energy_percentage
@@ -308,7 +308,7 @@ test_that("energy percentages sum to 100%", {
     power_alactic = c(0, 3, 6, 3, 0),
     power_lactic = c(0, 2, 4, 2, 0),
     power_aerobic = c(0, 5, 10, 5, 0),
-    power_anaerobic = c(0, 5, 10, 5, 0)  # alactic + lactic
+    power_anaerobic = c(0, 5, 10, 5, 0) # alactic + lactic
   )
 
   # Calculate all percentages
@@ -323,5 +323,3 @@ test_that("energy percentages sum to 100%", {
   # Anaerobic should equal sum of alactic and lactic
   expect_equal(anaerobic_pct, alactic_pct + lactic_pct, tolerance = 1e-10)
 })
-
-

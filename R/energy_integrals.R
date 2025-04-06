@@ -1,6 +1,3 @@
-
-
-
 #' Total Energy Expenditure
 #'
 #' Computes the integral of the total metabolic power over time to obtain total energy expenditure.
@@ -14,17 +11,15 @@
 #'
 #' @examples
 #' data <- tibble::tibble(
-#'  time = c(0, 1, 2, 3, 4),
-#'  power = c(0, 1, 2, 1, 0)
+#'   time = c(0, 1, 2, 3, 4),
+#'   power = c(0, 1, 2, 1, 0)
 #' )
 #'
 #' energy_total(data)
 #'
-#'
-#'
 energy_total <- function(data) {
   # Ensure the data are sorted by time
-  data <- data |>  arrange(time)
+  data <- data |> arrange(time)
 
   # Use the trapezoidal rule to calculate the integral of power over time
   integral <- pracma::trapz(data$time, data$power)
@@ -45,15 +40,15 @@ energy_total <- function(data) {
 #'
 #' @examples
 #' data <- tibble::tibble(
-#'  time = c(0, 1, 2, 3, 4),
-#'  power_aerobic = c(0, 1, 2, 1, 0)
+#'   time = c(0, 1, 2, 3, 4),
+#'   power_aerobic = c(0, 1, 2, 1, 0)
 #' )
 #'
 #' energy_aerobic(data)
 #'
 energy_aerobic <- function(data) {
   # Ensure the data are sorted by time
-  data <- data |>  arrange(time)
+  data <- data |> arrange(time)
 
   # Use the trapezoidal rule to calculate the integral of power over time
   integral <- pracma::trapz(data$time, data$power_aerobic)
@@ -74,15 +69,15 @@ energy_aerobic <- function(data) {
 #'
 #' @examples
 #' data <- tibble::tibble(
-#'  time = c(0, 1, 2, 3, 4),
-#'  power_anaerobic = c(0, 1, 2, 1, 0)
+#'   time = c(0, 1, 2, 3, 4),
+#'   power_anaerobic = c(0, 1, 2, 1, 0)
 #' )
 #'
 #' energy_anaerobic(data)
 #'
 energy_anaerobic <- function(data) {
   # Ensure the data are sorted by time
-  data <- data |>  arrange(time)
+  data <- data |> arrange(time)
 
   # Use the trapezoidal rule to calculate the integral of power over time
   integral <- pracma::trapz(data$time, data$power_anaerobic)
@@ -104,15 +99,15 @@ energy_anaerobic <- function(data) {
 #'
 #' @examples
 #' data <- tibble::tibble(
-#'  time = c(0, 1, 2, 3, 4),
-#'  power_lactic = c(0, 1, 2, 1, 0)
+#'   time = c(0, 1, 2, 3, 4),
+#'   power_lactic = c(0, 1, 2, 1, 0)
 #' )
 #'
 #' energy_lactic(data)
 #'
 energy_lactic <- function(data) {
   # Ensure the data are sorted by time
-  data <- data |>  arrange(time)
+  data <- data |> arrange(time)
 
   # Use the trapezoidal rule to calculate the integral of power over time
   integral <- pracma::trapz(data$time, data$power_lactic)
@@ -134,8 +129,8 @@ energy_lactic <- function(data) {
 #'
 #' @examples
 #' data <- tibble::tibble(
-#'  time = c(0, 1, 2, 3, 4),
-#'  power_alactic = c(0, 1, 2, 1, 0)
+#'   time = c(0, 1, 2, 3, 4),
+#'   power_alactic = c(0, 1, 2, 1, 0)
 #' )
 #'
 #' energy_alactic(data)
@@ -164,14 +159,14 @@ energy_alactic <- function(data) {
 #' @examples
 #'
 #' data <- tibble::tibble(
-#' time = c(0, 1, 2, 3, 4),
-#' power = c(0, 1, 2, 1, 0),
-#' power_alactic = c(0, 0.5, 1, 0.5, 0))
+#'   time = c(0, 1, 2, 3, 4),
+#'   power = c(0, 1, 2, 1, 0),
+#'   power_alactic = c(0, 0.5, 1, 0.5, 0)
+#' )
 #'
 #' alactic_energy_percentage(data)
 #'
-#'
-alactic_energy_percentage <- function(data){
+alactic_energy_percentage <- function(data) {
   # Calculate the total energy expenditure
   total_energy <- energy_total(data)
 
@@ -182,7 +177,6 @@ alactic_energy_percentage <- function(data){
   percentage <- (alactic_energy / total_energy) * 100
 
   return(percentage)
-
 }
 
 #' Lactic Energy Percentage
@@ -198,14 +192,14 @@ alactic_energy_percentage <- function(data){
 #' @examples
 #'
 #' data <- tibble::tibble(
-#' time = c(0, 1, 2, 3, 4),
-#' power = c(0, 1, 2, 1, 0),
-#' power_lactic = c(0, 0.5, 1, 0.5, 0))
+#'   time = c(0, 1, 2, 3, 4),
+#'   power = c(0, 1, 2, 1, 0),
+#'   power_lactic = c(0, 0.5, 1, 0.5, 0)
+#' )
 #'
 #' lactic_energy_percentage(data)
 #'
-#'
-lactic_energy_percentage <- function(data){
+lactic_energy_percentage <- function(data) {
   # Calculate the total energy expenditure
   total_energy <- energy_total(data)
 
@@ -216,7 +210,6 @@ lactic_energy_percentage <- function(data){
   percentage <- (lactic_energy / total_energy) * 100
 
   return(percentage)
-
 }
 
 #' Anaerobic Energy Percentage
@@ -232,14 +225,14 @@ lactic_energy_percentage <- function(data){
 #' @examples
 #'
 #' data <- tibble::tibble(
-#' time = c(0, 1, 2, 3, 4),
-#' power = c(0, 1, 2, 1, 0),
-#' power_anaerobic = c(0, 0.5, 1, 0.5, 0))
+#'   time = c(0, 1, 2, 3, 4),
+#'   power = c(0, 1, 2, 1, 0),
+#'   power_anaerobic = c(0, 0.5, 1, 0.5, 0)
+#' )
 #'
 #' anaerobic_energy_percentage(data)
 #'
-#'
-anaerobic_energy_percentage <- function(data){
+anaerobic_energy_percentage <- function(data) {
   # Calculate the total energy expenditure
   total_energy <- energy_total(data)
 
@@ -250,7 +243,6 @@ anaerobic_energy_percentage <- function(data){
   percentage <- (anaerobic_energy / total_energy) * 100
 
   return(percentage)
-
 }
 
 #' Aerobic Energy Percentage
@@ -266,14 +258,14 @@ anaerobic_energy_percentage <- function(data){
 #' @examples
 #'
 #' data <- tibble::tibble(
-#' time = c(0, 1, 2, 3, 4),
-#' power = c(0, 1, 2, 1, 0),
-#' power_aerobic = c(0, 0.5, 1, 0.5, 0))
+#'   time = c(0, 1, 2, 3, 4),
+#'   power = c(0, 1, 2, 1, 0),
+#'   power_aerobic = c(0, 0.5, 1, 0.5, 0)
+#' )
 #'
 #' aerobic_energy_percentage(data)
 #'
-#'
-aerobic_energy_percentage <- function(data){
+aerobic_energy_percentage <- function(data) {
   # Calculate the total energy expenditure
   total_energy <- energy_total(data)
 
@@ -284,9 +276,4 @@ aerobic_energy_percentage <- function(data){
   percentage <- (aerobic_energy / total_energy) * 100
 
   return(percentage)
-
 }
-
-
-
-

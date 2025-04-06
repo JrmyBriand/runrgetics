@@ -285,7 +285,7 @@ average_velocity_from_splits <- function(splits, distances) {
   distance_intervals <- diff(distances)
 
 
-  velocities <- c(0,distance_intervals / time_intervals)
+  velocities <- c(0, distance_intervals / time_intervals)
 
   return(velocities)
 }
@@ -308,8 +308,7 @@ average_velocity_from_splits <- function(splits, distances) {
 #' @export
 #'
 #' @examples find_tau(1:10, 1:10, 0.1)
-find_tau <- function(time, velocity, reaction_time){
-
+find_tau <- function(time, velocity, reaction_time) {
   mod_velocity <- minpack.lm::nlsLM(
     velocity ~ sprint_acc_velocity_model(time, tau, vf, reaction_time = reaction_time),
     start = list(tau = 0.5, vf = 12),
@@ -320,7 +319,6 @@ find_tau <- function(time, velocity, reaction_time){
   tau <- stats::coef(mod_velocity)[1]
 
   return(tau)
-
 }
 
 
@@ -334,9 +332,8 @@ find_tau <- function(time, velocity, reaction_time){
 #' @export
 #'
 #' @examples predicted_maximal_velocity(10, 1.5, 5)
-predicted_maximal_velocity <- function(maximal_velocity, tau, time_maximal_velocity){
+predicted_maximal_velocity <- function(maximal_velocity, tau, time_maximal_velocity) {
   predicted_maximal_velocity <- sprint_acc_velocity_model(time_maximal_velocity, tau, maximal_velocity, reaction_time = 0)
 
   return(predicted_maximal_velocity)
 }
-
