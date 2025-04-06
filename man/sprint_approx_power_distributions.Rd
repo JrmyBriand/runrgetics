@@ -24,7 +24,7 @@ A tibble with the following columns: time, velocity, acceleration, distance, cos
 Computes approximate aerobic, lactic and alactic power distributions from sprint motion data.
 }
 \examples{
-#'
+
 # Extract the data for the 100 m
 men_100 <- graubner_nixdorf_sprints |>
   dplyr::filter(event == "Men's 100 m")

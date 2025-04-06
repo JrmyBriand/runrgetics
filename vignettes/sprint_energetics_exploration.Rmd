@@ -133,7 +133,7 @@ During the acceleration phase, the aerobic energy expenditure is estimated to be
 
 ### Considering Approximate Anaerobic Lactic Contribution
 
-Based on previous ork modelling energy contributions in sprint running, it can be assumed that anaerobic lactic power follows an exponential rising function in the sprint acceleration phase (see Briand et al. 2025). The maximum ($P_{an,max}$) of this rising function is attained at the end of the acceleration, around 5 s. It therefore has a very short time constant ($k_{an}$) of 2 s. 
+Based on previous work modelling energy contributions in sprint running, it can be assumed that anaerobic lactic power follows an exponential rising function in the sprint acceleration phase (see Briand et al. 2025). The maximum ($P_{an,max}$) of this rising function is attained at the end of the acceleration, around 5 s. It therefore has a very short time constant ($k_{an}$) of 2 s. 
 
 $$
 P_{an,accel} = P_{an,max} \left(1 - e^{-\frac{t}{k_{an}}}\right)
@@ -170,7 +170,7 @@ Folowing the previous calculations, during the acceleration phase, the anaerobic
 
 Following the acceleration, the aerobic power contribution is expected to continue increasing following the same exponentially rising function. We can assume that the anaerobic alactic power contribution decreases and reach a null contribution at the end of the race. The anaerobic lactic contribution presents the remaining power of the total metabolic power. 
 
-Following these assumptions, the function `sprint_approx_distribution`calculates both the acceleration and deceleration phases aprroximate distributions to provide a global approximate distribution of the energy systems to total power over the whole sprint.
+Following these assumptions, the function `sprint_approx_distribution`calculates both the acceleration and deceleration phases approximate distributions to provide a global approximate distribution of the energy systems to total power over the whole sprint.
 
 ```{r}
 # compute the approximate distribution of the energy systems
@@ -180,14 +180,116 @@ head(sprint_approx_power_distribution)
 
 ```
 
-We can compute the aprroximate energy contribution from the three metabolic pathways. 
+We can compute the approximate energy contribution from the three metabolic pathways. 
 
 ```{r}
 energy_lactic <- energy_lactic(sprint_approx_power_distribution)
 energy_alactic <- energy_alactic(sprint_approx_power_distribution)
 energy_aerobic <- energy_aerobic(sprint_approx_power_distribution)
+energy_total <- energy_total(sprint_approx_power_distribution)
 ```
 
+From the approximate distribution, the total energy expenditure is estimated to be `r round(energy_total, 2)` J/kg. The anaerobic alactic energy expenditure is estimated to be `r round(energy_alactic, 2)` J/kg, while the anaerobic lactic energy expenditure is estimated to be `r round(energy_lactic, 2)` J/kg. The aerobic energy expenditure is estimated to be `r round(energy_aerobic, 2)` J/kg.
+
+plot approximate power distribution ......
+
+### Relative Energy Contributions
+
+Calcluate relative energy contributions in percentages.....
 
 
+## Alactic Power Model
 
+Functions can be applied to model the approximate alactic power of the course of the sprint. The following log-normal function can be used to model alactic power.: 
+
+$$
+P_{al}(t) = P_{al,max}(T) e^{\frac{-(ln(t) - \mu_{al})^2}{2\sigma_{al}^2}}
+$$
+Where $P_{al,max}(T)$ is the maximal alactic power for a race of duration $T$, $\mu_{al}$ is a constant seting the peak of the log-normal distribution and $\sigma_{al}$ is a parameter setting the distribution's decay. The function `fit_approx_alactic_power_model` can be used to determine the values of parameters $P_{al,max}(T)$, $\mu_{al}$ and $\sigma_{al}$ to the approximate distribution. Following the determination of $\mu_{al}$ and $\sigma_{al}$, the function `sprint_approx_alactic_power_model` can be used to calculate the alactic power distribution. 
+
+
+```{r}
+# Fiting the alactic power model to the approximate distributions
+
+alactic_parameters <- fit_approx_alactic_power_model(sprint_approx_power_distribution
+)
+
+p_al_max <- alactic_parameters$pal_max
+mu_al <- alactic_parameters$mu
+sigma_al <- alactic_parameters$sigma
+
+```
+
+After fitting the alactic power model to the approximate alactic power distribution, a the maximal alactic power over the sprint is estimated to be `r round(p_al_max, 2)` W/kg. The peak of the log-normal distribution is estimated to be `r round(mu_al, 2)` and the decay of the distribution is estimated to be `r round(sigma_al, 2)`. 
+
+The alactic power can be calculated using the alacic power model.
+
+```{r}
+# compute the alactic power from the model
+
+sprint_approx_power_distribution <- sprint_approx_power_distribution |> 
+  dplyr::mutate(
+    power_alactic_model = sprint_approx_alactic_power_model(
+      time = time,
+      maximal_alactic_power = p_al_max,
+      mu = mu_al,
+      sigma = sigma_al
+    )
+  )
+
+```
+
+The alactic power computed using the model can now be compared to the approximate distribution. 
+
+```{r}
+
+```
+
+ plot approximate distribution compared to power calculated using the model .....
+
+## Lactic Power Model
+
+To model the approximate lactic power output over the course of the sprint, a bi-exponential function can be used. The following function can be used to fit the parameters of the bi-exponential function to the approximate distribution.
+
+$$
+P_{la}(t) = P_{la,max}(T) \cdot k_{norm}\cdot \left(1 - e^{-\frac{t}{k_1}} \right) \cdot e^{-\frac{t}{k_2}}
+$$
+Where $P_{la,max}(T)$ is the maximal lactic power for a sprint race of duration $T$, $k_{norm}$ is a normalizing constant, $k_1$ is the time constant of the first rising exponential and $k_2$ is the time constant of the second decaying exponential. The function `fit_approx_lactic_power_model` can be used to determine the values of parameters $P_{la,max}(T)$, $k_{norm}$, $k_1$ and $k_2$ to the approximate distribution. Following the determination of $k_{norm}$, $k_1$ and $k_2$, the function `sprint_approx_lactic_power_model` can be used to calculate the lactic power distribution. 
+
+```{r}
+# Fiting the alactic power model to the approximate distributions
+
+lactic_parameters <- fit_approx_lactic_power_model(sprint_approx_power_distribution
+)
+
+p_la_max <- lactic_parameters$p_la_max
+k1 <- lactic_parameters$k1
+k2 <- lactic_parameters$k2
+```
+
+After fitting the lactic power model to the approximate lactic power distribution, a the maximal lactic power over the sprint is estimated to be `r round(p_la_max, 2)` W/kg. The time-constant of the rising exponential is estimated to be `r round(k1, 2)` and the time constant of the second decaying exponential is estimated to be `r round(k2, 2)`. 
+
+The lactic power can be calculated using the lacic power model.
+
+```{r}
+# compute the alactic power from the model
+
+sprint_approx_power_distribution <- sprint_approx_power_distribution |> 
+  dplyr::mutate(
+    power_lactic_model = sprint_approx_lactic_power_model(
+      time = time,
+      maximal_lactic_power = p_la_max,
+      k1 = k1,
+      k2 = k2
+    )
+  )
+
+```
+
+The lactic power computed using the model can now be compared to the approximate distribution. 
+
+```{r}
+
+```
+
+ plot approximate distribution compared to power calculated using the model .....
