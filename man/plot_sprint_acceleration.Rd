@@ -36,7 +36,7 @@ A ggplot object
 Plot of modeled sprint acceleration as a function of time.
 }
 \examples{
- plot_sprint_acceleration(
+plot_sprint_acceleration(
   mean_velocity_splits = c(0, 5.77, 9.99),
   time_splits = c(0, 1.88, 2.88),
   distance = c(0, 10, 20),

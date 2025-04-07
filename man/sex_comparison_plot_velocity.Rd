@@ -34,10 +34,10 @@ sprint data from Graubner and Nixdorf (2011).
 \examples{
 
 # Extract the data for the 100 m
-men_100 <- graubner_nixdorf_sprints  |>
+men_100 <- graubner_nixdorf_sprints |>
   dplyr::filter(event == "Men's 100 m")
 
-women_100 <- graubner_nixdorf_sprints  |>
+women_100 <- graubner_nixdorf_sprints |>
   dplyr::filter(event == "Women's 100 m")
 
 # Get the sprint motion data for both men and women
@@ -59,12 +59,13 @@ sprint_data_women_100 <- sprint_motion_model_data(
 )
 
 
-#Generate the plots
+# Generate the plots
 
 sex_comparison_plot_velocity(
   sprint_data_male = sprint_data_men_100,
   sprint_data_female = sprint_data_women_100,
   observed_data_male = men_100,
   observed_data_female = women_100,
-  color = "darkgreen") + ggplot2::ggtitle("Sex Comparison of the 100 m Instantaneous Velocity")
+  color = "darkgreen"
+) + ggplot2::ggtitle("Sex Comparison of the 100 m Instantaneous Velocity")
 }

@@ -17,8 +17,8 @@ Computes the integral of the anaerobic alactic power over time to obtain anaerob
 }
 \examples{
 data <- tibble::tibble(
- time = c(0, 1, 2, 3, 4),
- power_alactic = c(0, 1, 2, 1, 0)
+  time = c(0, 1, 2, 3, 4),
+  power_alactic = c(0, 1, 2, 1, 0)
 )
 
 energy_alactic(data)

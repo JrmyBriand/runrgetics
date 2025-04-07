@@ -28,9 +28,8 @@ maximal_lactic_power <- 60
 k1 <- 2.5
 k2 <- 35
 
-time <- seq(1,10, 0.1)
+time <- seq(1, 10, 0.1)
 
 sprint_approx_lactic_power_model(time, maximal_lactic_power, k1, k2)
-
 
 }

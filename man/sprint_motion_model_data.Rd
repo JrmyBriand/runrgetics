@@ -35,11 +35,12 @@ and power for a sprint event. Based on available time splits and velocity data
 provided in the graubner_nixdorf_sprints data set.
 }
 \examples{
-sprint_motion_model_data(mean_velocity_splits = c(0, 5.77, 9.99),
-                            time_splits = c(0, 1.88, 2.88),
-                            distance = c(0, 10, 20),
-                            reaction_time = 0.146,
-                            maximal_velocity = 12.34)
-
+sprint_motion_model_data(
+  mean_velocity_splits = c(0, 5.77, 9.99),
+  time_splits = c(0, 1.88, 2.88),
+  distance = c(0, 10, 20),
+  reaction_time = 0.146,
+  maximal_velocity = 12.34
+)
 
 }

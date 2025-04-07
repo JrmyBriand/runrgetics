@@ -17,8 +17,8 @@ Computes the integral of the anaerobic lactic power over time to obtain anaerobi
 }
 \examples{
 data <- tibble::tibble(
- time = c(0, 1, 2, 3, 4),
- power_lactic = c(0, 1, 2, 1, 0)
+  time = c(0, 1, 2, 3, 4),
+  power_lactic = c(0, 1, 2, 1, 0)
 )
 
 energy_lactic(data)

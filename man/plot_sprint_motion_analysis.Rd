@@ -41,5 +41,4 @@ plot_sprint_motion_analysis(
   maximal_velocity = 12.34
 )
 
-
 }

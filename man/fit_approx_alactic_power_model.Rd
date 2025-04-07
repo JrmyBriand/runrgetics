@@ -40,5 +40,4 @@ sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_da
 
 fit_approx_alactic_power_model(sprint_approx_power_distributions)
 
-
 }

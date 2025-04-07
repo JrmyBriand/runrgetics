@@ -17,8 +17,8 @@ Computes the integral of the aerobic power over time to obtain aerobic energy ex
 }
 \examples{
 data <- tibble::tibble(
- time = c(0, 1, 2, 3, 4),
- power_aerobic = c(0, 1, 2, 1, 0)
+  time = c(0, 1, 2, 3, 4),
+  power_aerobic = c(0, 1, 2, 1, 0)
 )
 
 energy_aerobic(data)

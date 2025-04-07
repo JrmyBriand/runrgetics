@@ -45,5 +45,4 @@ plot_sprint_velocity(
   maximal_velocity = 12.34
 )
 
-
 }

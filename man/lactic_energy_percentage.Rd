@@ -18,11 +18,11 @@ Computes the percentage of the total energy expenditure that is attributed to an
 \examples{
 
 data <- tibble::tibble(
-time = c(0, 1, 2, 3, 4),
-power = c(0, 1, 2, 1, 0),
-power_lactic = c(0, 0.5, 1, 0.5, 0))
+  time = c(0, 1, 2, 3, 4),
+  power = c(0, 1, 2, 1, 0),
+  power_lactic = c(0, 0.5, 1, 0.5, 0)
+)
 
 lactic_energy_percentage(data)
-
 
 }

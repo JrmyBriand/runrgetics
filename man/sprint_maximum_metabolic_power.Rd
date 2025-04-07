@@ -17,7 +17,7 @@ Computes the maximal metabolic power generated during a sprint event.
 }
 \examples{
 # Extract the data for the 100 m
-men_100 <- graubner_nixdorf_sprints  |>
+men_100 <- graubner_nixdorf_sprints |>
   dplyr::filter(event == "Men's 100 m")
 
 

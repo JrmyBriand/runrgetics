@@ -28,9 +28,8 @@ maximal_alactic_power <- 160
 mu <- 1
 sigma <- 1
 
-time <- seq(1,10, 0.1)
+time <- seq(1, 10, 0.1)
 
 sprint_approx_alactic_power_model(time, maximal_alactic_power, mu, sigma)
-
 
 }

@@ -180,7 +180,14 @@ energy_total <- energy_total(sprint_approx_power_distribution)
 
 From the approximate distribution, the total energy expenditure is estimated to be `r round(energy_total, 2)` J/kg. The anaerobic alactic energy expenditure is estimated to be `r round(energy_alactic, 2)` J/kg, while the anaerobic lactic energy expenditure is estimated to be `r round(energy_lactic, 2)` J/kg. The aerobic energy expenditure is estimated to be `r round(energy_aerobic, 2)` J/kg.
 
-plot approximate power distribution ......
+The approximate power dirstibution of the three metabolic pathways contribution can be plotted using the function `plot_sprint_approx_power_dist`. The following chunk shows the approximate power distribution of the three metabolic pathways contribution over the course of the sprint. 
+
+```{r}
+# plot the approximate power distribution of the three metabolic pathways
+plot_sprint_approx_power_dist(sprint_approx_power_distribution
+)
+
+```
 
 ### Relative Energy Contributions
 
@@ -239,6 +246,10 @@ sprint_approx_power_distribution <- sprint_approx_power_distribution |>
 The alactic power computed using the model can now be compared to the approximate distribution. 
 
 ```{r}
+# plot approximate distribution compared to power calculated using the model
+
+plot_sprint_approx_alactic_power_model(sprint_approx_power_distribution)
+
 ```
 
  plot approximate distribution compared to power calculated using the model .....
@@ -283,6 +294,10 @@ sprint_approx_power_distribution <- sprint_approx_power_distribution |>
 The lactic power computed using the model can now be compared to the approximate distribution. 
 
 ```{r}
+# plot approximate distribution compared to power calculated using the model
+
+plot_sprint_approx_lactic_power_model(sprint_approx_power_distribution)
+
 ```
 
- plot approximate distribution compared to power calculated using the model .....
+

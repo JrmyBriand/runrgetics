@@ -17,12 +17,10 @@ Computes the integral of the total metabolic power over time to obtain total ene
 }
 \examples{
 data <- tibble::tibble(
- time = c(0, 1, 2, 3, 4),
- power = c(0, 1, 2, 1, 0)
+  time = c(0, 1, 2, 3, 4),
+  power = c(0, 1, 2, 1, 0)
 )
 
 energy_total(data)
-
-
 
 }
