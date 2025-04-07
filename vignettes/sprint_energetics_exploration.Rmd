@@ -212,13 +212,13 @@ Functions can be applied to model the approximate alactic power of the course of
 $$
 P_{al}(t) = P_{al,max}(T) e^{\frac{-(ln(t) - \mu_{al})^2}{2\sigma_{al}^2}}
 $$
-Where $P_{al,max}(T)$ is the maximal alactic power for a race of duration $T$, $\mu_{al}$ is a constant seting the peak of the log-normal distribution and $\sigma_{al}$ is a parameter setting the distribution's decay. The function `fit_approx_alactic_power_model` can be used to determine the values of parameters $P_{al,max}(T)$, $\mu_{al}$ and $\sigma_{al}$ to the approximate distribution. Following the determination of $\mu_{al}$ and $\sigma_{al}$, the function `sprint_approx_alactic_power_model` can be used to calculate the alactic power distribution. 
+Where $P_{al,max}(T)$ is the maximal alactic power for a race of duration $T$, $\mu_{al}$ is a constant seting the peak of the log-normal distribution and $\sigma_{al}$ is a parameter setting the distribution's decay. The function `fit_approx_alactic_power_params` can be used to determine the values of parameters $P_{al,max}(T)$, $\mu_{al}$ and $\sigma_{al}$ to the approximate distribution. Following the determination of $\mu_{al}$ and $\sigma_{al}$, the function `sprint_approx_alactic_power_model` can be used to calculate the alactic power distribution. 
 
 
 ```{r}
 # Fiting the alactic power model to the approximate distributions
 
-alactic_parameters <- fit_approx_alactic_power_model(sprint_approx_power_distribution)
+alactic_parameters <- fit_approx_alactic_power_params(sprint_approx_power_distribution)
 
 p_al_max <- alactic_parameters$pal_max
 mu_al <- alactic_parameters$mu
@@ -261,12 +261,12 @@ To model the approximate lactic power output over the course of the sprint, a bi
 $$
 P_{la}(t) = P_{la,max}(T) \cdot k_{norm}\cdot \left(1 - e^{-\frac{t}{k_1}} \right) \cdot e^{-\frac{t}{k_2}}
 $$
-Where $P_{la,max}(T)$ is the maximal lactic power for a sprint race of duration $T$, $k_{norm}$ is a normalizing constant, $k_1$ is the time constant of the first rising exponential and $k_2$ is the time constant of the second decaying exponential. The function `fit_approx_lactic_power_model` can be used to determine the values of parameters $P_{la,max}(T)$, $k_{norm}$, $k_1$ and $k_2$ to the approximate distribution. Following the determination of $k_{norm}$, $k_1$ and $k_2$, the function `sprint_approx_lactic_power_model` can be used to calculate the lactic power distribution. 
+Where $P_{la,max}(T)$ is the maximal lactic power for a sprint race of duration $T$, $k_{norm}$ is a normalizing constant, $k_1$ is the time constant of the first rising exponential and $k_2$ is the time constant of the second decaying exponential. The function `fit_approx_lactic_power_params` can be used to determine the values of parameters $P_{la,max}(T)$, $k_{norm}$, $k_1$ and $k_2$ to the approximate distribution. Following the determination of $k_{norm}$, $k_1$ and $k_2$, the function `sprint_approx_lactic_power_model` can be used to calculate the lactic power distribution. 
 
 ```{r}
 # Fiting the alactic power model to the approximate distributions
 
-lactic_parameters <- fit_approx_lactic_power_model(sprint_approx_power_distribution)
+lactic_parameters <- fit_approx_lactic_power_params(sprint_approx_power_distribution)
 
 p_la_max <- lactic_parameters$p_la_max
 k1 <- lactic_parameters$k1

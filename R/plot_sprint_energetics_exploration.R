@@ -123,7 +123,7 @@ plot_sprint_approx_alactic_power_model <- function(sprint_approx_power_distribut
 
   # fit the alactic power model on the data
 
-  alactic_parameters <- fit_approx_alactic_power_model(sprint_approx_power_distribution)
+  alactic_parameters <- fit_approx_alactic_power_params(sprint_approx_power_distribution)
 
   p_al_max <- alactic_parameters$pal_max
   mu_al <- alactic_parameters$mu
@@ -213,7 +213,7 @@ plot_sprint_approx_alactic_power_model <- function(sprint_approx_power_distribut
 plot_sprint_approx_lactic_power_model <- function(sprint_approx_power_distribution){
 
 # calculate parameters
-  lactic_parameters <- fit_approx_lactic_power_model(sprint_approx_power_distribution)
+  lactic_parameters <- fit_approx_lactic_power_params(sprint_approx_power_distribution)
 
   p_la_max <- lactic_parameters$p_la_max
   k1 <- lactic_parameters$k1

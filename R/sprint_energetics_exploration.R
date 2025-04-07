@@ -224,9 +224,9 @@ sprint_approx_power_distributions <- function(sprint_motion_data, maximal_aerobi
   return(sprint_energetics_data)
 }
 
-#' Log-normal Fit on Approximate Alactic Power Distribution
+#' Parameters of Log-normal Fit on Approximate Alactic Power Distribution
 #'
-#' Fits a log-normal distribution to the approximate alactic power distribution.
+#' Extracts the parameters of a log-normal fit on the approximate alactic power distribution.
 #'
 #' @param sprint_approx_power_distribution A tibble containing approximate power distributions over the course of the sprint with at least the following columns: time (s), power_alactic (W/kg)
 #'
@@ -259,9 +259,9 @@ sprint_approx_power_distributions <- function(sprint_motion_data, maximal_aerobi
 #'
 #' # Fit the log-normal distribution to the alactic power distribution
 #'
-#' fit_approx_alactic_power_model(sprint_approx_power_distributions)
+#' fit_approx_alactic_power_params(sprint_approx_power_distributions)
 #'
-fit_approx_alactic_power_model <- function(sprint_approx_power_distribution) {
+fit_approx_alactic_power_params <- function(sprint_approx_power_distribution) {
   log_norm_dist <- minpack.lm::nlsLM(power_alactic ~ pal_max * exp(-(log(time) - mu)^2 / (2 * sigma^2)), data = sprint_approx_power_distribution, start = list(pal_max = 160, sigma = 1, mu = 1))
 
   return(list(
@@ -304,7 +304,9 @@ sprint_approx_alactic_power_model <- function(time,
 
 
 
-#' Bi-exponential Fit on Approximate lactic Power Distribution
+#' Parameters of Bi-exponential Fit on Approximate lactic Power Distribution
+#'
+#' Extracts the parameters of a bi-exponential fit on the approximate lactic power distribution.
 #'
 #' @param sprint_approx_power_distribution A tibble containing approximate power distributions over the course of the sprint with at least the following columns: time (s), power_lactic (W/kg)
 #'
@@ -338,9 +340,9 @@ sprint_approx_alactic_power_model <- function(time,
 #'
 #' # Fit the log-normal distribution to the alactic power distribution
 #'
-#' fit_approx_lactic_power_model(sprint_approx_power_distributions)
+#' fit_approx_lactic_power_params(sprint_approx_power_distributions)
 #'
-fit_approx_lactic_power_model <- function(sprint_approx_power_distribution) {
+fit_approx_lactic_power_params <- function(sprint_approx_power_distribution) {
   bi_exp_dist <- minpack.lm::nlsLM(
     power_lactic ~ sprint_approx_lactic_power_model(
       time = time,

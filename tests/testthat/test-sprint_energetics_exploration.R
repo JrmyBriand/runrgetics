@@ -195,8 +195,8 @@ test_that("sprint_approx_power_distributions basic functionality", {
 library(testthat)
 library(tibble)
 
-# Test for fit_approx_alactic_power_model
-test_that("fit_approx_alactic_power_model returns expected structure", {
+# Test for fit_approx_alactic_power_params
+test_that("fit_approx_alactic_power_params returns expected structure", {
   # Create minimal test data
   test_data <- tibble(
     time = seq(0.1, 10, by = 0.1),
@@ -204,7 +204,7 @@ test_that("fit_approx_alactic_power_model returns expected structure", {
   )
 
   # Test function
-  result <- fit_approx_alactic_power_model(test_data)
+  result <- fit_approx_alactic_power_params(test_data)
 
   # Check structure
   expect_type(result, "list")
@@ -273,8 +273,8 @@ test_that("sprint_approx_alactic_power_model produces expected output", {
   expect_true(values_around_peak[2] > values_around_peak[3])
 })
 
-# Test for fit_approx_lactic_power_model
-test_that("fit_approx_lactic_power_model returns expected structure", {
+# Test for fit_approx_lactic_power_params
+test_that("fit_approx_lactic_power_params returns expected structure", {
   # Create test data - simple approximation of expected pattern
   test_times <- seq(0.1, 20, by = 0.1)
   k_norm <- (2.5 + 35) / (35 * (2.5 / (2.5 + 35))^(2.5 / 35))
@@ -288,7 +288,7 @@ test_that("fit_approx_lactic_power_model returns expected structure", {
   # Test function with some error handling
   result <- tryCatch(
     {
-      fit_approx_lactic_power_model(test_data)
+      fit_approx_lactic_power_params(test_data)
     },
     error = function(e) {
       # Return NA if there's a fitting error
