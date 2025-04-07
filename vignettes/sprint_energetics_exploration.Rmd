@@ -184,9 +184,7 @@ The approximate power dirstibution of the three metabolic pathways contribution 
 
 ```{r}
 # plot the approximate power distribution of the three metabolic pathways
-plot_sprint_approx_power_dist(sprint_approx_power_distribution
-)
-
+plot_sprint_approx_power_dist(sprint_approx_power_distribution)
 ```
 
 ### Relative Energy Contributions
@@ -249,7 +247,6 @@ The alactic power computed using the model can now be compared to the approximat
 # plot approximate distribution compared to power calculated using the model
 
 plot_sprint_approx_alactic_power_model(sprint_approx_power_distribution)
-
 ```
 
  plot approximate distribution compared to power calculated using the model .....
@@ -297,7 +294,6 @@ The lactic power computed using the model can now be compared to the approximate
 # plot approximate distribution compared to power calculated using the model
 
 plot_sprint_approx_lactic_power_model(sprint_approx_power_distribution)
-
 ```
 
 

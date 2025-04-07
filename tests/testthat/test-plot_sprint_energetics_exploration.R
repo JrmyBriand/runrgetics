@@ -19,7 +19,7 @@ test_that("plot_sprint_approx_power_dist returns a ggplot object", {
 
   # Check if the plot has all required lines
   line_layers <- sapply(plot$layers, function(l) inherits(l$geom, "GeomLine"))
-  expect_true(sum(line_layers) >= 4)  # At least 4 lines (total, alactic, lactic, aerobic)
+  expect_true(sum(line_layers) >= 4) # At least 4 lines (total, alactic, lactic, aerobic)
 })
 
 # Test for plot_sprint_approx_alactic_power_model
@@ -38,12 +38,15 @@ test_that("plot_sprint_approx_alactic_power_model returns a ggplot object", {
     }
   }
 
-  plot <- tryCatch({
-    plot_sprint_approx_alactic_power_model(test_sprint_approx_power_distribution)
-  }, error = function(e) {
-    skip(paste("Error in plot_sprint_approx_alactic_power_model:", e$message))
-    NULL
-  })
+  plot <- tryCatch(
+    {
+      plot_sprint_approx_alactic_power_model(test_sprint_approx_power_distribution)
+    },
+    error = function(e) {
+      skip(paste("Error in plot_sprint_approx_alactic_power_model:", e$message))
+      NULL
+    }
+  )
 
   if (!is.null(plot)) {
     expect_s3_class(plot, "ggplot")
@@ -72,12 +75,15 @@ test_that("plot_sprint_approx_lactic_power_model returns a ggplot object", {
     }
   }
 
-  plot <- tryCatch({
-    plot_sprint_approx_lactic_power_model(test_sprint_approx_power_distribution)
-  }, error = function(e) {
-    skip(paste("Error in plot_sprint_approx_lactic_power_model:", e$message))
-    NULL
-  })
+  plot <- tryCatch(
+    {
+      plot_sprint_approx_lactic_power_model(test_sprint_approx_power_distribution)
+    },
+    error = function(e) {
+      skip(paste("Error in plot_sprint_approx_lactic_power_model:", e$message))
+      NULL
+    }
+  )
 
   if (!is.null(plot)) {
     expect_s3_class(plot, "ggplot")
@@ -101,11 +107,14 @@ test_that("plot functions handle missing columns appropriately", {
   )
 
   # Test how plot_sprint_approx_power_dist handles incomplete data
-  result <- tryCatch({
-    plot_sprint_approx_power_dist(incomplete_data)
-  }, error = function(e) {
-    e
-  })
+  result <- tryCatch(
+    {
+      plot_sprint_approx_power_dist(incomplete_data)
+    },
+    error = function(e) {
+      e
+    }
+  )
 
   # Either the function should throw an error (which we catch)
   # or it should return a valid ggplot object (maybe with fewer lines)

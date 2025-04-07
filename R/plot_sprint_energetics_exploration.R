@@ -41,9 +41,7 @@ utils::globalVariables(c("power_alactic_model", "power_lactic_model"))
 #'
 #' plot_sprint_approx_power_dist(sprint_approx_power_distributions)
 #'
-plot_sprint_approx_power_dist <- function(sprint_approx_power_distribution){
-
-
+plot_sprint_approx_power_dist <- function(sprint_approx_power_distribution) {
   plot <- ggplot2::ggplot(sprint_approx_power_distribution, aes(x = time)) +
     ggplot2::geom_line(aes(y = power, color = "Total Power"), linewidth = 1.2) +
     ggplot2::geom_line(aes(y = power_alactic, color = "Alactic Power"), linewidth = 1.2) +
@@ -52,10 +50,10 @@ plot_sprint_approx_power_dist <- function(sprint_approx_power_distribution){
     ggplot2::scale_color_manual(
       name = "Legend",
       values = c(
-        "Total Power" = "#984EA3",       # purple (colorblind friendly)
-        "Alactic Power" = "#55A868",     # green (colorblind friendly)
-        "Lactic Power" = "#4C72B0",  # blue (colorblind friendly)
-        "Aerobic Power" = "#E76F51"      # red-orange (colorblind friendly)
+        "Total Power" = "#984EA3", # purple (colorblind friendly)
+        "Alactic Power" = "#55A868", # green (colorblind friendly)
+        "Lactic Power" = "#4C72B0", # blue (colorblind friendly)
+        "Aerobic Power" = "#E76F51" # red-orange (colorblind friendly)
       ),
       breaks = c("Total Power", "Alactic Power", "Lactic Power", "Aerobic Power")
     ) +
@@ -79,7 +77,6 @@ plot_sprint_approx_power_dist <- function(sprint_approx_power_distribution){
 
 
   return(plot)
-
 }
 
 
@@ -119,8 +116,7 @@ plot_sprint_approx_power_dist <- function(sprint_approx_power_distribution){
 #'
 #' plot_sprint_approx_alactic_power_model(sprint_approx_power_distributions)
 #'
-plot_sprint_approx_alactic_power_model <- function(sprint_approx_power_distribution){
-
+plot_sprint_approx_alactic_power_model <- function(sprint_approx_power_distribution) {
   # fit the alactic power model on the data
 
   alactic_parameters <- fit_approx_alactic_power_params(sprint_approx_power_distribution)
@@ -210,9 +206,8 @@ plot_sprint_approx_alactic_power_model <- function(sprint_approx_power_distribut
 #'
 #' plot_sprint_approx_lactic_power_model(sprint_approx_power_distributions)
 #'
-plot_sprint_approx_lactic_power_model <- function(sprint_approx_power_distribution){
-
-# calculate parameters
+plot_sprint_approx_lactic_power_model <- function(sprint_approx_power_distribution) {
+  # calculate parameters
   lactic_parameters <- fit_approx_lactic_power_params(sprint_approx_power_distribution)
 
   p_la_max <- lactic_parameters$p_la_max
@@ -261,6 +256,4 @@ plot_sprint_approx_lactic_power_model <- function(sprint_approx_power_distributi
     )
 
   return(plot)
-
-
 }
