@@ -347,3 +347,53 @@ test_that("sprint_approx_lactic_power_model produces expected output", {
   expect_equal(result_vector[1], 0) # At t=0, should be 0
   expect_true(result_vector[4] < result_vector[2]) # At large t, should decay
 })
+
+# tests/testthat/test-fit_approx_gof_metrics.R
+
+test_that("fit_approx_alactic_gof_metrics returns expected structure", {
+  # Create more realistic test data
+  test_data <- data.frame(
+    time = seq(0.1, 10, by = 0.1),
+    power_alactic = 160 * exp(-(log(seq(0.1, 10, by = 0.1)) - 1)^2 / (2 * 1^2)),
+    power_lactic = rep(50, 100)
+  )
+
+  result <- fit_approx_alactic_gof_metrics(test_data)
+
+  # Test structure
+  expect_type(result, "list")
+  expect_named(result, c("r_squared", "residual_se", "AIC", "BIC"))
+
+  # First check if values are not NA
+  expect_false(is.na(result$r_squared))
+  expect_false(is.na(result$residual_se))
+  expect_false(is.na(result$AIC))
+  expect_false(is.na(result$BIC))
+
+  # Then check the range
+  expect_true(result$r_squared >= 0 && result$r_squared <= 1)
+})
+
+test_that("fit_approx_lactic_gof_metrics returns expected structure", {
+  # Create more realistic test data
+  test_data <- data.frame(
+    time = seq(0.1, 10, by = 0.1),
+    power_lactic = 60 * (1 - exp(-2.5 * seq(0.1, 10, by = 0.1))) * exp(-seq(0.1, 10, by = 0.1) / 35),
+    power_alactic = rep(50, 100)
+  )
+
+  result <- fit_approx_lactic_gof_metrics(test_data)
+
+  # Test structure
+  expect_type(result, "list")
+  expect_named(result, c("r_squared", "residual_se", "AIC", "BIC"))
+
+  # First check if values are not NA
+  expect_false(is.na(result$r_squared))
+  expect_false(is.na(result$residual_se))
+  expect_false(is.na(result$AIC))
+  expect_false(is.na(result$BIC))
+
+  # Then check the range
+  expect_true(result$r_squared >= 0 && result$r_squared <= 1)
+})

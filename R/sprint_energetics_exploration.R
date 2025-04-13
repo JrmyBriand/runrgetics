@@ -1,5 +1,8 @@
 #' @importFrom utils globalVariables
-utils::globalVariables(c("power_aerobic", "power_anaerobic", "power_lactic", "power_alactic"))
+utils::globalVariables(c(
+  "power_aerobic", "power_anaerobic", "power_lactic", "power_alactic",
+  "df.residual", "AIC", "BIC", "log_normal_dist"
+))
 
 #' Sprint Motion Acceleration Data
 #'
@@ -224,6 +227,84 @@ sprint_approx_power_distributions <- function(sprint_motion_data, maximal_aerobi
   return(sprint_energetics_data)
 }
 
+
+fit_approx_alactic_power_model <- function(sprint_approx_power_distribution) {
+  log_norm_dist <- minpack.lm::nlsLM(power_alactic ~ pal_max * exp(-(log(time) - mu)^2 / (2 * sigma^2)), data = sprint_approx_power_distribution, start = list(pal_max = 160, sigma = 1, mu = 1))
+
+  return(log_normal_dist)
+}
+
+
+#' Goodness of Fit (Gof) for Approximate Alactic Power Model
+#'
+#' Computes the goodness of fit metrics for the approximate alactic power model.
+#'
+#' @param data A tibble containing approximate power distributions over the course of the sprint with at least the following columns: time (s), power_alactic (W/kg)
+#'
+#' @returns A list with the following elements: r_squared, residual_se, AIC, BIC
+#'
+#' @importFrom minpack.lm nlsLM
+#'
+#' @export
+#'
+#'
+#' @examples
+#'
+#' # Extract the data for the 100 m
+#' men_100 <- graubner_nixdorf_sprints |>
+#'   dplyr::filter(event == "Men's 100 m")
+#'
+#'
+#' # Get the sprint motion data for both men and women
+#'
+#' sprint_data <- sprint_motion_model_data(
+#'   mean_velocity_splits = men_100$velocity,
+#'   time_splits = men_100$splits,
+#'   distance = men_100$distance,
+#'   reaction_time = men_100$reaction_time[1],
+#'   maximal_velocity = men_100$maximal_velocity[1]
+#' )
+#'
+#' sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
+#'   maximal_aerobic_power = 24.5,
+#'   basal_metabolic_rate = 1.2
+#' )
+#'
+#' # Fit the log-normal distribution to the alactic power distribution
+#'
+#' fit_approx_alactic_gof_metrics(sprint_approx_power_distributions)
+#'
+fit_approx_alactic_gof_metrics <- function(data) {
+  # run the model
+
+  model <- minpack.lm::nlsLM(power_alactic ~ pal_max * exp(-(log(time) - mu)^2 / (2 * sigma^2)), data = data, start = list(pal_max = 160, sigma = 1, mu = 1))
+
+
+  # Extract residuals and fitted values
+  residuals <- residuals(model)
+  fitted <- fitted(model)
+  observed <- data$power_alactic
+
+  # Sum of squares
+  ss_res <- sum(residuals^2)
+  ss_tot <- sum((observed - mean(observed))^2)
+
+  # Metrics
+  r_squared <- 1 - (ss_res / ss_tot)
+  residual_se <- sqrt(ss_res / df.residual(model))
+  aic_val <- AIC(model)
+  bic_val <- BIC(model)
+
+  # Return as list
+  return(list(
+    r_squared = r_squared,
+    residual_se = residual_se,
+    AIC = aic_val,
+    BIC = bic_val
+  ))
+}
+
+
 #' Parameters of Log-normal Fit on Approximate Alactic Power Distribution
 #'
 #' Extracts the parameters of a log-normal fit on the approximate alactic power distribution.
@@ -299,6 +380,98 @@ sprint_approx_alactic_power_model <- function(time,
                                               mu,
                                               sigma) {
   return(maximal_alactic_power * exp(-(log(time) - mu)^2 / (2 * sigma^2)))
+}
+
+
+
+fit_approx_lactic_power_model <- function(sprint_approx_power_distribution) {
+  bi_exp_dist <- minpack.lm::nlsLM(
+    power_lactic ~ sprint_approx_lactic_power_model(
+      time = time,
+      maximal_lactic_power = p_la_max,
+      k1 = k1,
+      k2 = k2
+    ),
+    data = sprint_approx_power_distribution, start = list(p_la_max = 60, k1 = 2.5, k2 = 35)
+  )
+
+
+  return(bi_exp_dist)
+}
+
+#' Goodness of Fit (Gof) Metrics for Approximate Lactic Power Model
+#'
+#' Computes the goodness of fit metrics for the approximate lactic power model.
+#'
+#' @param data A tibble containing approximate power distributions over the course of the sprint with at least the following columns: time (s), power_lactic (W/kg)
+#'
+#' @returns A list with the following elements: r_squared, residual_se, AIC, BIC
+#'
+#' @importFrom minpack.lm nlsLM
+#'
+#' @export
+#'
+#' @examples
+#' # Extract the data for the 100 m
+#' men_100 <- graubner_nixdorf_sprints |>
+#'   dplyr::filter(event == "Men's 100 m")
+#'
+#'
+#' # Get the sprint motion data for both men and women
+#'
+#' sprint_data <- sprint_motion_model_data(
+#'   mean_velocity_splits = men_100$velocity,
+#'   time_splits = men_100$splits,
+#'   distance = men_100$distance,
+#'   reaction_time = men_100$reaction_time[1],
+#'   maximal_velocity = men_100$maximal_velocity[1]
+#' )
+#'
+#' sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
+#'   maximal_aerobic_power = 24.5,
+#'   basal_metabolic_rate = 1.2
+#' )
+#'
+#' # Fit the log-normal distribution to the alactic power distribution
+#'
+#' fit_approx_lactic_gof_metrics(sprint_approx_power_distributions)
+#'
+fit_approx_lactic_gof_metrics <- function(data) {
+  # run the model
+
+  model <- minpack.lm::nlsLM(
+    power_lactic ~ sprint_approx_lactic_power_model(
+      time = time,
+      maximal_lactic_power = p_la_max,
+      k1 = k1,
+      k2 = k2
+    ),
+    data = data, start = list(p_la_max = 60, k1 = 2.5, k2 = 35)
+  )
+
+
+  # Extract residuals and fitted values
+  residuals <- residuals(model)
+  fitted <- fitted(model)
+  observed <- data$power_lactic
+
+  # Sum of squares
+  ss_res <- sum(residuals^2)
+  ss_tot <- sum((observed - mean(observed))^2)
+
+  # Metrics
+  r_squared <- 1 - (ss_res / ss_tot)
+  residual_se <- sqrt(ss_res / df.residual(model))
+  aic_val <- AIC(model)
+  bic_val <- BIC(model)
+
+  # Return as list
+  return(list(
+    r_squared = r_squared,
+    residual_se = residual_se,
+    AIC = aic_val,
+    BIC = bic_val
+  ))
 }
 
 

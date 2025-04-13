@@ -225,7 +225,7 @@ sigma_al <- alactic_parameters$sigma
 
 After fitting the alactic power model to the approximate alactic power distribution, a the maximal alactic power over the sprint is estimated to be `r round(p_al_max, 2)` W/kg. The peak of the log-normal distribution is estimated to be `r round(mu_al, 2)` and the decay of the distribution is estimated to be `r round(sigma_al, 2)`. 
 
-The alactic power can be calculated using the alacic power model.
+The alactic power can be calculated using the alacic power model and the function `sprint_approx_alactic_power_model`.
 
 ```{r}
 # compute the alactic power from the model
@@ -249,7 +249,18 @@ The alactic power computed using the model can now be compared to the approximat
 plot_sprint_approx_alactic_power_model(sprint_approx_power_distribution)
 ```
 
- plot approximate distribution compared to power calculated using the model .....
+The function `fit_approx_alactic_gof_metrics` can be used to compute some goodness of fit metrics of the alactic power model on the approximate power distribution. 
+
+```{r}
+# compute the goodness of fit metrics
+
+alactic_gof_metrics <- fit_approx_alactic_gof_metrics(
+  data = sprint_approx_power_distribution
+)
+
+alactic_gof_metrics
+```
+
 
 ## Lactic Power Model
 
@@ -295,5 +306,19 @@ The lactic power computed using the model can now be compared to the approximate
 
 plot_sprint_approx_lactic_power_model(sprint_approx_power_distribution)
 ```
+
+
+The function `fit_approx_lactic_gof_metrics` can be used to compute some goodness of fit metrics of the alactic power model on the approximate power distribution. 
+
+```{r}
+# compute the goodness of fit metrics
+
+lactic_gof_metrics <- fit_approx_lactic_gof_metrics(
+  data = sprint_approx_power_distribution
+)
+
+lactic_gof_metrics
+```
+The next step is to properly formalize the model on all running distances. 
 
 

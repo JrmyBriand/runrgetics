@@ -1,0 +1,19 @@
+---
+title: "sprint_model_formalisation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sprint_model_formalisation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(runrgetics)
+```
