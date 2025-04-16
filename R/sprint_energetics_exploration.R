@@ -384,20 +384,6 @@ sprint_approx_alactic_power_model <- function(time,
 
 
 
-fit_approx_lactic_power_model <- function(sprint_approx_power_distribution) {
-  bi_exp_dist <- minpack.lm::nlsLM(
-    power_lactic ~ sprint_approx_lactic_power_model(
-      time = time,
-      maximal_lactic_power = p_la_max,
-      k1 = k1,
-      k2 = k2
-    ),
-    data = sprint_approx_power_distribution, start = list(p_la_max = 60, k1 = 2.5, k2 = 35)
-  )
-
-
-  return(bi_exp_dist)
-}
 
 #' Goodness of Fit (Gof) Metrics for Approximate Lactic Power Model
 #'

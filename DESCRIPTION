@@ -33,5 +33,6 @@ Imports:
     pracma,
     stats,
     tibble,
+    tinytable,
     utils
 VignetteBuilder: knitr

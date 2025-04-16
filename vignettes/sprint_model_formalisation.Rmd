@@ -7,13 +7,69 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+```{r}
+library(runrgetics)
+library(dplyr)
+library(ggplot2)
 ```
 
-```{r setup}
-library(runrgetics)
+
+## Seting the Model Parameters
+
+Parameters optimizing the `sprint_approx_lactic_power_model` and `sprint_approx_alactic_power_model` can be otained applying the `fit_approx_lactic_power_model` and `fit_approx_alactic_power_model` functions on the approximate power distribution coming from each energy pathway. 
+
+The functions `sprint_alactic_model_optimal_params_table` and `sprint_lactic_model_optimal_params_table` display the parameters for the men's and women's 100, 200 and 400 m sprint events from the `graubner_nixdorf_sprints` dataset. 
+
+```{r}
+# Alactic model parameters table
+sprint_alactic_model_optimal_params_table()
+
+# Lactic model parameters table
+
+sprint_lactic_model_optimal_params_table()
+
+
 ```
+
+We can also look at the goodness of fit metrics of these fitted models. The `sprint_alactic_model_optimal_gof_metrics_table` and `sprint_lactic_model_optimal_gof_metrics_table` functions display the goodness of fit metrics for the alactic and lactic model, respectively. 
+
+```{r}
+# Alactic model gof table
+sprint_alactic_model_optimal_gof_metrics_table()
+
+# Lactic model gof table
+
+sprint_lactic_model_optimal_gof_metrics_table()
+
+```
+
+
+### Setting the Model Parameters
+
+The data from the `graubner_nixdorf_sprints` are subject to a certain level of uncertainty. For example, the instantaneous velocity profile is determined from time splits that are only available at each 50 m for the races of 200 and 400 m. Therefore, it is reasonable to assume that some of the uncertainty is captured by fitting the model to the approximate power distribution over these distances. 
+
+To make the model useful and applicable, we will set the parameters of the lactic and alactic model such that they represent a compromise between the fitted parameters over each distances for men and women. By setting the parameters $\mu$ and $\sigma$ of the alactic model and the $\k_1$ and $\k_2$ parameters of the lactic model, the only parameters that will determine the alactic and lactic power model are the maximal alactic and lactic power over the race duration. Based on the values of the fitted parameters over all the sprint events, the values of $\mu$ and $\sigma$ for the alactic model are set to -0.4 and 1, respectively. Similarly, The values of $\k_1$ and $\k_2$ for the lactic model are set to 2.75 and 35 s, respectively.
+
+The following function generates tables that compare the parameters and goodness of fit metrics of the optimal fit, where the values of $\mu$, $\sigma$, $k_1$ and $k_2$ are variables that can be fitters, with the a formalized or simplified fit where the values of $\mu$, $\sigma$, $k_1$ and $k_2$ are set to the values mentioned above. The following code chunk generates the comparison tables. The cells in red to the optimal model fit and the cells in blue correspond to the formalized model fit. 
+
+```{r}
+
+# alactic model comparison table
+sprint_alactic_model_gof_comp_table()
+
+# lactic model comparison table
+
+sprint_lactic_model_gof_comp_table()
+
+```
+
+As expected, because the formalized model corresponds to a compromise between the parameters values over all events, the AIC and BIC is less than the optimal model. The residual squared error is also larger than the optimal model. However, the residual squared error is not significantly larger than the optimal model, except for some rare occasions (e.g. the Men's 100 m alactic model). The choice of set parameters therefore seems a reasonable compromise between the optimal model and a simplified model that can be easily applied accross all sprint events. The same observations can be made of the $R^2$ values. 
+
+
+## The Formalised Model
+
+
+
+
+
+
