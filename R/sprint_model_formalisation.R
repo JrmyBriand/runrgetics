@@ -39,12 +39,11 @@ utils::globalVariables(c(
 #'
 #' sprint_alactic_model_optimal_params()
 #'
-#'
-sprint_alactic_model_optimal_params <- function(data = graubner_nixdorf_sprints){
+sprint_alactic_model_optimal_params <- function(data = graubner_nixdorf_sprints) {
   # events
   events <- unique(data$event)
 
-  #initialize table
+  # initialize table
 
   table <- tibble::tibble(
     event = character(),
@@ -54,35 +53,34 @@ sprint_alactic_model_optimal_params <- function(data = graubner_nixdorf_sprints)
   )
 
 
-  for(i in events){
-
-
+  for (i in events) {
     event_data <- data |>
       dplyr::filter(event == i)
 
 
     sprint_data <- sprint_motion_model_data(
-    mean_velocity_splits = event_data$velocity,
-    time_splits = event_data$splits,
-    distance = event_data$distance,
-    reaction_time = event_data$reaction_time[1],
-    maximal_velocity = event_data$maximal_velocity[1]
-     )
+      mean_velocity_splits = event_data$velocity,
+      time_splits = event_data$splits,
+      distance = event_data$distance,
+      reaction_time = event_data$reaction_time[1],
+      maximal_velocity = event_data$maximal_velocity[1]
+    )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
 
-    if(i == "Men's 100 m" | i == "Men's 200 m"| i == "Men's 400 m"){
-      map<- 24.5}
-    else{
-      map <- 21}
+    if (i == "Men's 100 m" | i == "Men's 200 m" | i == "Men's 400 m") {
+      map <- 24.5
+    } else {
+      map <- 21
+    }
 
 
-     sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
-       maximal_aerobic_power = map,
-       basal_metabolic_rate = 1.2
-     )
+    sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
+      maximal_aerobic_power = map,
+      basal_metabolic_rate = 1.2
+    )
 
-     # Fit the log-normal distribution to the alactic power distribution
+    # Fit the log-normal distribution to the alactic power distribution
 
     params <- fit_approx_alactic_power_params(sprint_approx_power_distributions)
 
@@ -98,13 +96,11 @@ sprint_alactic_model_optimal_params <- function(data = graubner_nixdorf_sprints)
     # add to table
 
     table <- dplyr::bind_rows(table, subtable)
-
   }
 
   # return table
 
   return(table)
-
 }
 
 
@@ -122,11 +118,10 @@ sprint_alactic_model_optimal_params <- function(data = graubner_nixdorf_sprints)
 #'
 #' sprint_alactic_model_optimal_params_table()
 #'
-sprint_alactic_model_optimal_params_table <- function(data = graubner_nixdorf_sprints){
-
+sprint_alactic_model_optimal_params_table <- function(data = graubner_nixdorf_sprints) {
   # generates a tidyer output for the vignette or document
 
-  #run the function
+  # run the function
 
   table <- sprint_alactic_model_optimal_params(data)
 
@@ -145,7 +140,6 @@ sprint_alactic_model_optimal_params_table <- function(data = graubner_nixdorf_sp
 
 
   return(tinytable::tt(table, notes = "Alactic optimal fitted parameters over different events"))
-
 }
 
 
@@ -214,12 +208,11 @@ fit_alactic_power_params <- function(sprint_approx_power_distribution, mu = -0.4
 #'
 #' sprint_alactic_model_params()
 #'
-#'
-sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints){
+sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints) {
   # events
   events <- unique(data$event)
 
-  #initialize table
+  # initialize table
 
   table <- tibble::tibble(
     event = character(),
@@ -229,9 +222,7 @@ sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints){
   )
 
 
-  for(i in events){
-
-
+  for (i in events) {
     event_data <- data |>
       dplyr::filter(event == i)
 
@@ -246,15 +237,16 @@ sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints){
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
 
-    if(i == "Men's 100 m" | i == "Men's 200 m"| i == "Men's 400 m"){
-      map<- 24.5}
-    else{
-      map <- 21}
+    if (i == "Men's 100 m" | i == "Men's 200 m" | i == "Men's 400 m") {
+      map <- 24.5
+    } else {
+      map <- 21
+    }
 
 
     sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
-                                                                           maximal_aerobic_power = map,
-                                                                           basal_metabolic_rate = 1.2
+      maximal_aerobic_power = map,
+      basal_metabolic_rate = 1.2
     )
 
     # Fit the log-normal distribution to the alactic power distribution
@@ -273,13 +265,11 @@ sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints){
     # add to table
 
     table <- dplyr::bind_rows(table, subtable)
-
   }
 
   # return table
 
   return(table)
-
 }
 
 
@@ -298,11 +288,10 @@ sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints){
 #'
 #' sprint_alactic_model_params_table()
 #'
-sprint_alactic_model_params_table <- function(data = graubner_nixdorf_sprints){
-
+sprint_alactic_model_params_table <- function(data = graubner_nixdorf_sprints) {
   # generates a tidyer output for the vignette or document
 
-  #run the function
+  # run the function
 
   table <- sprint_alactic_model_params(data)
 
@@ -321,7 +310,6 @@ sprint_alactic_model_params_table <- function(data = graubner_nixdorf_sprints){
 
 
   return(tinytable::tt(table, notes = "Formalized Alactic Model fitted parameters over different sprint events"))
-
 }
 
 
@@ -342,13 +330,12 @@ sprint_alactic_model_params_table <- function(data = graubner_nixdorf_sprints){
 #'
 #'
 #' sprint_alactic_model_optimal_gof_metrics()
-sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_sprints){
-
+sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_sprints) {
   # events
   events <- unique(data$event)
 
-  #initialize table
- table <- tibble::tibble(
+  # initialize table
+  table <- tibble::tibble(
     event = character(),
     aic = numeric(),
     bic = numeric(),
@@ -356,9 +343,7 @@ sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spr
     rse = numeric()
   )
 
-  for(i in events){
-
-
+  for (i in events) {
     event_data <- data |>
       dplyr::filter(event == i)
 
@@ -373,15 +358,16 @@ sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spr
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
 
-    if(i == "Men's 100 m" | i == "Men's 200 m"| i == "Men's 400 m"){
-      map<- 24.5}
-    else{
-      map <- 21}
+    if (i == "Men's 100 m" | i == "Men's 200 m" | i == "Men's 400 m") {
+      map <- 24.5
+    } else {
+      map <- 21
+    }
 
 
     sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
-                                                                           maximal_aerobic_power = map,
-                                                                           basal_metabolic_rate = 1.2
+      maximal_aerobic_power = map,
+      basal_metabolic_rate = 1.2
     )
 
     gof_metrics <- fit_approx_alactic_gof_metrics(sprint_approx_power_distributions)
@@ -398,13 +384,10 @@ sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spr
 
     # add to table
 
-   table <- dplyr::bind_rows(table, subtable)
-
-
+    table <- dplyr::bind_rows(table, subtable)
   }
 
   return(table)
-
 }
 
 
@@ -425,11 +408,10 @@ sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spr
 #'
 #' sprint_alactic_model_optimal_gof_metrics_table()
 #'
-sprint_alactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdorf_sprints){
-
+sprint_alactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdorf_sprints) {
   # generates a tidyer output for the vignette or document
 
-  #run the function
+  # run the function
 
   table <- sprint_alactic_model_optimal_gof_metrics(data)
 
@@ -450,8 +432,6 @@ sprint_alactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdo
   names(table)[names(table) == "rse"] <- "RSE <br> "
 
   return(tinytable::tt(table, notes = "Optimal alactic model goodness of fit metrics over different events"))
-
-
 }
 
 
@@ -541,11 +521,11 @@ fit_alactic_gof_metrics <- function(data, mu = -0.4, sigma = 1) {
 #'
 #' sprint_alactic_model_gof_metrics()
 #'
-sprint_alactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints){
+sprint_alactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints) {
   # events
   events <- unique(data$event)
 
-  #initialize table
+  # initialize table
   table <- tibble::tibble(
     event = character(),
     aic = numeric(),
@@ -554,9 +534,7 @@ sprint_alactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints){
     rse = numeric()
   )
 
-  for(i in events){
-
-
+  for (i in events) {
     event_data <- data |>
       dplyr::filter(event == i)
 
@@ -571,15 +549,16 @@ sprint_alactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints){
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
 
-    if(i == "Men's 100 m" | i == "Men's 200 m"| i == "Men's 400 m"){
-      map<- 24.5}
-    else{
-      map <- 21}
+    if (i == "Men's 100 m" | i == "Men's 200 m" | i == "Men's 400 m") {
+      map <- 24.5
+    } else {
+      map <- 21
+    }
 
 
     sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
-                                                                           maximal_aerobic_power = map,
-                                                                           basal_metabolic_rate = 1.2
+      maximal_aerobic_power = map,
+      basal_metabolic_rate = 1.2
     )
 
     gof_metrics <- fit_alactic_gof_metrics(sprint_approx_power_distributions)
@@ -597,18 +576,14 @@ sprint_alactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints){
     # add to table
 
     table <- dplyr::bind_rows(table, subtable)
-
-
   }
 
   return(table)
-
-
 }
 
 #' Formatted Table of Goodness of Fit Metrics for the Formalized/Simplified Alactic Model (On Berlin 2009 Sprint Performances)
 #'
-#'Provides a formatted table of the goodness of fit metrics of the formalized/simplified alactic model on the sprint data from Graubner and Nixdorf (2009) for the men's
+#' Provides a formatted table of the goodness of fit metrics of the formalized/simplified alactic model on the sprint data from Graubner and Nixdorf (2009) for the men's
 #' and women's 100, 200 and 400 m.
 #'
 #'
@@ -621,11 +596,10 @@ sprint_alactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints){
 #'
 #' sprint_alactic_model_gof_metrics_table()
 #'
-sprint_alactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprints){
-
+sprint_alactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprints) {
   # generates a tidyer output for the vignette or document
 
-  #run the function
+  # run the function
 
   table <- sprint_alactic_model_gof_metrics(data)
 
@@ -646,7 +620,6 @@ sprint_alactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprin
   names(table)[names(table) == "rse"] <- "RSE <br> "
 
   return(tinytable::tt(table, notes = "Formalized/simplified Alactic model goodness of fit metrics over different sprint events"))
-
 }
 
 #' Table of Comparison of the Optimal and Formalized/Simplified Alactic Model Parameters and Goodness of Fit Metrics (On Berlin 2009 Sprint Performances)
@@ -665,9 +638,7 @@ sprint_alactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprin
 #'
 #' sprint_alactic_model_gof_comp()
 #'
-sprint_alactic_model_gof_comp <- function(data = graubner_nixdorf_sprints ){
-
-
+sprint_alactic_model_gof_comp <- function(data = graubner_nixdorf_sprints) {
   # For each event, compare the parameters and the gof metrics of the optimal as well as the formalized/simplified version of the model.
 
   # get parameters and gof of the optimized model
@@ -686,25 +657,25 @@ sprint_alactic_model_gof_comp <- function(data = graubner_nixdorf_sprints ){
   table <- dplyr::left_join(optimal_params, formalized_params, by = "event", suffix = c("_optimal", "_formalized")) |>
     dplyr::left_join(optimal_gof, by = "event") |>
     dplyr::left_join(formalized_gof, by = "event", suffix = c("_optimal", "_formalized")) |>
-    dplyr::select(event,
-                  pal_max_optimal,
-                  pal_max_formalized,
-                  mu_optimal,
-                  mu_formalized,
-                  sigma_optimal,
-                  sigma_formalized,
-                  aic_optimal,
-                  aic_formalized,
-                  bic_optimal,
-                  bic_formalized,
-                  r_squared_optimal,
-                  r_squared_formalized,
-                  rse_optimal,
-                  rse_formalized
+    dplyr::select(
+      event,
+      pal_max_optimal,
+      pal_max_formalized,
+      mu_optimal,
+      mu_formalized,
+      sigma_optimal,
+      sigma_formalized,
+      aic_optimal,
+      aic_formalized,
+      bic_optimal,
+      bic_formalized,
+      r_squared_optimal,
+      r_squared_formalized,
+      rse_optimal,
+      rse_formalized
     )
 
-return(table)
-
+  return(table)
 }
 
 #' Formated Table of Comparison of the Optimal and Formalized/Simplified Alactic Model Parameters and Goodness of Fit Metrics (On Berlin 2009 Sprint Performances)
@@ -721,8 +692,7 @@ return(table)
 #' @examples
 #' sprint_alactic_model_gof_comp_table()
 #'
-sprint_alactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints){
-
+sprint_alactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints) {
   # create a tidy table for the comparison of the optimal and formalized/simplified model
 
   table <- sprint_alactic_model_gof_comp(data)
@@ -765,24 +735,29 @@ sprint_alactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints)
 
   table <- table |>
     tinytable::tt(
-      notes = "Comparison of the optimal and formalized/simplified alactic model fitted parameters and goodness of fit metrics over different events") |>
-    tinytable::style_tt(i = 1:7,
-                        j = c(2, 4, 6, 8, 10, 12,14),
-                        background = "#FF9999") |>
-    tinytable::style_tt(i = 1:7,
-                        j = c(3, 5, 7, 9, 11, 13,15),
-                        background = "#99CCFF") |>
-    tinytable::group_tt(j = list("Maximal Alactic<br> Power (W/kg)" = 2:3,
-                                 "\u03bc" = 4:5,
-                                 "\u03c3" = 6:7,
-                                 "AIC" = 8:9,
-                                 "BIC" = 10:11,
-                                 "R-squared" = 12:13,
-                                 "RSE" = 14:15
-                                 ))
+      notes = "Comparison of the optimal and formalized/simplified alactic model fitted parameters and goodness of fit metrics over different events"
+    ) |>
+    tinytable::style_tt(
+      i = 1:7,
+      j = c(2, 4, 6, 8, 10, 12, 14),
+      background = "#FF9999"
+    ) |>
+    tinytable::style_tt(
+      i = 1:7,
+      j = c(3, 5, 7, 9, 11, 13, 15),
+      background = "#99CCFF"
+    ) |>
+    tinytable::group_tt(j = list(
+      "Maximal Alactic<br> Power (W/kg)" = 2:3,
+      "\u03bc" = 4:5,
+      "\u03c3" = 6:7,
+      "AIC" = 8:9,
+      "BIC" = 10:11,
+      "R-squared" = 12:13,
+      "RSE" = 14:15
+    ))
 
   return(table)
-
 }
 
 
@@ -802,12 +777,11 @@ sprint_alactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints)
 #'
 #' sprint_lactic_model_optimal_params()
 #'
-#'
-sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints){
+sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints) {
   # events
   events <- unique(data$event)
 
-  #initialize table
+  # initialize table
 
   table <- tibble::tibble(
     event = character(),
@@ -817,9 +791,7 @@ sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints){
   )
 
 
-  for(i in events){
-
-
+  for (i in events) {
     event_data <- data |>
       dplyr::filter(event == i)
 
@@ -834,15 +806,16 @@ sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints){
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
 
-    if(i == "Men's 100 m" | i == "Men's 200 m"| i == "Men's 400 m"){
-      map<- 24.5}
-    else{
-      map <- 21}
+    if (i == "Men's 100 m" | i == "Men's 200 m" | i == "Men's 400 m") {
+      map <- 24.5
+    } else {
+      map <- 21
+    }
 
 
     sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
-                                                                           maximal_aerobic_power = map,
-                                                                           basal_metabolic_rate = 1.2
+      maximal_aerobic_power = map,
+      basal_metabolic_rate = 1.2
     )
 
     # Fit the log-normal distribution to the alactic power distribution
@@ -861,13 +834,11 @@ sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints){
     # add to table
 
     table <- dplyr::bind_rows(table, subtable)
-
   }
 
   # return table
 
   return(table)
-
 }
 
 
@@ -885,11 +856,10 @@ sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints){
 #'
 #' sprint_lactic_model_optimal_params_table()
 #'
-sprint_lactic_model_optimal_params_table <- function(data = graubner_nixdorf_sprints){
-
+sprint_lactic_model_optimal_params_table <- function(data = graubner_nixdorf_sprints) {
   # generates a tidyer output for the vignette or document
 
-  #run the function
+  # run the function
 
   table <- sprint_lactic_model_optimal_params(data)
 
@@ -908,7 +878,6 @@ sprint_lactic_model_optimal_params_table <- function(data = graubner_nixdorf_spr
 
 
   return(tinytable::tt(table, notes = "Lactic model optimal fitted parameters over different events"))
-
 }
 
 
@@ -985,12 +954,11 @@ fit_lactic_power_params <- function(sprint_approx_power_distribution, k1 = 2.75,
 #'
 #' sprint_lactic_model_params()
 #'
-#'
-sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints){
+sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints) {
   # events
   events <- unique(data$event)
 
-  #initialize table
+  # initialize table
 
   table <- tibble::tibble(
     event = character(),
@@ -1000,9 +968,7 @@ sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints){
   )
 
 
-  for(i in events){
-
-
+  for (i in events) {
     event_data <- data |>
       dplyr::filter(event == i)
 
@@ -1017,15 +983,16 @@ sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints){
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
 
-    if(i == "Men's 100 m" | i == "Men's 200 m"| i == "Men's 400 m"){
-      map<- 24.5}
-    else{
-      map <- 21}
+    if (i == "Men's 100 m" | i == "Men's 200 m" | i == "Men's 400 m") {
+      map <- 24.5
+    } else {
+      map <- 21
+    }
 
 
     sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
-                                                                           maximal_aerobic_power = map,
-                                                                           basal_metabolic_rate = 1.2
+      maximal_aerobic_power = map,
+      basal_metabolic_rate = 1.2
     )
 
     # Fit the log-normal distribution to the alactic power distribution
@@ -1044,13 +1011,11 @@ sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints){
     # add to table
 
     table <- dplyr::bind_rows(table, subtable)
-
   }
 
   # return table
 
   return(table)
-
 }
 
 
@@ -1069,11 +1034,10 @@ sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints){
 #'
 #' sprint_lactic_model_params_table()
 #'
-sprint_lactic_model_params_table <- function(data = graubner_nixdorf_sprints){
-
+sprint_lactic_model_params_table <- function(data = graubner_nixdorf_sprints) {
   # generates a tidyer output for the vignette or document
 
-  #run the function
+  # run the function
 
   table <- sprint_lactic_model_params(data)
 
@@ -1092,7 +1056,6 @@ sprint_lactic_model_params_table <- function(data = graubner_nixdorf_sprints){
 
 
   return(tinytable::tt(table, notes = "Formalized lactic Model fitted parameters over different sprint events"))
-
 }
 
 
@@ -1111,12 +1074,11 @@ sprint_lactic_model_params_table <- function(data = graubner_nixdorf_sprints){
 #'
 #'
 #' sprint_lactic_model_optimal_gof_metrics()
-sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_sprints){
-
+sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_sprints) {
   # events
   events <- unique(data$event)
 
-  #initialize table
+  # initialize table
   table <- tibble::tibble(
     event = character(),
     aic = numeric(),
@@ -1125,9 +1087,7 @@ sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spri
     rse = numeric()
   )
 
-  for(i in events){
-
-
+  for (i in events) {
     event_data <- data |>
       dplyr::filter(event == i)
 
@@ -1142,15 +1102,16 @@ sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spri
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
 
-    if(i == "Men's 100 m" | i == "Men's 200 m"| i == "Men's 400 m"){
-      map<- 24.5}
-    else{
-      map <- 21}
+    if (i == "Men's 100 m" | i == "Men's 200 m" | i == "Men's 400 m") {
+      map <- 24.5
+    } else {
+      map <- 21
+    }
 
 
     sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
-                                                                           maximal_aerobic_power = map,
-                                                                           basal_metabolic_rate = 1.2
+      maximal_aerobic_power = map,
+      basal_metabolic_rate = 1.2
     )
 
     gof_metrics <- fit_approx_lactic_gof_metrics(sprint_approx_power_distributions)
@@ -1168,12 +1129,9 @@ sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spri
     # add to table
 
     table <- dplyr::bind_rows(table, subtable)
-
-
   }
 
   return(table)
-
 }
 
 
@@ -1192,11 +1150,10 @@ sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spri
 #'
 #' sprint_lactic_model_optimal_gof_metrics_table()
 #'
-sprint_lactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdorf_sprints){
-
+sprint_lactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdorf_sprints) {
   # generates a tidyer output for the vignette or document
 
-  #run the function
+  # run the function
 
   table <- sprint_lactic_model_optimal_gof_metrics(data)
 
@@ -1217,7 +1174,6 @@ sprint_lactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdor
   names(table)[names(table) == "rse"] <- "RSE <br> "
 
   return(tinytable::tt(table, notes = "Optimal lactic model goodness of fit metrics over different events"))
-
 }
 
 
@@ -1260,7 +1216,6 @@ sprint_lactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdor
 #' fit_lactic_gof_metrics(sprint_approx_power_distributions)
 #'
 fit_lactic_gof_metrics <- function(data, k1 = 2.75, k2 = 35) {
-
   # run the model
 
 
@@ -1314,11 +1269,11 @@ fit_lactic_gof_metrics <- function(data, k1 = 2.75, k2 = 35) {
 #'
 #' sprint_lactic_model_gof_metrics()
 #'
-sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints){
+sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints) {
   # events
   events <- unique(data$event)
 
-  #initialize table
+  # initialize table
   table <- tibble::tibble(
     event = character(),
     aic = numeric(),
@@ -1327,9 +1282,7 @@ sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints){
     rse = numeric()
   )
 
-  for(i in events){
-
-
+  for (i in events) {
     event_data <- data |>
       dplyr::filter(event == i)
 
@@ -1344,15 +1297,16 @@ sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints){
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
 
-    if(i == "Men's 100 m" | i == "Men's 200 m"| i == "Men's 400 m"){
-      map<- 24.5}
-    else{
-      map <- 21}
+    if (i == "Men's 100 m" | i == "Men's 200 m" | i == "Men's 400 m") {
+      map <- 24.5
+    } else {
+      map <- 21
+    }
 
 
     sprint_approx_power_distributions <- sprint_approx_power_distributions(sprint_data,
-                                                                           maximal_aerobic_power = map,
-                                                                           basal_metabolic_rate = 1.2
+      maximal_aerobic_power = map,
+      basal_metabolic_rate = 1.2
     )
 
     gof_metrics <- fit_lactic_gof_metrics(sprint_approx_power_distributions)
@@ -1370,19 +1324,15 @@ sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints){
     # add to table
 
     table <- dplyr::bind_rows(table, subtable)
-
-
   }
 
   return(table)
-
-
 }
 
 #' Formatted Table of Goodness of Fit Metrics for the Formalized/Simplified Lactic Model (On Berlin 2009 Sprint Performances)
 #'
-#'Provides a formatted table of the goodness of fit metrics of the formalized/simplified lactic model on the sprint data from Graubner and Nixdorf (2009) for the men's
-#'and women's 100, 200 and 400 m.
+#' Provides a formatted table of the goodness of fit metrics of the formalized/simplified lactic model on the sprint data from Graubner and Nixdorf (2009) for the men's
+#' and women's 100, 200 and 400 m.
 #'
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
@@ -1394,11 +1344,10 @@ sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints){
 #'
 #' sprint_lactic_model_gof_metrics_table()
 #'
-sprint_lactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprints){
-
+sprint_lactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprints) {
   # generates a tidyer output for the vignette or document
 
-  #run the function
+  # run the function
 
   table <- sprint_lactic_model_gof_metrics(data)
 
@@ -1419,7 +1368,6 @@ sprint_lactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprint
   names(table)[names(table) == "rse"] <- "RSE <br> "
 
   return(tinytable::tt(table, notes = "Formalized/simplified lactic model goodness of fit metrics over different sprint events"))
-
 }
 
 #' Table of Comparison of the Optimal and Formalized/Simplified Lactic Models Parameters and Goodness of Fit Metrics (On Berlin 2009 Sprint Performances)
@@ -1438,9 +1386,7 @@ sprint_lactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprint
 #'
 #' sprint_lactic_model_gof_comp()
 #'
-sprint_lactic_model_gof_comp <- function(data = graubner_nixdorf_sprints ){
-
-
+sprint_lactic_model_gof_comp <- function(data = graubner_nixdorf_sprints) {
   # For each event, compare the parameters and the gof metrics of the optimal as well as the formalized/simplified version of the model.
 
   # get parameters and gof of the optimized model
@@ -1459,25 +1405,25 @@ sprint_lactic_model_gof_comp <- function(data = graubner_nixdorf_sprints ){
   table <- dplyr::left_join(optimal_params, formalized_params, by = "event", suffix = c("_optimal", "_formalized")) |>
     dplyr::left_join(optimal_gof, by = "event") |>
     dplyr::left_join(formalized_gof, by = "event", suffix = c("_optimal", "_formalized")) |>
-    dplyr::select(event,
-                  p_la_max_optimal,
-                  p_la_max_formalized,
-                  k1_optimal,
-                  k1_formalized,
-                  k2_optimal,
-                  k2_formalized,
-                  aic_optimal,
-                  aic_formalized,
-                  bic_optimal,
-                  bic_formalized,
-                  r_squared_optimal,
-                  r_squared_formalized,
-                  rse_optimal,
-                  rse_formalized
+    dplyr::select(
+      event,
+      p_la_max_optimal,
+      p_la_max_formalized,
+      k1_optimal,
+      k1_formalized,
+      k2_optimal,
+      k2_formalized,
+      aic_optimal,
+      aic_formalized,
+      bic_optimal,
+      bic_formalized,
+      r_squared_optimal,
+      r_squared_formalized,
+      rse_optimal,
+      rse_formalized
     )
 
   return(table)
-
 }
 
 #' Formatted Table of Comparison of the Optimal and Formalized/Simplified Lactic Models Parameters and Goodness of Fit Metrics (On Berlin 2009 Sprint Performances)
@@ -1494,8 +1440,7 @@ sprint_lactic_model_gof_comp <- function(data = graubner_nixdorf_sprints ){
 #' @examples
 #' sprint_lactic_model_gof_comp_table()
 #'
-sprint_lactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints){
-
+sprint_lactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints) {
   # create a tidy table for the comparison of the optimal and formalized/simplified model
 
   table <- sprint_lactic_model_gof_comp(data)
@@ -1540,25 +1485,27 @@ sprint_lactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints){
 
   table <- table |>
     tinytable::tt(
-      notes = "Comparison of the optimal and formalized/simplified alactic model fitted parameters and goodness of fit metrics over different events") |>
-    tinytable::style_tt(i = 1:7,
-                        j = c(2, 4, 6, 8, 10, 12,14),
-                        background = "#FF9999") |>
-    tinytable::style_tt(i = 1:7,
-                        j = c(3, 5, 7, 9, 11, 13,15),
-                        background = "#99CCFF") |>
-    tinytable::group_tt(j = list("Maximal Alactic<br> Power (W/kg)" = 2:3,
-                                 "k1" = 4:5,
-                                 "k2" = 6:7,
-                                 "AIC" = 8:9,
-                                 "BIC" = 10:11,
-                                 "R-squared" = 12:13,
-                                 "RSE" = 14:15
+      notes = "Comparison of the optimal and formalized/simplified alactic model fitted parameters and goodness of fit metrics over different events"
+    ) |>
+    tinytable::style_tt(
+      i = 1:7,
+      j = c(2, 4, 6, 8, 10, 12, 14),
+      background = "#FF9999"
+    ) |>
+    tinytable::style_tt(
+      i = 1:7,
+      j = c(3, 5, 7, 9, 11, 13, 15),
+      background = "#99CCFF"
+    ) |>
+    tinytable::group_tt(j = list(
+      "Maximal Lactic<br> Power (W/kg)" = 2:3,
+      "k1" = 4:5,
+      "k2" = 6:7,
+      "AIC" = 8:9,
+      "BIC" = 10:11,
+      "R-squared" = 12:13,
+      "RSE" = 14:15
     ))
 
   return(table)
-
 }
-
-
-

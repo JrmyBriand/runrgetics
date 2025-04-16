@@ -27,8 +27,6 @@ sprint_alactic_model_optimal_params_table()
 # Lactic model parameters table
 
 sprint_lactic_model_optimal_params_table()
-
-
 ```
 
 We can also look at the goodness of fit metrics of these fitted models. The `sprint_alactic_model_optimal_gof_metrics_table` and `sprint_lactic_model_optimal_gof_metrics_table` functions display the goodness of fit metrics for the alactic and lactic model, respectively. 
@@ -40,7 +38,6 @@ sprint_alactic_model_optimal_gof_metrics_table()
 # Lactic model gof table
 
 sprint_lactic_model_optimal_gof_metrics_table()
-
 ```
 
 
@@ -53,17 +50,17 @@ To make the model useful and applicable, we will set the parameters of the lacti
 The following function generates tables that compare the parameters and goodness of fit metrics of the optimal fit, where the values of $\mu$, $\sigma$, $k_1$ and $k_2$ are variables that can be fitters, with the a formalized or simplified fit where the values of $\mu$, $\sigma$, $k_1$ and $k_2$ are set to the values mentioned above. The following code chunk generates the comparison tables. The cells in red to the optimal model fit and the cells in blue correspond to the formalized model fit. 
 
 ```{r}
-
 # alactic model comparison table
 sprint_alactic_model_gof_comp_table()
 
 # lactic model comparison table
 
 sprint_lactic_model_gof_comp_table()
-
 ```
 
-As expected, because the formalized model corresponds to a compromise between the parameters values over all events, the AIC and BIC is less than the optimal model. The residual squared error is also larger than the optimal model. However, the residual squared error is not significantly larger than the optimal model, except for some rare occasions (e.g. the Men's 100 m alactic model). The choice of set parameters therefore seems a reasonable compromise between the optimal model and a simplified model that can be easily applied accross all sprint events. The same observations can be made of the $R^2$ values. 
+As expected, because the formalized model corresponds to a compromise between the parameters values over all events, the AIC and BIC is less than the optimal model. The residual squared error is also larger than the optimal model. However, the residual squared error is not significantly larger than the optimal model, except for some rare occasions (e.g. the Men's 100 m alactic model). A large portion of this discrepancy for the Men's 100 m can be attributed to the difference in the peak alactic power. This value is already subject to some uncertainty since the instantaneous velocity in the first seconds of running is interpolated using available time splits. 
+
+Based on the above, the choice of set parameters therefore seems a reasonable compromise between the optimal model and a simplified model that can be easily applied across all sprint events. The same observations can be made of the $R^2$ values. 
 
 
 ## The Formalised Model
