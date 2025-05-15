@@ -21,5 +21,4 @@ The only fitted value is therefore the maximal alactic power. The set value corr
 
 sprint_alactic_model_params()
 
-
 }

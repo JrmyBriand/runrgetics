@@ -21,5 +21,4 @@ The only fitted value is therefore the maximal lactic power. The set value corre
 
 sprint_lactic_model_params()
 
-
 }

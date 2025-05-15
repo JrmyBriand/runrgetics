@@ -1,4 +1,5 @@
 library(ggplot2)
+library(mockery)
 
 # Create a simple test dataset similar to what your functions expect
 test_sprint_approx_power_distribution <- data.frame(

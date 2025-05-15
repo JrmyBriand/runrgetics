@@ -20,5 +20,4 @@ and women's 100, 200 and 400 m.
 
 sprint_lactic_model_optimal_params()
 
-
 }
