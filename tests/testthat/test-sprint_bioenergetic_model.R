@@ -79,3 +79,72 @@ test_that("sprint_bioenergetic_model_max_la returns expected type", {
   expect_length(result, 1)  # should be a single value
 })
 
+# tests/testthat/test-sprint-bioenergetic-model-data.R
+
+test_that("sprint_bioenergetic_model_data returns expected structure", {
+  # Create minimal mock data
+  mock_data <- tibble::tibble(
+    time = seq(0, 10, by = 1),
+    velocity = seq(0, 10, by = 1),
+    acceleration = rep(1, 11),
+    distance = cumsum(velocity),
+    power = velocity * 10
+  )
+
+  result <- sprint_bioenergetic_model_data(mock_data)
+
+  # Check that it's a tibble
+  expect_s3_class(result, "tbl_df")
+
+  # Check that all expected columns exist
+  expected_columns <- c(
+    "time", "velocity", "acceleration", "distance", "power",
+    "power_mod", "power_alactic", "power_lactic",
+    "power_anaerobic", "power_aerobic"
+  )
+
+  expect_true(all(expected_columns %in% names(result)))
+
+  # Check that number of rows matches input
+  expect_equal(nrow(result), nrow(mock_data))
+})
+
+test_that("sprint_bioenergetic_model_data power columns are numeric", {
+  # Create minimal mock data
+  mock_data <- tibble::tibble(
+    time = seq(0, 10, by = 1),
+    velocity = seq(0, 10, by = 1),
+    acceleration = rep(1, 11),
+    distance = cumsum(velocity),
+    power = velocity * 10
+  )
+
+  result <- sprint_bioenergetic_model_data(mock_data)
+
+  # Check that power columns are numeric
+  expect_type(result$power_mod, "double")
+  expect_type(result$power_alactic, "double")
+  expect_type(result$power_lactic, "double")
+  expect_type(result$power_anaerobic, "double")
+  expect_type(result$power_aerobic, "double")
+})
+
+test_that("sprint_bioenergetic_model_data anaerobic power is sum of alactic and lactic", {
+  # Create minimal mock data
+  mock_data <- tibble::tibble(
+    time = seq(0, 10, by = 1),
+    velocity = seq(0, 10, by = 1),
+    acceleration = rep(1, 11),
+    distance = cumsum(velocity),
+    power = velocity * 10
+  )
+
+  result <- sprint_bioenergetic_model_data(mock_data)
+
+  # Check that anaerobic power equals alactic + lactic
+  expect_equal(
+    result$power_anaerobic,
+    result$power_alactic + result$power_lactic
+  )
+})
+

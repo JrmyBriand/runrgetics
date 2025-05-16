@@ -106,7 +106,6 @@ maximal_lactic_power
 
 ```
 
-
 As presented in Briand et al. (2025), for elite sprinters available in the Graubner and Nixdrof (2011) dataset, the maximal aerobic power can be estimated to be 24.5 W/kg for male sprinters and 21 W/kg for female sprinter. The default parameter was set at 24.5 W/kg for the maximal aerobic power. When dealing with female athletes' performances, the maximal aerobic power can be adjusted accordingly. 
 
 The following example derived Fraser-Pryce's 100 m maximal alactic and maximal lactic power from the Graubner and Nixdorf (2011) dataset.
@@ -137,8 +136,34 @@ maximal_lactic_power <- sprint_bioenergetic_model_max_la(FP_100m_motion_data, ma
 maximal_lactic_power
 ```
 
+From the sprint motion data extracted from the Graubner and Nixdorf data set, the function `sprint_bioenergetic_model_data` can be used to add columns to the sprint motion data, representing the energy from the 3 energy pathways as well as the total metabolic power computed from the model. 
+
+```{r}
+bolt_modeled_data <- sprint_bioenergetic_model_data(bolt_100m_motion_data)
+
+head(bolt_modeled_data)
+
+```
+
+
 ## Visualising the Sprint Bioenergetic Model Compared to Sprint Motion Data
 
+The function `plot_sprint_bioenergetic_model` can be used to visualise the power derived sprint bioenergetic model compared to the metabolic power available in the sprint motion data, derived using di Pampero et al. (2005, 2018) approach. The following example plots the sprint bioenergetic model compared to the sprint motion data for Bolt's 100 m sprint. 
 
+```{r}
+plot_sprint_bioenergetic_model(
+  sprint_motion_data = bolt_100m_motion_data
+)
 
+```
+
+The same function can be used to plot the sprint bioenergetic model compared to the sprint motion data for Fraser-Pryce's 100 m sprint, specifying a maximal aerobic power of 21 W/kg. The y-axis scale can also be adjusted using the `scale_max_power` argument, which is set by default at 160 W/kg.
+
+```{r}
+plot_sprint_bioenergetic_model(
+  sprint_motion_data = FP_100m_motion_data,
+  maximal_aerobic_power = 21,
+  scale_max_power = 110
+)
+```
 

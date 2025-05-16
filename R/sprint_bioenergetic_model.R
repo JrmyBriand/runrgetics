@@ -193,4 +193,81 @@ sprint_bioenergetic_model_max_la <- function(sprint_motion_data, maximal_aerobic
 
 }
 
+#' Model Power from Energy Pathways (alactic, lactic and aerobic) from Sprint Motion Data
+#'
+#' Applies the sprint bioenergetic model to the sprint motion data. The functions adds columns to the sprint motion data tibble corresponding to the
+#' alactic, lactic and aerobic power. The function also adds a column for the anaerobic and total power.
+#'
+#' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
+#' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
+#'
+#' @returns A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg). The function adds columns for the alactic (power_alactic), lactic (power_lactic), anaerobic (power_anaerobic), aerobic (power_aerobic) and modeled total metabolic power (power_mod).
+#' @export
+#'
+#' @examples
+#' # Extract Bolt's 100 m data from Graubner and Nixdorf data set.
+#' bolt_100m <- graubner_nixdorf_sprints |>
+#'   dplyr::filter(
+#'     athlete == "Bolt",
+#'     event == "Men's 100 m"
+#'   )
+#'
+#' # Compute sprint motion data
+#'
+#' bolt_100m_motion_data <- sprint_motion_model_data(
+#'   mean_velocity_splits = bolt_100m$velocity,
+#'   time_splits = bolt_100m$splits,
+#'   distance = bolt_100m$distance,
+#'   reaction_time = bolt_100m$reaction_time[1],
+#'   maximal_velocity = bolt_100m$maximal_velocity[1]
+#' )
+#'
+#'
+#' bolt_modeled_data <- sprint_bioenergetic_model_data(bolt_100m_motion_data)
+#'
+#' head(bolt_modeled_data)
+#'
+sprint_bioenergetic_model_data <- function(sprint_motion_data, maximal_aerobic_power = 24.5){
 
+  # get maximal alactic power
+  maximal_alactic_power <- sprint_bioenergetic_model_max_al(sprint_motion_data, maximal_aerobic_power)
+
+  # get maximal lactic power
+
+  maximal_lactic_power <- sprint_bioenergetic_model_max_la(sprint_motion_data, maximal_aerobic_power)
+
+  sprint_modeled_data <- sprint_motion_data |>
+    dplyr::mutate(
+      power_mod = sprint_bioenergetic_model(
+        time = time,
+        maximal_alactic_power = maximal_alactic_power,
+        maximal_lactic_power = maximal_lactic_power,
+        maximal_aerobic_power = maximal_aerobic_power
+      ),
+      power_alactic = sprint_bioenergetic_model(
+        time = time,
+        maximal_alactic_power = maximal_alactic_power,
+        maximal_lactic_power = maximal_lactic_power,
+        maximal_aerobic_power = maximal_aerobic_power,
+        output = "alactic power"
+      ),
+      power_lactic = sprint_bioenergetic_model(
+        time = time,
+        maximal_alactic_power = maximal_alactic_power,
+        maximal_lactic_power = maximal_lactic_power,
+        maximal_aerobic_power = maximal_aerobic_power,
+        output = "lactic power"
+      ),
+      power_anaerobic = power_alactic+ power_lactic,
+      power_aerobic = sprint_bioenergetic_model(
+        time = time,
+        maximal_alactic_power = maximal_alactic_power,
+        maximal_lactic_power = maximal_lactic_power,
+        maximal_aerobic_power = maximal_aerobic_power,
+        output = "aerobic power"
+      )
+    )
+
+  return(sprint_modeled_data)
+
+}

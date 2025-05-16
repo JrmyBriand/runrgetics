@@ -76,7 +76,7 @@ sprint_motion_deceleration_data <- function(sprint_motion_data) {
   # compute aerobic and anaerobic power
 
   sprint_motion_data_mod <- sprint_motion_data |>
-    mutate(
+    dplyr::mutate(
       power_aerobic = sprint_approx_aerobic_power(time = time),
       power_anaerobic = power - power_aerobic
     )
