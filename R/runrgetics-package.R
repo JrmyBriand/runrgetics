@@ -19,6 +19,7 @@
 #' @importFrom ggplot2 theme_minimal
 #' @importFrom minpack.lm nlsLM
 #' @importFrom stats approx
+#' @importFrom stats coef
 #' @importFrom stats fitted
 #' @importFrom stats resid
 #' @importFrom tibble tibble

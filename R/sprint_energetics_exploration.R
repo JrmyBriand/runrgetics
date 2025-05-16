@@ -174,7 +174,7 @@ sprint_approx_power_distributions <- function(sprint_motion_data, maximal_aerobi
   # calculate aerobic and anaerobic power
 
   sprint_motion_data_mod <- sprint_motion_data |>
-    mutate(
+    dplyr::mutate(
       power_aerobic = sprint_approx_aerobic_power(time = time, maximal_aerobic_power = maximal_aerobic_power, basal_metabolic_rate = basal_metabolic_rate),
       power_anaerobic = power - power_aerobic
     )
