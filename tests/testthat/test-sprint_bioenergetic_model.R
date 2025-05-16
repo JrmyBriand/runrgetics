@@ -38,7 +38,7 @@ test_that("sprint_bioenergetic_model_fit returns expected class", {
     velocity = seq(0, 10, by = 1),
     acceleration = rep(1, 11),
     distance = cumsum(velocity),
-    power = velocity * 10  # Simple mock power values
+    power = velocity * 10 # Simple mock power values
   )
 
   fit <- sprint_bioenergetic_model_fit(mock_data)
@@ -60,7 +60,7 @@ test_that("sprint_bioenergetic_model_max_al returns expected type", {
   result <- sprint_bioenergetic_model_max_al(mock_data)
 
   expect_type(result, "double")
-  expect_length(result, 1)  # should be a single value
+  expect_length(result, 1) # should be a single value
 })
 
 test_that("sprint_bioenergetic_model_max_la returns expected type", {
@@ -76,7 +76,7 @@ test_that("sprint_bioenergetic_model_max_la returns expected type", {
   result <- sprint_bioenergetic_model_max_la(mock_data)
 
   expect_type(result, "double")
-  expect_length(result, 1)  # should be a single value
+  expect_length(result, 1) # should be a single value
 })
 
 # tests/testthat/test-sprint-bioenergetic-model-data.R
@@ -147,4 +147,3 @@ test_that("sprint_bioenergetic_model_data anaerobic power is sum of alactic and 
     result$power_alactic + result$power_lactic
   )
 })
-

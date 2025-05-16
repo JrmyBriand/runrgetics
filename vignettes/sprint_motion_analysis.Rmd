@@ -173,31 +173,26 @@ The following function returns the velocity model for distances of less than 200
 Now we can apply the model on the male and female 100, 200 and 400 m and check if the assumptions are respected. 
 
 ```{r}
+time <- find_time_velocity(men_100$splits, men_100$reaction_time[1])
+velocity <- men_100$velocity
+reaction_time <- men_100$reaction_time[1]
 
- time <- find_time_velocity(men_100$splits, men_100$reaction_time[1])
- velocity <- men_100$velocity
- reaction_time <- men_100$reaction_time[1]
-  
 
 # generate the model
- mod_100 <- sprint_velocity_least_squares_model(time = time, velocity = velocity, reaction_time = reaction_time)
- mod_100
-
+mod_100 <- sprint_velocity_least_squares_model(time = time, velocity = velocity, reaction_time = reaction_time)
+mod_100
 ```
 
 
 A diagnostic of the non linear least-squares model assumptions can be made with the function `diagnose_velocity_model_acc`. The function will return the RMSE and RSE of the model, along with 4 plots: observed vs. fitted values, residuals vs. fitted values, Q–Q plot of residuals, and histogram of residuals.
 
 ```{r}
-
 diagnose_velocity_model_acc(
   mean_velocity_splits = men_100$velocity,
   time_splits = men_100$splits,
   distance = men_100$distance,
   reaction_time = men_100$reaction_time[1]
 )
-
-
 ```
 
 As specified in Briand et al. (2025), for running distances beyond 200 m, the non-linear least-squares model uses only estimated instantaneous velocity and their associated time points up to distances of 200 m. In such case, the distance parameter can be modulated in the `diagnose_velocity_model_acc` function. 
@@ -209,10 +204,9 @@ diagnose_velocity_model_acc(
   mean_velocity_splits = merritt_400m$velocity,
   time_splits = merritt_400m$splits,
   distance = merritt_400m$distance,
-  reaction_time = merritt_400m$reaction_time[1], 
+  reaction_time = merritt_400m$reaction_time[1],
   sprint_total_distance = 400
 )
-
 ```
 
 ```{r}
@@ -223,8 +217,6 @@ diagnose_sprint_model(
   reaction_time = men_100$reaction_time[1],
   maximal_velocity = men_100$maximal_velocity[1],
 )
-  
-
 ```
 
 
@@ -234,7 +226,7 @@ diagnose_sprint_model(
   mean_velocity_splits = merritt_400m$velocity,
   time_splits = merritt_400m$splits,
   distance = merritt_400m$distance,
-  reaction_time = merritt_400m$reaction_time[1], 
+  reaction_time = merritt_400m$reaction_time[1],
   maximal_velocity = merritt_400m$maximal_velocity[1],
 )
 ```

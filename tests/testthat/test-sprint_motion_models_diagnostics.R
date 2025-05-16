@@ -10,7 +10,7 @@ test_that("sprint_velocity_least_squares_model works with valid inputs", {
 
   # Basic checks
   expect_s3_class(model, "nls")
-  expect_true(all(coef(model) > 0))  # coefficients should be positive
+  expect_true(all(coef(model) > 0)) # coefficients should be positive
   expect_named(coef(model), c("tau", "vf"))
 })
 

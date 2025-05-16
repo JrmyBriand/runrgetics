@@ -29,7 +29,6 @@ We can use the male 100 m sprint data from the Graubner and Nixdorf (2023) datas
 Supposing that the maximal alactic power attained during the sprint is of 150 W/kg and that the maximal lactic power attained during the sprint is of 50 W/kg, we can use the function `sprint_bioenergetic_model` to compute the total metabolic power during the sprint.
 
 ```{r}
-
 # Setting, time, maximal_alactic_power and maximal_lactic_power
 time <- seq(0, 9.58, by = 0.01)
 maximal_alactic_power <- 150
@@ -43,18 +42,17 @@ total_power <- sprint_bioenergetic_model(time, maximal_alactic_power, maximal_la
 
 ggplot2::ggplot(data = tibble::tibble(time = time, total_power = total_power), aes(x = time, y = total_power)) +
   ggplot2::geom_line(linewidth = 1.5) +
-  ggplot2::labs(title = "Total Metabolic Power during a Sprint",
-       x = "Time (s)",
-       y = "Total Power (W/kg)") +
+  ggplot2::labs(
+    title = "Total Metabolic Power during a Sprint",
+    x = "Time (s)",
+    y = "Total Power (W/kg)"
+  ) +
   ggplot2::theme_minimal()
-
-
 ```
 
 The `output` argument of the function `sprint_bioenergetic_model` allows to compute the contribution of each energy pathway to the total metabolic power. For example, we can compute the alactic power contribution during the sprint as follows:
 
 ```{r}
-
 # applying the sprint_bioenergetic_model function to get total metabolic power
 
 alactic_power <- sprint_bioenergetic_model(time, maximal_alactic_power, maximal_lactic_power, output = "alactic power")
@@ -63,12 +61,12 @@ alactic_power <- sprint_bioenergetic_model(time, maximal_alactic_power, maximal_
 
 ggplot2::ggplot(data = tibble::tibble(time = time, alactic_power = alactic_power), aes(x = time, y = alactic_power)) +
   ggplot2::geom_line(color = "darkred", linewidth = 1.5) +
-  ggplot2::labs(title = "Alactic Power during a Sprint",
-       x = "Time (s)",
-       y = "Alactic Power (W/kg)") +
+  ggplot2::labs(
+    title = "Alactic Power during a Sprint",
+    x = "Time (s)",
+    y = "Alactic Power (W/kg)"
+  ) +
   ggplot2::theme_minimal()
-
-
 ```
 
 
@@ -79,7 +77,7 @@ The previous examples relied on rough guesses of the sprint maximal alactic and 
 The following example shows how to derive sprint motion data from the Graubner and Nixdorf (2011) dataset and fit the sprint bioenergetic model to the data to extract the sprint maximal alactic and maximal lactic power. The functions `sprint_bioenergetic_model_max_al` and `sprint_bioenergetic_model_max_la` are used to extract both paramters.
 
 ```{r}
-# Extract Bolt's 100 m data from Graubner and Nixdorf data set. 
+# Extract Bolt's 100 m data from Graubner and Nixdorf data set.
 bolt_100m <- graubner_nixdorf_sprints |>
   dplyr::filter(
     athlete == "Bolt",
@@ -103,7 +101,6 @@ maximal_alactic_power
 
 maximal_lactic_power <- sprint_bioenergetic_model_max_la(bolt_100m_motion_data)
 maximal_lactic_power
-
 ```
 
 As presented in Briand et al. (2025), for elite sprinters available in the Graubner and Nixdrof (2011) dataset, the maximal aerobic power can be estimated to be 24.5 W/kg for male sprinters and 21 W/kg for female sprinter. The default parameter was set at 24.5 W/kg for the maximal aerobic power. When dealing with female athletes' performances, the maximal aerobic power can be adjusted accordingly. 
@@ -111,7 +108,7 @@ As presented in Briand et al. (2025), for elite sprinters available in the Graub
 The following example derived Fraser-Pryce's 100 m maximal alactic and maximal lactic power from the Graubner and Nixdorf (2011) dataset.
 
 ```{r}
-# Extract Bolt's 100 m data from Graubner and Nixdorf data set. 
+# Extract Bolt's 100 m data from Graubner and Nixdorf data set.
 FP_100m <- graubner_nixdorf_sprints |>
   dplyr::filter(
     event == "Women's 100 m"
@@ -120,7 +117,7 @@ FP_100m <- graubner_nixdorf_sprints |>
 # Compute sprint motion data
 
 FP_100m_motion_data <- sprint_motion_model_data(
-  mean_velocity_splits =FP_100m$velocity,
+  mean_velocity_splits = FP_100m$velocity,
   time_splits = FP_100m$splits,
   distance = FP_100m$distance,
   reaction_time = FP_100m$reaction_time[1],
@@ -142,7 +139,6 @@ From the sprint motion data extracted from the Graubner and Nixdorf data set, th
 bolt_modeled_data <- sprint_bioenergetic_model_data(bolt_100m_motion_data)
 
 head(bolt_modeled_data)
-
 ```
 
 
@@ -154,7 +150,6 @@ The function `plot_sprint_bioenergetic_model` can be used to visualise the power
 plot_sprint_bioenergetic_model(
   sprint_motion_data = bolt_100m_motion_data
 )
-
 ```
 
 The same function can be used to plot the sprint bioenergetic model compared to the sprint motion data for Fraser-Pryce's 100 m sprint, specifying a maximal aerobic power of 21 W/kg. The y-axis scale can also be adjusted using the `scale_max_power` argument, which is set by default at 160 W/kg.

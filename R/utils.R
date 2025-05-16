@@ -32,7 +32,6 @@ middle_point <- function(t1, t2) {
 #'
 #' bi_exponential_knorm(2, 40)
 #'
-bi_exponential_knorm <- function(t1, t2){
-
- return((t1+t2)/(t2*(t1/(t1+t2))^(t1/t2)) )
+bi_exponential_knorm <- function(t1, t2) {
+  return((t1 + t2) / (t2 * (t1 / (t1 + t2))^(t1 / t2)))
 }

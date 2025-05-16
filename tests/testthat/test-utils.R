@@ -1,4 +1,3 @@
-
 # tests/testthat/test-middle-point.R
 
 test_that("middle_point calculates correct midpoint", {

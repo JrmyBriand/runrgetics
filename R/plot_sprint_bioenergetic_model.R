@@ -30,14 +30,10 @@ utils::globalVariables(c("power_mod"))
 #'
 #'
 #' plot_sprint_bioenergetic_model(
-#' sprint_motion_data = bolt_100m_motion_data
+#'   sprint_motion_data = bolt_100m_motion_data
 #' )
 #'
-#'
-#'
-plot_sprint_bioenergetic_model <- function(sprint_motion_data, maximal_aerobic_power = 24.5, scale_max_power = 160){
-
-
+plot_sprint_bioenergetic_model <- function(sprint_motion_data, maximal_aerobic_power = 24.5, scale_max_power = 160) {
   # compute modeled data from the three energy pathways
 
   modeled_data <- sprint_bioenergetic_model_data(sprint_motion_data, maximal_aerobic_power)
@@ -46,7 +42,7 @@ plot_sprint_bioenergetic_model <- function(sprint_motion_data, maximal_aerobic_p
     # Add model components
     ggplot2::geom_line(aes(y = power_aerobic, color = "Aerobic Power"), linewidth = 1) +
     ggplot2::geom_line(aes(y = power_alactic, color = "Alactic Power"), linewidth = 1) +
-    ggplot2::geom_line(aes(y = power_lactic, color = "Lactic Power"), linewidth= 1) +
+    ggplot2::geom_line(aes(y = power_lactic, color = "Lactic Power"), linewidth = 1) +
     ggplot2::geom_line(aes(y = power_mod, color = "Modeled Metabolic Power"), linewidth = 1) +
     ggplot2::geom_line(aes(y = power, color = "Observed Metabolic Power"), alpha = 0.6, linewidth = 1) +
     # Customize the plot
@@ -81,10 +77,8 @@ plot_sprint_bioenergetic_model <- function(sprint_motion_data, maximal_aerobic_p
       legend.text = element_text(size = 16),
       legend.position = "inside",
       legend.position.inside = c(0.7, 0.75)
-    )+
+    ) +
     ggplot2::scale_y_continuous(limits = c(0, scale_max_power))
 
   return(plot)
-
 }
-

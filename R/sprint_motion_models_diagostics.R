@@ -1,6 +1,8 @@
 #' @importFrom utils globalVariables
-utils::globalVariables(c("observed_velocity", "fitted_velocity",
-                        "residuals", "observed" ))
+utils::globalVariables(c(
+  "observed_velocity", "fitted_velocity",
+  "residuals", "observed"
+))
 
 #' Sprint Acceleration Velocity Model (Non-Linear Least-Squares Approach)
 #'
@@ -58,24 +60,21 @@ sprint_velocity_least_squares_model <- function(time, velocity, reaction_time) {
 #'   dplyr::filter(event == "Men's 200 m")
 #'
 #' diagnose_velocity_model_acc(
-#' mean_velocity_splits = men_200$velocity,
-#' time_splits = men_200$splits,
-#' distance = men_200$distance,
-#' reaction_time = men_200$reaction_time[1],
-#' sprint_total_distance = 200
-#'  )
+#'   mean_velocity_splits = men_200$velocity,
+#'   time_splits = men_200$splits,
+#'   distance = men_200$distance,
+#'   reaction_time = men_200$reaction_time[1],
+#'   sprint_total_distance = 200
+#' )
 #'
-#'
-diagnose_velocity_model_acc <- function(mean_velocity_splits, time_splits, distance, reaction_time ,sprint_total_distance = 100, histogram_binwidth = 0.1) {
-
+diagnose_velocity_model_acc <- function(mean_velocity_splits, time_splits, distance, reaction_time, sprint_total_distance = 100, histogram_binwidth = 0.1) {
   dat <- tibble::tibble(
     distance = distance,
     velocity = mean_velocity_splits,
     splits = time_splits
   )
 
-  if(sprint_total_distance > 200 ) {
-
+  if (sprint_total_distance > 200) {
     dat <- dat |>
       dplyr::filter(distance <= 200)
   }
@@ -167,13 +166,12 @@ diagnose_velocity_model_acc <- function(mean_velocity_splits, time_splits, dista
 #'   dplyr::filter(event == "Men's 200 m")
 #'
 #' diagnose_sprint_model(
-#' mean_velocity_splits = men_200$velocity,
-#' time_splits = men_200$splits,
-#' distance = men_200$distance,
-#' reaction_time = men_200$reaction_time[1],
-#' maximal_velocity =  men_200$maximal_velocity[1]
-#'  )
-#'
+#'   mean_velocity_splits = men_200$velocity,
+#'   time_splits = men_200$splits,
+#'   distance = men_200$distance,
+#'   reaction_time = men_200$reaction_time[1],
+#'   maximal_velocity = men_200$maximal_velocity[1]
+#' )
 #'
 diagnose_sprint_model <- function(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = NA, dt = 0.01) {
   # Run your model
