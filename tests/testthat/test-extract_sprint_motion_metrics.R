@@ -64,7 +64,7 @@ test_that("sprint_motion_model_data works with NA maximal_velocity", {
 })
 
 
-test_that("sprint_maximum_metabolic_power works correctly", {
+test_that("sprint_maximum_metabolic_power works correctly for both power types", {
   # Test case 1: Basic data with obvious maximum
   basic_data <- tibble::tibble(
     time = c(1, 2, 3),
@@ -72,10 +72,12 @@ test_that("sprint_maximum_metabolic_power works correctly", {
     acceleration = c(1, 1, 1),
     distance = c(1, 3, 6),
     cost_of_running = c(1, 2, 3),
-    power = c(10, 20, 30)
+    power = c(10, 20, 30),
+    power_mod = c(15, 25, 35)
   )
 
-  expect_equal(sprint_maximum_metabolic_power(basic_data), 30)
+  expect_equal(sprint_maximum_metabolic_power(basic_data, type = "power"), 30)
+  expect_equal(sprint_maximum_metabolic_power(basic_data, type = "power bioenergetic model"), 35)
 
   # Test case 2: Data with maximum not at the end
   unordered_data <- tibble::tibble(
@@ -84,10 +86,12 @@ test_that("sprint_maximum_metabolic_power works correctly", {
     acceleration = c(1, 1, 1),
     distance = c(1, 3, 6),
     cost_of_running = c(1, 2, 3),
-    power = c(20, 40, 10)
+    power = c(20, 40, 10),
+    power_mod = c(25, 45, 15)
   )
 
-  expect_equal(sprint_maximum_metabolic_power(unordered_data), 40)
+  expect_equal(sprint_maximum_metabolic_power(unordered_data, type = "power"), 40)
+  expect_equal(sprint_maximum_metabolic_power(unordered_data, type = "power bioenergetic model"), 45)
 
   # Test case 3: All same values
   constant_data <- tibble::tibble(
@@ -96,8 +100,21 @@ test_that("sprint_maximum_metabolic_power works correctly", {
     acceleration = c(0, 0, 0),
     distance = c(1, 2, 3),
     cost_of_running = c(5, 5, 5),
-    power = c(25, 25, 25)
+    power = c(25, 25, 25),
+    power_mod = c(30, 30, 30)
   )
 
-  expect_equal(sprint_maximum_metabolic_power(constant_data), 25)
+  expect_equal(sprint_maximum_metabolic_power(constant_data, type = "power"), 25)
+  expect_equal(sprint_maximum_metabolic_power(constant_data, type = "power bioenergetic model"), 30)
+})
+
+test_that("sprint_maximum_metabolic_power handles invalid type", {
+  basic_data <- tibble::tibble(
+    time = c(1, 2, 3),
+    power = c(10, 20, 30),
+    power_mod = c(15, 25, 35)
+  )
+
+  # Should default to "power" when invalid type is provided
+  expect_equal(sprint_maximum_metabolic_power(basic_data, type = "invalid"), 30)
 })
