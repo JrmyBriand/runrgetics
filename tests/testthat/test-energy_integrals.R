@@ -1,53 +1,75 @@
 # test-energy-total.R
 library(tibble)
 
-test_that("energy_total calculates the integral correctly", {
+test_that("energy_total calculates the integral correctly for both power types", {
   # Test with the example from the documentation
   test_data <- tibble::tibble(
     time = c(0, 1, 2, 3, 4),
-    power = c(0, 1, 2, 1, 0)
+    power = c(0, 1, 2, 1, 0),
+    power_mod = c(0, 1, 2, 1, 0)  # Adding modeled power
   )
 
   # Expected result using trapezoidal rule: (0+1)/2 + (1+2)/2 + (2+1)/2 + (1+0)/2 = 0.5 + 1.5 + 1.5 + 0.5 = 4
-  expect_equal(energy_total(test_data), 4)
+  expect_equal(energy_total(test_data, type = "power"), 4)
+  expect_equal(energy_total(test_data, type = "power bioenergetic model"), 4)
 })
 
-test_that("energy_total handles unsorted data", {
+test_that("energy_total handles unsorted data for both power types", {
   # Test with unsorted data
   unsorted_data <- tibble::tibble(
     time = c(2, 0, 4, 1, 3),
-    power = c(2, 0, 0, 1, 1)
+    power = c(2, 0, 0, 1, 1),
+    power_mod = c(2, 0, 0, 1, 1)
   )
 
   # The function should sort this internally and produce the same result as sorted data
   sorted_data <- tibble::tibble(
     time = c(0, 1, 2, 3, 4),
-    power = c(0, 1, 2, 1, 0)
+    power = c(0, 1, 2, 1, 0),
+    power_mod = c(0, 1, 2, 1, 0)
   )
 
-  expect_equal(energy_total(unsorted_data), energy_total(sorted_data))
+  expect_equal(energy_total(unsorted_data, type = "power"),
+               energy_total(sorted_data, type = "power"))
+  expect_equal(energy_total(unsorted_data, type = "power bioenergetic model"),
+               energy_total(sorted_data, type = "power bioenergetic model"))
 })
 
-test_that("energy_total works with constant power", {
+test_that("energy_total works with constant power for both power types", {
   # Test with constant power
   constant_data <- tibble::tibble(
     time = c(0, 1, 2, 3),
-    power = c(5, 5, 5, 5)
+    power = c(5, 5, 5, 5),
+    power_mod = c(5, 5, 5, 5)
   )
 
   # Expected: 5 * (3-0) = 15
-  expect_equal(energy_total(constant_data), 15)
+  expect_equal(energy_total(constant_data, type = "power"), 15)
+  expect_equal(energy_total(constant_data, type = "power bioenergetic model"), 15)
 })
 
-test_that("energy_total handles single point data", {
+test_that("energy_total handles single point data for both power types", {
   # Test with a single data point (should return 0)
   single_point <- tibble::tibble(
     time = 1,
-    power = 10
+    power = 10,
+    power_mod = 10
   )
 
   # With only one point, the integral should be 0
-  expect_equal(energy_total(single_point), 0)
+  expect_equal(energy_total(single_point, type = "power"), 0)
+  expect_equal(energy_total(single_point, type = "power bioenergetic model"), 0)
+})
+
+test_that("energy_total handles invalid power type", {
+  test_data <- tibble::tibble(
+    time = c(0, 1),
+    power = c(0, 1),
+    power_mod = c(0, 1)
+  )
+
+  # Should error with invalid type
+  expect_error(energy_total(test_data, type = "invalid"))
 })
 
 

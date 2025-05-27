@@ -4,10 +4,12 @@
 \alias{anaerobic_energy_percentage}
 \title{Anaerobic Energy Percentage}
 \usage{
-anaerobic_energy_percentage(data)
+anaerobic_energy_percentage(data, type = "power")
 }
 \arguments{
 \item{data}{A tibble with a time series of anaerobic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_anaerobic (W/kg)}
+
+\item{type}{A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.}
 }
 \value{
 A double representing the percentage (\%) of anaerobic energy expenditure relative to total energy expenditure.

@@ -21,6 +21,7 @@
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 theme_minimal
 #' @importFrom minpack.lm nlsLM
+#' @importFrom pracma trapz
 #' @importFrom stats approx
 #' @importFrom stats coef
 #' @importFrom stats fitted

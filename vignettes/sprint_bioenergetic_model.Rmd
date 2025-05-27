@@ -254,7 +254,63 @@ To further evaluate the sprint bioenergetic model and its goodness of fit, we ca
 
 ## Sprint Bioenergetic Model Theortical Comparisons
 
+Using `bolt_modeled_data`, we can compute the total energy expenditure estimated using di Prampero et al. (2005, 2018) equivalent slope approach and compare it to the energy expenditure estimated using the sprint bioenergetic model. The following example shows how to compute the total energy expenditure for Bolt's 100 m sprint and compare it to the energy expenditure estimated using the sprint bioenergetic model.
 
 
+```{r}
+# energy estimated using di Prampero et al. (2005, 2018) equivalent slope approach
+energy_estimated <- energy_total(bolt_modeled_data, type = "power")
+round(energy_estimated)
 
+# energy estimated using the sprint bioenergetic model
+
+energy_bioenergetic_model <- energy_total(bolt_modeled_data, type = "power bioenergetic model")
+round(energy_bioenergetic_model)
+
+# we can compute the percentage difference between the two energy expenditure estimates
+
+percentage_difference <- (energy_bioenergetic_model - energy_estimated) / energy_estimated * 100
+round(percentage_difference, 2)
+
+```
+
+Similarly, we can compute the energy exependiture from the three metabolic pathways estimated using the sprint bioenergetic model.
+
+```{r}
+# alactic energy expenditure
+
+alactic_energy <- energy_alactic(bolt_modeled_data)
+alactic_energy
+
+# lactic energy exepnditure
+lactic_energy <- energy_lactic(bolt_modeled_data)
+lactic_energy
+
+# aerobic energy expenditure
+aerobic_energy <- energy_aerobic(bolt_modeled_data)
+aerobic_energy
+
+```
+
+Finally, we can compute the percentage of energy expenditure from each energy pathway relative to the total energy expenditure estimated using the sprint bioenergetic model.
+
+```{r}
+# alactic energy percentage
+alactic_energy_percentage <- alactic_energy_percentage(bolt_modeled_data, type = "power bioenergetic model")
+round(alactic_energy_percentage)
+
+# lactic energy percentage
+
+lactic_energy_percentage <- lactic_energy_percentage(bolt_modeled_data, type = "power bioenergetic model")
+round(lactic_energy_percentage)
+
+# aerobic energy percentage
+aerobic_energy_percentage <- aerobic_energy_percentage(bolt_modeled_data, type = "power bioenergetic model")
+round(aerobic_energy_percentage)
+
+# anaerobic energy percentage
+anaerobic_energy_percentage <- anaerobic_energy_percentage(bolt_modeled_data, type = "power bioenergetic model")
+round(anaerobic_energy_percentage)
+
+```
 

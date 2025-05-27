@@ -3,10 +3,10 @@
 #' Computes the integral of the total metabolic power over time to obtain total energy expenditure.
 #'
 #' @param data A tibble with a time series of power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg)
+#' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
 #'
 #' @returns A double with the total energy expended (J/kg)
 #'
-#' @importFrom pracma trapz
 #' @export
 #'
 #' @examples
@@ -17,12 +17,22 @@
 #'
 #' energy_total(data)
 #'
-energy_total <- function(data) {
+energy_total <- function(data, type = "power") {
+
+  if(type == "power"){
   # Ensure the data are sorted by time
   data <- data |> arrange(time)
 
   # Use the trapezoidal rule to calculate the integral of power over time
   integral <- pracma::trapz(data$time, data$power)
+  }
+  if(type == "power bioenergetic model"){
+    # Ensure the data are sorted by time
+    data <- data |> arrange(time)
+
+    # Use the trapezoidal rule to calculate the integral of power over time
+    integral <- pracma::trapz(data$time, data$power_mod)
+  }
 
   return(integral)
 }
@@ -151,6 +161,7 @@ energy_alactic <- function(data) {
 #' Computes the percentage of the total energy expenditure that is attributed to anaerobic alactic energy pathway.
 #'
 #' @param data A tibble with a time series of alactic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_alactic (W/kg)
+#' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
 #'
 #' @returns A double representing the percentage (%) of anaerobic alactic energy expenditure relative to total energy expenditure.
 #' @export
@@ -166,9 +177,10 @@ energy_alactic <- function(data) {
 #'
 #' alactic_energy_percentage(data)
 #'
-alactic_energy_percentage <- function(data) {
+alactic_energy_percentage <- function(data, type = "power") {
+
   # Calculate the total energy expenditure
-  total_energy <- energy_total(data)
+  total_energy <- energy_total(data, type = type)
 
   # Calculate the anaerobic alactic energy expenditure
   alactic_energy <- energy_alactic(data)
@@ -184,6 +196,7 @@ alactic_energy_percentage <- function(data) {
 #' Computes the percentage of the total energy expenditure that is attributed to anaerobic lactic energy pathway.
 #'
 #' @param data A tibble with a time series of alactic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_lactic (W/kg)
+#' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
 #'
 #' @returns A double representing the percentage (%) of anaerobic lactic energy expenditure relative to total energy expenditure.
 #' @export
@@ -199,9 +212,9 @@ alactic_energy_percentage <- function(data) {
 #'
 #' lactic_energy_percentage(data)
 #'
-lactic_energy_percentage <- function(data) {
+lactic_energy_percentage <- function(data, type = "power") {
   # Calculate the total energy expenditure
-  total_energy <- energy_total(data)
+  total_energy <- energy_total(data, type = type)
 
   # Calculate the anaerobic lactic energy expenditure
   lactic_energy <- energy_lactic(data)
@@ -217,6 +230,7 @@ lactic_energy_percentage <- function(data) {
 #' Computes the percentage of the total energy expenditure that is attributed to anaerobic energy pathways.
 #'
 #' @param data A tibble with a time series of anaerobic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_anaerobic (W/kg)
+#' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
 #'
 #' @returns A double representing the percentage (%) of anaerobic energy expenditure relative to total energy expenditure.
 #' @export
@@ -232,9 +246,9 @@ lactic_energy_percentage <- function(data) {
 #'
 #' anaerobic_energy_percentage(data)
 #'
-anaerobic_energy_percentage <- function(data) {
+anaerobic_energy_percentage <- function(data, type = "power") {
   # Calculate the total energy expenditure
-  total_energy <- energy_total(data)
+  total_energy <- energy_total(data, type = type)
 
   # Calculate the anaerobic energy expenditure
   anaerobic_energy <- energy_anaerobic(data)
@@ -250,6 +264,7 @@ anaerobic_energy_percentage <- function(data) {
 #' Computes the percentage of the total energy expenditure that is attributed to aerobic energy pathway.
 #'
 #' @param data A tibble with a time series of aerobic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_aerobic (W/kg)
+#' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
 #'
 #' @returns A double representing the percentage (%) of anaerobic aerobic energy expenditure relative to total energy expenditure.
 #' @export
@@ -265,9 +280,9 @@ anaerobic_energy_percentage <- function(data) {
 #'
 #' aerobic_energy_percentage(data)
 #'
-aerobic_energy_percentage <- function(data) {
+aerobic_energy_percentage <- function(data, type = "power") {
   # Calculate the total energy expenditure
-  total_energy <- energy_total(data)
+  total_energy <- energy_total(data, type = type)
 
   # Calculate the aerobic energy expenditure
   aerobic_energy <- energy_aerobic(data)
