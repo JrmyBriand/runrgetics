@@ -231,6 +231,25 @@ diagnose_sprint_model(
 )
 ```
 
+```{r}
+time <- seq(1, 30, 0.01)
+velocity <- sprint_acc_velocity_model(
+  time = time,
+  tau = 1.5,
+  maximal_velocity  = 12,
+  reaction_time = 0.2
+)
+
+
+plot <- ggplot2::ggplot(data = data.frame(time = time, velocity = velocity), aes(x = time, y = velocity)) +
+  ggplot2::geom_line(linewidth = 1.5, color = "darkgreen") +
+  ggplot2::labs(title = "", x = "", y = "") + theme_classic()
+plot
+
+```
+
+
+
 
 ## References
 

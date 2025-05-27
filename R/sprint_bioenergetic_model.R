@@ -55,6 +55,10 @@ sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lacti
 #' Fit Sprint Bioenergetic Model to Sprint Motion Data
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
+#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
+#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
+#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
+#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
 #' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
 #'
 #' @returns An object of class \code{nls} and \code{nls.lm}, as returned by \code{nlsLM()}. This object contains the fitted model and can be used with generic functions like \code{summary()}, \code{predict()}, and \code{coef()}.
@@ -84,9 +88,9 @@ sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lacti
 #' fit <- sprint_bioenergetic_model_fit(bolt_100m_motion_data)
 #' fit
 #'
-sprint_bioenergetic_model_fit <- function(sprint_motion_data, maximal_aerobic_power = 24.5) {
+sprint_bioenergetic_model_fit <- function(sprint_motion_data,  mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35,  maximal_aerobic_power = 24.5) {
   fit <- minpack.lm::nlsLM(
-    power ~ sprint_bioenergetic_model(time, maximal_alactic_power, maximal_lactic_power, maximal_aerobic_power = maximal_aerobic_power),
+    power ~ sprint_bioenergetic_model(time, maximal_alactic_power, maximal_lactic_power, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power),
     data = sprint_motion_data,
     start = list(maximal_alactic_power = 110, maximal_lactic_power = 50),
     lower = c(maximal_alactic_power = 0, maximal_lactic_power = 0),
@@ -102,6 +106,10 @@ sprint_bioenergetic_model_fit <- function(sprint_motion_data, maximal_aerobic_po
 #' Applies the sprint bioenergetic model to extract the sprint maximal alactic power from the sprint motion data.
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
+#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
+#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
+#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
+#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
 #' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
 #'
 #' @returns A double representing the sprint maximal alactic power (W/kg) extracted from the sprint motion data.
@@ -131,8 +139,8 @@ sprint_bioenergetic_model_fit <- function(sprint_motion_data, maximal_aerobic_po
 #' maximal_alactic_power <- sprint_bioenergetic_model_max_al(bolt_100m_motion_data)
 #' maximal_alactic_power
 #'
-sprint_bioenergetic_model_max_al <- function(sprint_motion_data, maximal_aerobic_power = 24.5) {
-  fit <- sprint_bioenergetic_model_fit(sprint_motion_data, maximal_aerobic_power)
+sprint_bioenergetic_model_max_al <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35,  maximal_aerobic_power = 24.5) {
+  fit <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   params <- stats::coef(fit)
 
@@ -145,6 +153,10 @@ sprint_bioenergetic_model_max_al <- function(sprint_motion_data, maximal_aerobic
 #' Applies the sprint bioenergetic model to extract the sprint maximal lactic power from the sprint motion data.
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
+#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
+#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
+#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
+#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
 #' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
 #'
 #' @returns A double representing the sprint maximal alactic power (W/kg) extracted from the sprint motion data.
@@ -173,8 +185,8 @@ sprint_bioenergetic_model_max_al <- function(sprint_motion_data, maximal_aerobic
 #' maximal_lactic_power <- sprint_bioenergetic_model_max_la(bolt_100m_motion_data)
 #' maximal_lactic_power
 #'
-sprint_bioenergetic_model_max_la <- function(sprint_motion_data, maximal_aerobic_power = 24.5) {
-  fit <- sprint_bioenergetic_model_fit(sprint_motion_data, maximal_aerobic_power)
+sprint_bioenergetic_model_max_la <- function(sprint_motion_data,mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5){
+  fit <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   params <- stats::coef(fit)
 
@@ -187,6 +199,10 @@ sprint_bioenergetic_model_max_la <- function(sprint_motion_data, maximal_aerobic
 #' alactic, lactic and aerobic power. The function also adds a column for the anaerobic and total power.
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
+#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
+#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
+#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
+#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
 #' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
 #'
 #' @returns A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg). The function adds columns for the alactic (power_alactic), lactic (power_lactic), anaerobic (power_anaerobic), aerobic (power_aerobic) and modeled total metabolic power (power_mod).
@@ -215,13 +231,13 @@ sprint_bioenergetic_model_max_la <- function(sprint_motion_data, maximal_aerobic
 #'
 #' head(bolt_modeled_data)
 #'
-sprint_bioenergetic_model_data <- function(sprint_motion_data, maximal_aerobic_power = 24.5) {
+sprint_bioenergetic_model_data <- function(sprint_motion_data,  mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
   # get maximal alactic power
-  maximal_alactic_power <- sprint_bioenergetic_model_max_al(sprint_motion_data, maximal_aerobic_power)
+  maximal_alactic_power <- sprint_bioenergetic_model_max_al(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   # get maximal lactic power
 
-  maximal_lactic_power <- sprint_bioenergetic_model_max_la(sprint_motion_data, maximal_aerobic_power)
+  maximal_lactic_power <- sprint_bioenergetic_model_max_la(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   sprint_modeled_data <- sprint_motion_data |>
     dplyr::mutate(
@@ -229,12 +245,20 @@ sprint_bioenergetic_model_data <- function(sprint_motion_data, maximal_aerobic_p
         time = time,
         maximal_alactic_power = maximal_alactic_power,
         maximal_lactic_power = maximal_lactic_power,
+        mu = mu,
+        sigma = sigma,
+        k1 = k1,
+        k2 = k2,
         maximal_aerobic_power = maximal_aerobic_power
       ),
       power_alactic = sprint_bioenergetic_model(
         time = time,
         maximal_alactic_power = maximal_alactic_power,
         maximal_lactic_power = maximal_lactic_power,
+        mu = mu,
+        sigma = sigma,
+        k1 = k1,
+        k2 = k2,
         maximal_aerobic_power = maximal_aerobic_power,
         output = "alactic power"
       ),
@@ -242,6 +266,10 @@ sprint_bioenergetic_model_data <- function(sprint_motion_data, maximal_aerobic_p
         time = time,
         maximal_alactic_power = maximal_alactic_power,
         maximal_lactic_power = maximal_lactic_power,
+        mu = mu,
+        sigma = sigma,
+        k1 = k1,
+        k2 = k2,
         maximal_aerobic_power = maximal_aerobic_power,
         output = "lactic power"
       ),
@@ -250,6 +278,10 @@ sprint_bioenergetic_model_data <- function(sprint_motion_data, maximal_aerobic_p
         time = time,
         maximal_alactic_power = maximal_alactic_power,
         maximal_lactic_power = maximal_lactic_power,
+        mu = mu,
+        sigma = sigma,
+        k1 = k1,
+        k2 = k2,
         maximal_aerobic_power = maximal_aerobic_power,
         output = "aerobic power"
       )

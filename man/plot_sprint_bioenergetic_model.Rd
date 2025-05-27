@@ -6,12 +6,24 @@
 \usage{
 plot_sprint_bioenergetic_model(
   sprint_motion_data,
+  mu = -0.4,
+  sigma = 1,
+  k1 = 2.75,
+  k2 = 35,
   maximal_aerobic_power = 24.5,
   scale_max_power = 160
 )
 }
 \arguments{
 \item{sprint_motion_data}{A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).}
+
+\item{mu}{A double. Parameter setting the peak of the log-normal distribution.Default is -0.4}
+
+\item{sigma}{A double. Parameter setting the decay of the log-normal distribution. Default is 1}
+
+\item{k1}{A double. Time constant of the first rising exponential (s). Default is 2.75}
+
+\item{k2}{A double. Time constant of the second decaying exponential (s). Default is 35}
 
 \item{maximal_aerobic_power}{A double representing the maximal aerobic power (W/kg) of the athlete. Default is 24.5 W/kg.}
 
@@ -44,9 +56,7 @@ bolt_100m_motion_data <- sprint_motion_model_data(
 
 
 plot_sprint_bioenergetic_model(
-sprint_motion_data = bolt_100m_motion_data
+  sprint_motion_data = bolt_100m_motion_data
 )
-
-
 
 }

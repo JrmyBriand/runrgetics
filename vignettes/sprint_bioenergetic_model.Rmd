@@ -162,3 +162,99 @@ plot_sprint_bioenergetic_model(
 )
 ```
 
+## Sprint Bionergetic Model Goodness of Fit
+
+The $R^2$, adjusted $R^2$ residual standard error (RSE) and root mean square error (RMSE) can be used to assess the goodness of fit of the sprint bioenergetic model. A function to evaluate each goodness of fot metric is available. 
+
+```{r}
+# residual standard error (rse)
+sprint_bioenergetic_model_rse(
+  sprint_motion_data = bolt_100m_motion_data,
+  maximal_aerobic_power = 24.5
+)
+
+
+# root mean square error (rmse)
+
+sprint_bioenergetic_model_rmse(
+  sprint_motion_data = bolt_100m_motion_data,
+  maximal_aerobic_power = 24.5
+)
+
+# R squared
+
+sprint_bioenergetic_model_R2(
+  sprint_motion_data = bolt_100m_motion_data,
+  maximal_aerobic_power = 24.5
+)
+
+# Adjusted R squared
+
+sprint_bioenergetic_model_adj_R2(
+  sprint_motion_data = bolt_100m_motion_data,
+  maximal_aerobic_power = 24.5
+)
+
+```
+
+
+The function `sprint_bioenergetic_model_diagnostics` can be used to comute the metrics and visualize the residuals distribution and Q-Q plots to assess non-linear least-squares fit assumptions. The following example shows how to use the function to compute the goodness of fit for Bolt's 100 m sprint.
+
+```{r}
+sprint_bioenergetic_model_diagnostic(
+  sprint_motion_data = bolt_100m_motion_data,
+  maximal_aerobic_power = 24.5,
+  histogram_binwidth = 1,
+)
+```
+
+The fit has several issues and some patterns can be observed in the residuals. These patterns are likely due to the the fact that the metabolic power computed from the sprint motion data relies on an imperfect model of the sprint motion, where instantaneous velocity is reconstructed to the best of our ability with limited information, i.e. data points collected at 10, 20 or even 50 m intervals. A better model of the sprint motion and a more precise measurement of the instantaneous velocity would likely improve the fit of the sprint bioenergetic model to the sprint motion data.
+
+The general bioenergetic model of sprunt running is also based on general functions that fit reasonnable well the approximate power distribution from the three metabolic pathways. The parameters' values were adjusted to ensure a good fit amongst all men and women running distances (see `sprint_model_formalisation` vignette). Therefore, while the model can be used to estimate energy contribution, it doesn't perfectly fit the metabolic power computed using the velocity, acceleration and equivalent slope as proposed by di Prampero et al. (2005, 2018).
+
+We can try to specifically retrieve the parameters that best fit Bolt's 100 m to see if the diagnostic of the sprint bioenergetic model is better. 
+
+```{r}
+# get sprint optimal alactic power parameters
+
+alactic_params <- sprint_alactic_model_optimal_params() |> 
+  filter(event == "Men's 100 m")
+
+# extract optimal mu and sigma
+
+mu <- alactic_params$mu
+sigma <- alactic_params$sigma
+
+
+# get sprint optimal lactic power parameters
+
+lactic_params <- sprint_lactic_model_optimal_params() |> 
+  filter(event == "Men's 100 m")
+
+k1 <- lactic_params$k1
+k2 <- lactic_params$k2
+
+# rerun the diagnostic with the updated parameters
+
+sprint_bioenergetic_model_diagnostic(
+  sprint_motion_data = bolt_100m_motion_data,
+  mu = mu,
+  sigma = sigma,
+  k1 = k1,
+  k2 = k2,
+  maximal_aerobic_power = 24.5,
+  histogram_binwidth = 1
+)
+
+```
+
+We see that the diagnostic of the model is slightly improved. All the metrics (RSE, RMSE, $R^2$ and adjusted $R^2$) show improvements. The main discrepencies are observed in the early moment of the sprint, where the log-normal function of the alactic model doesn't perfectly match the metabolic power. The second discrepency is observed around metabolic eak power, where the alactic model lead to a slight overestimation of the peak power. The last discrepency is related to the transition between the acceleration and the constant-velocity phase, derived from the sprint motion model that reproduces the instantaneous velocity profile from the time splits. The limitations of the sprint bioenergetic model are discussed in further details by Briand et al. (2025).
+
+To further evaluate the sprint bioenergetic model and its goodness of fit, we can compare the model's predicted energy expenditure from the three energy pathways with experimental data available in the literature.
+
+## Sprint Bioenergetic Model Theortical Comparisons
+
+
+
+
+

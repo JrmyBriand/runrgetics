@@ -38,12 +38,11 @@ men_200 <- graubner_nixdorf_sprints |>
   dplyr::filter(event == "Men's 200 m")
 
 diagnose_sprint_model(
-mean_velocity_splits = men_200$velocity,
-time_splits = men_200$splits,
-distance = men_200$distance,
-reaction_time = men_200$reaction_time[1],
-maximal_velocity =  men_200$maximal_velocity[1]
- )
-
+  mean_velocity_splits = men_200$velocity,
+  time_splits = men_200$splits,
+  distance = men_200$distance,
+  reaction_time = men_200$reaction_time[1],
+  maximal_velocity = men_200$maximal_velocity[1]
+)
 
 }

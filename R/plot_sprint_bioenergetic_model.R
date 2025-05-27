@@ -3,6 +3,10 @@ utils::globalVariables(c("power_mod"))
 #' Plot Sprint Bioenergetic Model Power
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
+#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
+#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
+#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
+#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
 #' @param maximal_aerobic_power A double representing the maximal aerobic power (W/kg) of the athlete. Default is 24.5 W/kg.
 #' @param scale_max_power A double representing the maximum y-axis value for the plot. Default is 160 W/kg.
 #'
@@ -33,10 +37,10 @@ utils::globalVariables(c("power_mod"))
 #'   sprint_motion_data = bolt_100m_motion_data
 #' )
 #'
-plot_sprint_bioenergetic_model <- function(sprint_motion_data, maximal_aerobic_power = 24.5, scale_max_power = 160) {
+plot_sprint_bioenergetic_model <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, scale_max_power = 160) {
   # compute modeled data from the three energy pathways
 
-  modeled_data <- sprint_bioenergetic_model_data(sprint_motion_data, maximal_aerobic_power)
+  modeled_data <- sprint_bioenergetic_model_data(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   plot <- ggplot2::ggplot(modeled_data, aes(x = time)) +
     # Add model components
