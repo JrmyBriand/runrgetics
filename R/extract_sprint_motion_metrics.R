@@ -125,9 +125,11 @@ sprint_motion_model_data <- function(mean_velocity_splits, time_splits, distance
 
 #' Maximum Matebolic Power
 #'
-#' Computes the maximal metabolic power generated during a sprint event.
+#' Computes the maximal metabolic power generated during a sprint event.The maximum of the estimated power using the sprint bioenergetic model
+#'  can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The `type` parameter has to be adjusted accordingly.
 #'
-#' @param sprint_motion_data A tibble with the following columns: time, velocity, acceleration, distance, cost of running and power
+#' @param sprint_motion_data A tibble with the following columns: time, velocity, acceleration, distance, cost of running and power. The maximum of the estimated power can also be computed by entering an extra column power_mod corresponding to the power derived from the sprint bioenergetic model.
+#' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
 #'
 #' @returns A double with the maximal metabolic power (W/kg)
 #' @export
@@ -150,6 +152,11 @@ sprint_motion_model_data <- function(mean_velocity_splits, time_splits, distance
 #'
 #' sprint_maximum_metabolic_power(sprint_data)
 #'
-sprint_maximum_metabolic_power <- function(sprint_motion_data) {
+sprint_maximum_metabolic_power <- function(sprint_motion_data, type = "power") {
+  if (type == "power") {
+    return(max(sprint_motion_data$power))
+  } else if (type == "power bioenergetic model") {
+    return(max(sprint_motion_data$power_mod))
+  }
   max(sprint_motion_data$power)
 }

@@ -1,6 +1,7 @@
 #' Total Energy Expenditure
 #'
-#' Computes the integral of the total metabolic power over time to obtain total energy expenditure.
+#' Computes the integral of the total metabolic power over time to obtain total energy expenditure. The total energy expenditure estimated the sprint bioenergetic model
+#'can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The `type` parameter has to be adjusted accordingly.
 #'
 #' @param data A tibble with a time series of power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg)
 #' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
@@ -158,7 +159,9 @@ energy_alactic <- function(data) {
 
 #' Alactic Energy Percentage
 #'
-#' Computes the percentage of the total energy expenditure that is attributed to anaerobic alactic energy pathway.
+#' Computes the percentage of the total energy expenditure that is attributed to anaerobic alactic energy pathway. The alactic energy expenditure percentage with respect to total energy expenditure estimated the sprint bioenergetic model
+#'can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The `type` parameter has to be adjusted accordingly.
+#'
 #'
 #' @param data A tibble with a time series of alactic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_alactic (W/kg)
 #' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
@@ -193,7 +196,8 @@ alactic_energy_percentage <- function(data, type = "power") {
 
 #' Lactic Energy Percentage
 #'
-#' Computes the percentage of the total energy expenditure that is attributed to anaerobic lactic energy pathway.
+#' Computes the percentage of the total energy expenditure that is attributed to anaerobic lactic energy pathway. The lactic energy expenditure percentage with respect to total energy expenditure estimated the sprint bioenergetic model
+#'can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The `type` parameter has to be adjusted accordingly.
 #'
 #' @param data A tibble with a time series of alactic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_lactic (W/kg)
 #' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
@@ -227,7 +231,8 @@ lactic_energy_percentage <- function(data, type = "power") {
 
 #' Anaerobic Energy Percentage
 #'
-#' Computes the percentage of the total energy expenditure that is attributed to anaerobic energy pathways.
+#' Computes the percentage of the total energy expenditure that is attributed to anaerobic energy pathways. The anaerobic energy expenditure percentage with respect to total energy expenditure estimated the sprint bioenergetic model
+#'can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The `type` parameter has to be adjusted accordingly.
 #'
 #' @param data A tibble with a time series of anaerobic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_anaerobic (W/kg)
 #' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
@@ -261,7 +266,8 @@ anaerobic_energy_percentage <- function(data, type = "power") {
 
 #' Aerobic Energy Percentage
 #'
-#' Computes the percentage of the total energy expenditure that is attributed to aerobic energy pathway.
+#' Computes the percentage of the total energy expenditure that is attributed to aerobic energy pathway. The aerobic energy expenditure percentage with respect to total energy expenditure estimated the sprint bioenergetic model
+#'can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The `type` parameter has to be adjusted accordingly.
 #'
 #' @param data A tibble with a time series of aerobic power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg), power_aerobic (W/kg)
 #' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.

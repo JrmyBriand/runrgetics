@@ -280,15 +280,15 @@ Similarly, we can compute the energy exependiture from the three metabolic pathw
 # alactic energy expenditure
 
 alactic_energy <- energy_alactic(bolt_modeled_data)
-alactic_energy
+round(alactic_energy)
 
 # lactic energy exepnditure
 lactic_energy <- energy_lactic(bolt_modeled_data)
-lactic_energy
+round(lactic_energy)
 
 # aerobic energy expenditure
 aerobic_energy <- energy_aerobic(bolt_modeled_data)
-aerobic_energy
+round(aerobic_energy)
 
 ```
 
@@ -311,6 +311,28 @@ round(aerobic_energy_percentage)
 # anaerobic energy percentage
 anaerobic_energy_percentage <- anaerobic_energy_percentage(bolt_modeled_data, type = "power bioenergetic model")
 round(anaerobic_energy_percentage)
+
+```
+
+### Computing Maximal Metabolic Power
+
+maximal metabolic power can be computed for the etabolic power derived using di Prampero et al. (2005, 2018) equivalent slope approach and for the metabolic power derived using the sprint bioenergetic model. The following example shows how to compute the maximal metabolic power for Bolt's 100 m sprint and compares the maximum obtained from the 2 approaches.
+
+```{r}
+# maximal metabolic power from di Prampero et al. (2005, 2018) equivalent slope approach
+
+estimated_max_power <- sprint_maximum_metabolic_power(bolt_modeled_data, type = "power")
+round(esimated_max_power)
+
+# maximal metabolic power from the sprint bioenergetic model
+estimated_max_power_bioenergetic_model <- sprint_maximum_metabolic_power(bolt_modeled_data, type = "power bioenergetic model")
+round(estimated_max_power_bioenergetic_model)
+
+# percentage difference between the two maximum metabolic power estimates
+
+percentage_difference_max_power <- (estimated_max_power_bioenergetic_model - esimated_max_power) / esimated_max_power * 100
+round(percentage_difference_max_power, 2)
+
 
 ```
 
