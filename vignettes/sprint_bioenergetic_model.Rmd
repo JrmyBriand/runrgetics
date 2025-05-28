@@ -254,6 +254,8 @@ To further evaluate the sprint bioenergetic model and its goodness of fit, we ca
 
 ## Sprint Bioenergetic Model Theortical Comparisons
 
+### Total Energy Expenditure Computations and Comparisons
+
 Using `bolt_modeled_data`, we can compute the total energy expenditure estimated using di Prampero et al. (2005, 2018) equivalent slope approach and compare it to the energy expenditure estimated using the sprint bioenergetic model. The following example shows how to compute the total energy expenditure for Bolt's 100 m sprint and compare it to the energy expenditure estimated using the sprint bioenergetic model.
 
 
@@ -273,6 +275,9 @@ percentage_difference <- (energy_bioenergetic_model - energy_estimated) / energy
 round(percentage_difference, 2)
 
 ```
+
+
+### Energy Pathways Expenditure Computations and Comparisons
 
 Similarly, we can compute the energy exependiture from the three metabolic pathways estimated using the sprint bioenergetic model.
 
@@ -322,7 +327,7 @@ maximal metabolic power can be computed for the etabolic power derived using di 
 # maximal metabolic power from di Prampero et al. (2005, 2018) equivalent slope approach
 
 estimated_max_power <- sprint_maximum_metabolic_power(bolt_modeled_data, type = "power")
-round(esimated_max_power)
+round(estimated_max_power)
 
 # maximal metabolic power from the sprint bioenergetic model
 estimated_max_power_bioenergetic_model <- sprint_maximum_metabolic_power(bolt_modeled_data, type = "power bioenergetic model")
@@ -330,9 +335,69 @@ round(estimated_max_power_bioenergetic_model)
 
 # percentage difference between the two maximum metabolic power estimates
 
-percentage_difference_max_power <- (estimated_max_power_bioenergetic_model - esimated_max_power) / esimated_max_power * 100
+percentage_difference_max_power <- (estimated_max_power_bioenergetic_model - estimated_max_power) / estimated_max_power * 100
 round(percentage_difference_max_power, 2)
 
 
 ```
+
+### Distance Travelled Computation
+
+The sprint bioenergetic model provides time series of the power produced by a sprinter over a sprint event. To validate the model's prediction it is relevent to invert the approach and compute distance travelled, as well as instantaneous velocity and acceleration from the power time series. 
+The function `sprint_recover_distance` can be used to compute the distance travelled from a power time series. The following example shows how to use the function to recover the motion data from Bolt's 100 m sprint.
+
+The Briand et al. (2025) paper mentions that the method to recover the distance travelled from the time series leads to a distance error of less than 0.01%, which can effectively be observed for time steps of 0.001 s. We can observe this in the following example.
+
+```{r}
+
+
+# Recompute Bolt motion data with a smaller time steps
+
+bolt_motion_small_dt <- sprint_motion_model_data(
+  mean_velocity_splits = bolt_100m$velocity,
+  time_splits = bolt_100m$splits,
+  distance = bolt_100m$distance,
+  reaction_time = bolt_100m$reaction_time[1],
+  maximal_velocity = bolt_100m$maximal_velocity[1], 
+  dt = 0.001
+)
+
+# Estimate distance through numerical integration of velocity
+
+distance_actual <- pracma::trapz(bolt_motion_small_dt$time, bolt_motion_small_dt$velocity)
+
+distance_recovered <- sprint_recover_distance(bolt_motion_small_dt$power, dt = 0.001)
+
+distance_percentage_diff <- (distance_recovered - distance_actual) / distance_actual * 100
+round(distance_percentage_diff,2)
+
+
+```
+
+Using such small time steps can be computationally heavy and therefore, for the remaining of the calculations, we will use a time step of 0.01 s, which is the default value for the `dt` argument in the `sprint_motion_model_data` function. This leads to slightly larger distance errors recovered from the power time series. The following code chunk also compute the distance difference as derived from di Prampero et al.'s (2005, 2018) equivalent slope approach and the distance recovered from the sprint bioenergetic model power time series. The percentage difference in Bolt's traveled distance over the 100 m is of less than 1 % (0.85 %). It's worth mentionning that the distance obtained from the `sprint_motion_model_data` function is not actually equal to distance traveled by Bolt which should be equal to 100 m. This occurs because the model to reconstruct instantaneous velocity from time splits relies on several assumptions that are discussed at length by Briand et al. (2025).
+
+```{r}
+# Recompute Bolt actual distance from motion data with a time step of 0.01 s
+
+distance_actual <- pracma::trapz(bolt_100m_motion_data$time, bolt_100m_motion_data$velocity)
+
+distance_recovered <- sprint_recover_distance(bolt_modeled_data$power, dt = 0.01)
+
+distance_percentage_diff <- (distance_recovered - distance_actual) / distance_actual * 100
+round(distance_percentage_diff,2)
+
+# Compute the difference between modelled distance (recovered from power)
+
+distance_recovered_bioenergetic_model <- sprint_recover_distance(bolt_modeled_data$power_mod, dt = 0.01)
+
+modelled_distance_percentage_diff <- (distance_recovered_bioenergetic_model - distance_recovered) / distance_recovered * 100
+round(modelled_distance_percentage_diff, 2)
+
+# A function was written to compute the percentage error between the modelled distance and the recovered distance from the power time series.
+
+round(sprint_modeled_distance_percentage_error(bolt_modeled_data, dt = 0.01), 2)
+
+
+```
+
 

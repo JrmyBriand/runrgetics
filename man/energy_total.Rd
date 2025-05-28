@@ -15,7 +15,8 @@ energy_total(data, type = "power")
 A double with the total energy expended (J/kg)
 }
 \description{
-Computes the integral of the total metabolic power over time to obtain total energy expenditure.
+Computes the integral of the total metabolic power over time to obtain total energy expenditure. The total energy expenditure estimated the sprint bioenergetic model
+can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The \code{type} parameter has to be adjusted accordingly.
 }
 \examples{
 data <- tibble::tibble(

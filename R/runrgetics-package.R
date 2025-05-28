@@ -25,6 +25,7 @@
 #' @importFrom stats approx
 #' @importFrom stats coef
 #' @importFrom stats fitted
+#' @importFrom stats optimize
 #' @importFrom stats resid
 #' @importFrom tibble tibble
 #' @importFrom tinytable group_tt

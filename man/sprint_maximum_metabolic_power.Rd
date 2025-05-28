@@ -4,16 +4,19 @@
 \alias{sprint_maximum_metabolic_power}
 \title{Maximum Matebolic Power}
 \usage{
-sprint_maximum_metabolic_power(sprint_motion_data)
+sprint_maximum_metabolic_power(sprint_motion_data, type = "power")
 }
 \arguments{
-\item{sprint_motion_data}{A tibble with the following columns: time, velocity, acceleration, distance, cost of running and power}
+\item{sprint_motion_data}{A tibble with the following columns: time, velocity, acceleration, distance, cost of running and power. The maximum of the estimated power can also be computed by entering an extra column power_mod corresponding to the power derived from the sprint bioenergetic model.}
+
+\item{type}{A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.}
 }
 \value{
 A double with the maximal metabolic power (W/kg)
 }
 \description{
-Computes the maximal metabolic power generated during a sprint event.
+Computes the maximal metabolic power generated during a sprint event.The maximum of the estimated power using the sprint bioenergetic model
+can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The \code{type} parameter has to be adjusted accordingly.
 }
 \examples{
 # Extract the data for the 100 m

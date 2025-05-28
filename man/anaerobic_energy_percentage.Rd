@@ -15,7 +15,8 @@ anaerobic_energy_percentage(data, type = "power")
 A double representing the percentage (\%) of anaerobic energy expenditure relative to total energy expenditure.
 }
 \description{
-Computes the percentage of the total energy expenditure that is attributed to anaerobic energy pathways.
+Computes the percentage of the total energy expenditure that is attributed to anaerobic energy pathways. The anaerobic energy expenditure percentage with respect to total energy expenditure estimated the sprint bioenergetic model
+can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The \code{type} parameter has to be adjusted accordingly.
 }
 \examples{
 
