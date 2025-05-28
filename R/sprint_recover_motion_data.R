@@ -176,7 +176,7 @@ sprint_modeled_distance_percentage_error <- function(sprint_power_data, dt = 0.0
 
   distance_recovered_bioenergetic_model <- sprint_recover_distance(sprint_power_data$power_mod, dt = dt)
 
-  modeled_distance_percentage_diff <- (distance_recovered_bioenergetic_model - distance_recovered) / distance_recovered * 100
+  modeled_distance_percentage_diff <- (distance_recovered_bioenergetic_model - distance_recovered ) / distance_recovered * 100
 
   return(modeled_distance_percentage_diff)
 }

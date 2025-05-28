@@ -41,8 +41,22 @@ sprint_motion_model_data <- function(mean_velocity_splits, time_splits, distance
   }
 
   # 4. Calculate tau
+  # For distances higher than 200m only distaces up to 200 m have to be considered to compute tau.
 
-  tau <- find_tau(times_velocity, mean_velocity_splits, reaction_time)
+  # find index corresponding to a distance of 200 m
+
+  index_200m <- which(distance >= 200)[1]
+
+  # filter for times_velocity and mean_velocity with index lower than index_200m to compute tau
+
+  if (!is.na(index_200m)) {
+    tau <- find_tau(times_velocity[1:index_200m], mean_velocity_splits[1:index_200m], reaction_time)
+  }
+
+  if (is.na(index_200m)) {
+    tau <- find_tau(times_velocity, mean_velocity_splits, reaction_time)
+  }
+
 
   # 5. Calculate the time at the end of the acceleration
 

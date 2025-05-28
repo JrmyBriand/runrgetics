@@ -335,7 +335,7 @@ round(estimated_max_power_bioenergetic_model)
 
 # percentage difference between the two maximum metabolic power estimates
 
-percentage_difference_max_power <- (estimated_max_power_bioenergetic_model - estimated_max_power) / estimated_max_power * 100
+percentage_difference_max_power <- ( estimated_max_power_bioenergetic_model - estimated_max_power) / estimated_max_power * 100
 round(percentage_difference_max_power, 2)
 
 
@@ -398,6 +398,26 @@ round(modelled_distance_percentage_diff, 2)
 round(sprint_modeled_distance_percentage_error(bolt_modeled_data, dt = 0.01), 2)
 
 
+```
+
+### Generating Comparison Tables
+
+The previous computations can be used to generate the tables assessing the sprint bioenergetic model's goodness of fit and comparing the fit amongst distances in Briand et al. (2025) article. 
+
+
+The goodness of fit metrics of each event can be computed using the function `sprint_bioenergetic_model_gof_metrics` that provides a data frame of the relevant metrics for the chosen event. 
+
+```{r}
+
+sprint_bioenergetic_model_gof_metrics(bolt_modeled_data, event = "Men's 100 m")
+
+```
+
+The following function returns a table similar to Table 2 in Briand et al. (2025) article, with the goodness of fit metrics for each event in the Graubner and Nixdorf (2011) dataset. Discrepencies between the table of the article can be due to the fact that the difference in distance travelled in this table was compared to the distance reconstructed from the estimated metabolic pouwer of sprint motion data, while in the article, the distance was compared to the distance traveled by the athlete as obtained from the instantaneous velocity model.
+
+
+```{r}
+sprint_briand_article_gof_table() 
 ```
 
 
