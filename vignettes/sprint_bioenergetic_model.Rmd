@@ -404,7 +404,6 @@ round(sprint_modeled_distance_percentage_error(bolt_modeled_data, dt = 0.01), 2)
 
 The previous computations can be used to generate the tables assessing the sprint bioenergetic model's goodness of fit and comparing the fit amongst distances in Briand et al. (2025) article. 
 
-
 The goodness of fit metrics of each event can be computed using the function `sprint_bioenergetic_model_gof_metrics` that provides a data frame of the relevant metrics for the chosen event. 
 
 ```{r}
@@ -413,11 +412,24 @@ sprint_bioenergetic_model_gof_metrics(bolt_modeled_data, event = "Men's 100 m")
 
 ```
 
-The following function returns a table similar to Table 2 in Briand et al. (2025) article, with the goodness of fit metrics for each event in the Graubner and Nixdorf (2011) dataset. Discrepencies between the table of the article can be due to the fact that the difference in distance travelled in this table was compared to the distance reconstructed from the estimated metabolic pouwer of sprint motion data, while in the article, the distance was compared to the distance traveled by the athlete as obtained from the instantaneous velocity model.
+The following function returns a table similar to Table 2 in Briand et al. (2025) article, with the goodness of fit metrics for each event in the Graubner and Nixdorf (2011) dataset. Discrepencies between the table of the article can be due to the fact that the difference in distance travelled in this table was compared to the distance reconstructed from the estimated metabolic pouwer of sprint motion data, while in the article, the distance was compared to the distance traveled by the athlete as obtained from the instantaneous velocity model. Other small differences observed can be due to the choice of integration and integration steps.
 
 
 ```{r}
 sprint_briand_article_gof_table() 
 ```
 
+The energy contribution from the 3 metabolic pathways of each event can be computed using the function `sprint_energy_contributions` that provides a data frame of the relevant energy contribution and percentage to total energy contribution for the chosen event.
 
+```{r}
+sprint_energy_contributions(bolt_modeled_data, event = "Men's 100 m")
+```
+
+
+The following function returns a table similar to Table 3 in Briand et al. (2025) article, with the energy contribution from the three metabolic pathways for each event in the Graubner and Nixdorf (2011) dataset. Discrepencies between the table of the one provided in the article can be due to the choice of integration and integration steps.
+
+
+```{r}
+sprint_energy_cont_briand_article_table()
+```
+Briand et al.'s (2025) article discuss the energy contribution of the metabolic pathways and puts the results in perspective with the literature. 
