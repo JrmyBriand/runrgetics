@@ -40,5 +40,4 @@ bolt_100m_motion_data <- sprint_motion_model_data(
 
 recovered_distance <- sprint_recover_distance(bolt_100m_motion_data$power, dt = 0.01)
 
-
 }

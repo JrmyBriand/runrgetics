@@ -1,11 +1,42 @@
-#' Title
+#' Sprint Lactic Energy and Power Over Running Duration
 #'
-#' @param sprint_power_data
+#' Computes the lactic energy and average power over the duration of a sprint. The function is based on a provided sprint power data frame
+#' containing instantaneous power contribution of the alactic, lactic and aerobic energy pathways. Such data frame can be derived using Briand et al.'s (2025)
+#' sprint bioenergetic model
 #'
-#' @returns
+#' @param sprint_power_data A tibble with a time column (time, in s) and instantaneous lactic power (power_lactic, in W/kg) over the sprint, as computed using the sprint bioenergetic model proposed by Briand et al. (2025).
+#'
+#' @returns A tibble with the following columns: duration (s), lactic_energy (J/kg), lactic_power (W/kg).
 #' @export
 #'
 #' @examples
+#' # Extract Bolt's 100 m data from Graubner and Nixdorf data set.
+#' bolt_100m <- graubner_nixdorf_sprints |>
+#'   dplyr::filter(
+#'     athlete == "Bolt",
+#'     event == "Men's 100 m"
+#'   )
+#'
+#' # Compute sprint motion data
+#'
+#' bolt_100m_motion_data <- sprint_motion_model_data(
+#'   mean_velocity_splits = bolt_100m$velocity,
+#'   time_splits = bolt_100m$splits,
+#'   distance = bolt_100m$distance,
+#'   reaction_time = bolt_100m$reaction_time[1],
+#'   maximal_velocity = bolt_100m$maximal_velocity[1]
+#' )
+#'
+#'
+#' # compute the power estimated from the sprint bioenergetic model
+#'
+#' bolt_modeled_data <- sprint_bioenergetic_model_data(bolt_100m_motion_data)
+#'
+#'
+#' # compute lactic energy vs duration for Bolt's 100 m performance
+#'
+#'  sprint_lactic_energy_duration(bolt_modeled_data)
+#'
 sprint_lactic_energy_duration <- function(sprint_power_data) {
   # extract duration (last time value of the sprint_power_data time colmunn)
 
@@ -30,20 +61,27 @@ sprint_lactic_energy_duration <- function(sprint_power_data) {
   return(result)
 }
 
-#' Title
+#' Sprint Lactic Energy and Power Over Running Duration (Graubner and Nixdorf dataset)
 #'
-#' @param data
-#' @param athlete_sex
-#' @param mu
-#' @param sigma
-#' @param k1
-#' @param k2
-#' @param dt
+#' Computes the lactic energy and average power over the duration of a sprint for the Graubner and Nixdorf dataset.
+#' The default data is the `graubner_nixdorf_sprints` dataset, which contains sprint performances of elite athletes.
+#' The `athlete_sex` parameter enables to compute lactic energy and power over running duration for either male or female 100, 200 and 400 m events.
 #'
-#' @returns
+#' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @param athlete_sex A character corresponding the athlete sex for the analysis. Default is "male" and computes energy and power over the Graubner and Nixdorf's (2011) men's 100, 200 and 400 m performances. It also sets the maximal aerobic power to 24.5 W/kg. Similarly, setting athlete_sex to "female" performs the computation on women's performances and sets maximal aerobic power to 21 W/kg.
+#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
+#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
+#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
+#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
+#' @param dt A double representing the time step at which power is provided (in seconds). Default is 0.01 seconds.
+#'
+#' @returns A tibble with duration (s), lactic_energy (J/kg), lactic_power (W/kg).
 #' @export
 #'
 #' @examples
+#'
+#' sprint_lactic_energy_duration_graubner_nixdorf()
+#'
 sprint_lactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdorf_sprints, athlete_sex = "male", mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01) {
   if (athlete_sex == "male") {
     dat <- data |>
@@ -113,17 +151,30 @@ sprint_lactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdo
 }
 
 
-#' Title
+
+#' Sprint Lactic Energy Duration Model
 #'
-#' @param duration
-#' @param lactic_capacity
-#' @param k1
-#' @param k2
+#' Computes the lactic energy as a function of duration using a bi-exponential model.
+#' Other than duration, the lactic capacity is the only parameter of the model. The lactic capacity corresponds to the maximal energy available through the lactic energy pathway.
 #'
-#' @returns
+#' @param duration A numeric vector representing the duration of the sprint (in seconds).
+#' @param lactic_capacity A numeric value representing the lactic capacity (in J/kg).
+#' @param k1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
+#' @param k2 A double representing to decaying time-constant of the bi-exponential model. Default is 2000.
+#'
+#' @returns A numeric vector representing the average lactic energy (in J/kg) as a function of running duration.
 #' @export
 #'
 #' @examples
+#'
+#' lactic_capacity <- 1350 # Example alactic capacity in J/kg
+#' duration <- seq(0.1, 10, by = 0.1) # Example durations from 0.1 to 10 seconds
+#'
+#' lactic_energy <- sprint_lactic_duration_model(duration, lactic_capacity)
+#' lactic_energy
+#'
+#'
+
 sprint_lactic_duration_model <- function(duration, lactic_capacity, k1 = 20, k2 = 2000) {
   knorm <- bi_exponential_knorm(t1 = k1, t2 = k2)
 
@@ -131,16 +182,27 @@ sprint_lactic_duration_model <- function(duration, lactic_capacity, k1 = 20, k2 
 }
 
 
-#' Title
+
+#' Sprint Lactic Duration Model Fit
 #'
-#' @param lactic_energy_duration
-#' @param k1
-#' @param k2
+#' Performs a non-linear least squares fitting of the lactic energy
+#' model to the lactic energy over running duration data.
 #'
-#' @returns
+#' @param lactic_energy_duration A tibble with the following columns: duration (s), lactic_energy (J/kg), corresponding to the average lactic energy expenditure over running duration. This data is used to fit the lactic energy model.
+#' @param k1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
+#' @param k2 A double representing to decaying time-constant of the bi-exponential model. Default is 2000.
+#'
+#' @returns A fitted model object of class "nls" representing the lactic energy model fitted to the lactic energy duration data.
 #' @export
 #'
 #' @examples
+#' men_lactic_energy <- sprint_lactic_energy_duration_graubner_nixdorf()
+#' men_lactic_energy
+#'
+#'  # Fit lactic model to energy
+#'
+#'  sprint_lactic_duration_model_fit(men_lactic_energy)
+#'
 sprint_lactic_duration_model_fit <- function(lactic_energy_duration, k1 = 20, k2 = 2000) {
   # Fit the alactic power model to the alactic power duration data
   fit <- minpack.lm::nlsLM(lactic_energy ~ sprint_lactic_duration_model(duration, lactic_capacity, k1 = k1, k2 = k2),
@@ -152,16 +214,27 @@ sprint_lactic_duration_model_fit <- function(lactic_energy_duration, k1 = 20, k2
 }
 
 
-#' Title
+#' Sprint Lactic Duration Model Fit Residual Standard Error
 #'
-#' @param lactic_energy_duration
-#' @param k1
-#' @param k2
+#' Performs a non-linear least squares fitting of the lactic energy model to the lactic energy over
+#' running duration data and returns the residual standard error of the fit.
 #'
-#' @returns
+#' @param lactic_energy_duration A tibble with the following columns: duration (s), lactic_energy (J/kg), corresponding to the average lactic energy expenditure over running duration. This data is used to fit the lactic energy model.
+#' @param k1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
+#' @param k2 A double representing to decaying time-constant of the bi-exponential model. Default is 2000.
+#'
+#' @returns A numeric value representing the residual standard error of the fitted lactic energy model.
 #' @export
 #'
 #' @examples
+#'
+#' men_lactic_energy <- sprint_lactic_energy_duration_graubner_nixdorf()
+#' men_lactic_energy
+#'
+#'  # Fit lactic model to energy
+#'
+#'  sprint_lactic_duration_model_fit_rse(men_lactic_energy)
+#'
 sprint_lactic_duration_model_fit_rse <- function(lactic_energy_duration, k1 = 20, k2 = 2000) {
   # Fit the lactic energy model to the lactic energy duration data
   fit <- sprint_lactic_duration_model_fit(lactic_energy_duration, k1 = k1, k2 = k2)
@@ -170,16 +243,26 @@ sprint_lactic_duration_model_fit_rse <- function(lactic_energy_duration, k1 = 20
 }
 
 
-#' Title
+#' Lactic Capacity from Lactic Energy Duration Data
 #'
-#' @param lactic_energy_duration
-#' @param k1
-#' @param k2
+#' Extracts the lactic capacity from the fitted lactic energy model based on the lactic energy duration data.
 #'
-#' @returns
+#' @param lactic_energy_duration A tibble with the following columns: duration (s), lactic_energy (J/kg), corresponding to the average lactic energy expenditure over running duration. This data is used to fit the lactic energy model.
+#' @param k1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
+#' @param k2 A double representing to decaying time-constant of the bi-exponential model. Default is 2000.
+#'
+#'
+#' @returns A numeric value representing the lactic capacity (in J/kg) extracted from the fitted lactic energy model.
 #' @export
 #'
 #' @examples
+#' men_lactic_energy <- sprint_lactic_energy_duration_graubner_nixdorf()
+#' men_lactic_energy
+#'
+#'  # Extract lactic capacity from the data
+#'
+#'  sprint_lactic_capacity(men_lactic_energy)
+#'
 sprint_lactic_capacity <- function(lactic_energy_duration, k1 = 20, k2 = 2000) {
   # Fit the lactic energy model to the lactic energy duration data
   fit <- sprint_lactic_duration_model_fit(lactic_energy_duration, k1 = k1, k2 = k2)

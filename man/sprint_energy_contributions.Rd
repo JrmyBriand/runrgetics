@@ -43,5 +43,4 @@ bolt_modeled_data <- sprint_bioenergetic_model_data(bolt_100m_motion_data)
 
 sprint_energy_contributions(bolt_modeled_data, event = "Men's 100 m")
 
-
 }

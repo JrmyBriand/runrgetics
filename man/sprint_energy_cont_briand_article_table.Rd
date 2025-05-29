@@ -36,7 +36,6 @@ The table computes the energy contribution in the men's and women's 100, 200 and
 }
 \examples{
 
-sprint_energy_cont_briand_article_table ()
-
+sprint_energy_cont_briand_article_table()
 
 }

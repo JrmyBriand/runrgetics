@@ -55,5 +55,4 @@ bolt_100m_motion_data <- sprint_motion_model_data(
 
 sprint_bioenergetic_model_rse(bolt_100m_motion_data)
 
-
 }

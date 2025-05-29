@@ -58,5 +58,4 @@ bolt_100m_motion_data <- sprint_motion_model_data(
 
 sprint_bioenergetic_model_diagnostic(bolt_100m_motion_data, maximal_aerobic_power = 24.5)
 
-
 }
