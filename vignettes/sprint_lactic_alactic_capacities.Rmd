@@ -1,0 +1,157 @@
+---
+title: "Sprint Lactic and Alactic Capacities"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Sprint Lactic and Alactic Capacities}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(runrgetics)
+library(ggplot2)
+library(dplyr)
+```
+
+The current vignette explores the modelling of the determination of lactic and alactic capacities from sprint performances. 
+
+## A Model of Lactic and Alactic Energy Contributions as a Function of Race Duration
+
+The first step consist of proposing a model for lactic and alactic energy contribution as a function of race duration. Briand et al. (2025) proposed such model which was determined by using Graubner and Nixdorf's (2011) dataset. The performances of the men's 100, 200 and 400 m were assumed to correspond to an hypothetical athlete's performances. Lactic and alactic energy contributions as a function of race duration were computed using the sprint bioenergetic model. 
+
+The following functions `sprint_alactic_energy_duration` and `sprint_lactic_energy_duration` compute the alactic and lactic energy expenditure and average power for a given sprint event. The functions input is a tibble with a time column and instantaneous alactic and lactic power over the sprint, as computed using the sprint bioenergetic model proposed by Briand et al. (2025). 
+
+The following chunk shows how to use the function with Bolt's 100 m performance data from the Graubner and Nixdorf dataset.
+
+```{r}
+# Extract Bolt's 100 m data from Graubner and Nixdorf data set.
+
+# Extract Bolt's 100 m data from Graubner and Nixdorf data set.
+bolt_100m <- graubner_nixdorf_sprints |>
+  dplyr::filter(
+    athlete == "Bolt",
+    event == "Men's 100 m"
+  )
+
+# Compute sprint motion data
+
+bolt_100m_motion_data <- sprint_motion_model_data(
+  mean_velocity_splits = bolt_100m$velocity,
+  time_splits = bolt_100m$splits,
+  distance = bolt_100m$distance,
+  reaction_time = bolt_100m$reaction_time[1],
+  maximal_velocity = bolt_100m$maximal_velocity[1]
+)
+
+# Compute sprint power data using Briand et al.'s (2025) sprint bioenergetic model
+
+bolt_modeled_data <- sprint_bioenergetic_model_data(bolt_100m_motion_data)
+
+# Compute alactic energy vs duration for Bolt's 100 m performance
+
+alactic_energy_duration_bolt_100m <- sprint_alactic_energy_duration(bolt_modeled_data)
+alactic_energy_duration_bolt_100m
+
+# Compute lactic energy vs duration for Bolt's 100 m performance
+
+lactic_energy_duration_bolt_100m <- sprint_lactic_energy_duration(bolt_modeled_data)
+lactic_energy_duration_bolt_100m
+
+
+```
+
+To formalise a model of lactic and alactic energy as a function of race duration, Briand et al. (2025) used the men's 100, 200 and 400 m performances from the Graubner and Nixdorf dataset. The function `sprint_alactic_energy_duration_graubner_nixdorf` and `sprint_lactic_energy_duration_graubner_nixdorf` can extract alactic and lacic energis as a function of race duraion for these events. 
+
+```{r}
+# extract men alactic energy vs duration for the 100, 200 and 400 m
+
+men_alactic_energy <- sprint_alactic_energy_duration_graubner_nixdorf()
+men_alactic_energy
+
+# extract men lactic energy vs duration for the 100, 200 and 400 m 
+
+men_lactic_energy <- sprint_lactic_energy_duration_graubner_nixdorf()
+men_lactic_energy
+
+
+```
+
+### Formulating a Model of Alactic Average Power as a Function of Race Duration
+
+Based on the hypothetical male alactic and lactic energy and average power over race durations, two seperate models were proposed by Briand et al. (2025). These models enable the estimation of maximal alactic and lactic capacities as a function of race duration. 
+
+The first model relates average alactic power $P_{al,avg}$ with race duration $T$. As described by Briand et al. (2025), a log-normal function can be used to model this functional relationship. The model was parametized to minimize the error between the average alactic power over the men's 100, 200 and 400 m, while keeping a good balance with theoretical behavior of alactic metabolism and available experimental data in the scientific litterature. More details are provided in the original article (Briand et al. 2025). 
+
+The model follows the following equation: 
+
+$$
+P_{al,avg}(T) =  \frac{E_{al,max}}{T} \cdot \exp\left(\frac{-(ln(T)-1.75)^2}{2\cdot(1.5)^2}\right)
+$$
+Where $E_{al,max}$ corresponds to the alactic capacity. The function `sprint_alactic_duration_model` can be used to compute average alactic power as a function of race duration and maximal alactic capacity.
+
+Although few data points are available, the average alactic power over the 100, 200 and 400 m can be used to estimate the hypothetical male athlete maximal alactic capacity through non-linear least squares fitting. 
+
+The function `sprint_alactic_duration_model_fit` performs the non-linear least-squares fit. The function `sprint_alactic_duration_model_fit_rse` provides the fit residual standard error as provided by Briand et al. (2025) and the function `sprint_alactic_capacity` computes the maximal alactic capacity. 
+
+```{r}
+
+# Fit alactic model to power
+sprint_alactic_duration_model_fit(men_alactic_energy)
+
+# compute residual standard error
+sprint_alactic_duration_model_fit_rse(men_alactic_energy)
+
+# compute alactic capacity
+
+sprint_alactic_capacity(men_alactic_energy)
+
+
+```
+
+The function `plot_sprint_alactic_duration_model` can be used to plot the alactic model fit with the average alactic power over the 100, 200 and 400 m.
+
+
+### Formulating a Model of Alactic Energy as a Function of Race Duration
+
+A second model can be used to model lactic energy $E_{la}$ as a function of race duration $T$. As described by Briand et al. (2025), a bi-exponential function can be used to model this functional relationship. The model was parametized to minimize the error between the lactic energy over the men's 100, 200 and 400 m, while keeping a good balance with theoretical behavior of lactic metabolism and available experimental data in the scientific litterature. More details are provided in the original article (Briand et al. 2025). This will also demonstrated in subsequent sections showing how to model fits data accumulated lactate over different running durations.
+
+The lactic model as a function of race duration follows the following equation: 
+
+$$
+E_{la}(T) = E_{la,max} \cdot k_{norm,2} \left(1 - \exp\left(-\frac{(T-3)}{20}\right)\right) \cdot \exp\left(-\frac{(T-3)}{2000}\right)
+$$
+
+Where $E_{la,max}$ corresponds to the lactic capacity. $k_{norm_2}$ is a normalisation constant ensure the maximal lactic energy expenditure corresponds to the maximal lactic capacity. The function `sprint_lactic_duration_model` can be used to compute average alactic power as a function of race duration and maximal alactic capacity.
+
+Although few data points are available, the average alactic power over the 100, 200 and 400 m can be used to estimate the hypothetical male athlete maximal alactic capacity through non-linear least squares fitting. 
+
+The function `sprint_lactic_duration_model_fit` performs the non-linear least-squares fit. The function `sprint_lactic_duration_model_fit_rse` provides the fit residual standard error as provided by Briand et al. (2025) and the function `sprint_lactic_capacity` computes the maximal alactic capacity. 
+
+
+```{r}
+
+# Fit lactic model to power
+sprint_lactic_duration_model_fit(men_lactic_energy)
+
+# compute residual standard error
+sprint_lactic_duration_model_fit_rse(men_lactic_energy)
+
+# compute lactic capacity
+
+sprint_lactic_capacity(men_lactic_energy)
+
+```
+
+The function `plot_sprint_alactic_duration_model` can be used to plot the alactic model fit with the average alactic power over the 100, 200 and 400 m.
+
+
+### Accumulated Lactate and Kindemann (1977) data
+
+
