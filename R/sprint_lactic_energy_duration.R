@@ -1,4 +1,3 @@
-
 #' Title
 #'
 #' @param sprint_power_data
@@ -7,8 +6,7 @@
 #' @export
 #'
 #' @examples
-sprint_lactic_energy_duration <- function(sprint_power_data){
-
+sprint_lactic_energy_duration <- function(sprint_power_data) {
   # extract duration (last time value of the sprint_power_data time colmunn)
 
   duration <- max(sprint_power_data$time)
@@ -30,7 +28,6 @@ sprint_lactic_energy_duration <- function(sprint_power_data){
   )
 
   return(result)
-
 }
 
 #' Title
@@ -47,26 +44,23 @@ sprint_lactic_energy_duration <- function(sprint_power_data){
 #' @export
 #'
 #' @examples
-sprint_lactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdorf_sprints, athlete_sex = "male", mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01){
-
-  if(athlete_sex == "male"){
+sprint_lactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdorf_sprints, athlete_sex = "male", mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01) {
+  if (athlete_sex == "male") {
     dat <- data |>
-      dplyr::filter(event == "Men's 100 m"|
-                    event == "Men's 200 m"|
-                    event == "Men's 400 m")
+      dplyr::filter(event == "Men's 100 m" |
+        event == "Men's 200 m" |
+        event == "Men's 400 m")
 
     map <- 24.5
-
   }
 
-  if(athlete_sex == "female"){
+  if (athlete_sex == "female") {
     dat <- data |>
-      dplyr::filter(event == "Women's 100 m"|
-                      event == "Women's 200 m"|
-                      event == "Women's 400 m")
+      dplyr::filter(event == "Women's 100 m" |
+        event == "Women's 200 m" |
+        event == "Women's 400 m")
 
     map <- 21
-
   }
 
   # events
@@ -97,12 +91,13 @@ sprint_lactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdo
     )
 
 
-    sprint_power_data  <-  sprint_bioenergetic_model_data(sprint_data,
-                                                          mu = mu,
-                                                          sigma = sigma,
-                                                          k1 = k1,
-                                                          k2 = k2,
-                                                          maximal_aerobic_power = map)
+    sprint_power_data <- sprint_bioenergetic_model_data(sprint_data,
+      mu = mu,
+      sigma = sigma,
+      k1 = k1,
+      k2 = k2,
+      maximal_aerobic_power = map
+    )
 
     # compute lactic energy vs duration for each event
 
@@ -112,11 +107,9 @@ sprint_lactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdo
     # add to table
 
     table <- dplyr::bind_rows(table, sprint_lactic_energy_duration_data)
-
   }
 
   return(table)
-
 }
 
 
@@ -131,12 +124,10 @@ sprint_lactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdo
 #' @export
 #'
 #' @examples
-sprint_lactic_duration_model <- function(duration, lactic_capacity, k1 = 20, k2 = 2000){
-
+sprint_lactic_duration_model <- function(duration, lactic_capacity, k1 = 20, k2 = 2000) {
   knorm <- bi_exponential_knorm(t1 = k1, t2 = k2)
 
-  return( lactic_capacity * knorm* (1 - exp(-(duration-3)/k1)) * exp(-(duration-3)/k2) )
-
+  return(lactic_capacity * knorm * (1 - exp(-(duration - 3) / k1)) * exp(-(duration - 3) / k2))
 }
 
 
@@ -150,15 +141,14 @@ sprint_lactic_duration_model <- function(duration, lactic_capacity, k1 = 20, k2 
 #' @export
 #'
 #' @examples
-sprint_lactic_duration_model_fit <- function(lactic_energy_duration, k1 = 20, k2 = 2000){
-
+sprint_lactic_duration_model_fit <- function(lactic_energy_duration, k1 = 20, k2 = 2000) {
   # Fit the alactic power model to the alactic power duration data
   fit <- minpack.lm::nlsLM(lactic_energy ~ sprint_lactic_duration_model(duration, lactic_capacity, k1 = k1, k2 = k2),
-                           data = lactic_energy_duration,
-                           start = list(lactic_capacity = 1300))
+    data = lactic_energy_duration,
+    start = list(lactic_capacity = 1300)
+  )
 
   return(fit)
-
 }
 
 
@@ -172,15 +162,11 @@ sprint_lactic_duration_model_fit <- function(lactic_energy_duration, k1 = 20, k2
 #' @export
 #'
 #' @examples
-sprint_lactic_duration_model_fit_rse <- function(lactic_energy_duration, k1 = 20, k2 = 2000){
-
+sprint_lactic_duration_model_fit_rse <- function(lactic_energy_duration, k1 = 20, k2 = 2000) {
   # Fit the lactic energy model to the lactic energy duration data
   fit <- sprint_lactic_duration_model_fit(lactic_energy_duration, k1 = k1, k2 = k2)
 
   return(summary(fit)$sigma)
-
-
-
 }
 
 
@@ -194,8 +180,7 @@ sprint_lactic_duration_model_fit_rse <- function(lactic_energy_duration, k1 = 20
 #' @export
 #'
 #' @examples
-sprint_lactic_capacity <- function(lactic_energy_duration, k1 = 20, k2 = 2000){
-
+sprint_lactic_capacity <- function(lactic_energy_duration, k1 = 20, k2 = 2000) {
   # Fit the lactic energy model to the lactic energy duration data
   fit <- sprint_lactic_duration_model_fit(lactic_energy_duration, k1 = k1, k2 = k2)
 
@@ -203,6 +188,4 @@ sprint_lactic_capacity <- function(lactic_energy_duration, k1 = 20, k2 = 2000){
   lactic_capacity <- coef(fit)["lactic_capacity"]
 
   return(lactic_capacity)
-
 }
-

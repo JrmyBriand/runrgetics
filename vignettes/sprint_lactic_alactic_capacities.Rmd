@@ -63,8 +63,6 @@ alactic_energy_duration_bolt_100m
 
 lactic_energy_duration_bolt_100m <- sprint_lactic_energy_duration(bolt_modeled_data)
 lactic_energy_duration_bolt_100m
-
-
 ```
 
 To formalise a model of lactic and alactic energy as a function of race duration, Briand et al. (2025) used the men's 100, 200 and 400 m performances from the Graubner and Nixdorf dataset. The function `sprint_alactic_energy_duration_graubner_nixdorf` and `sprint_lactic_energy_duration_graubner_nixdorf` can extract alactic and lacic energis as a function of race duraion for these events. 
@@ -75,12 +73,10 @@ To formalise a model of lactic and alactic energy as a function of race duration
 men_alactic_energy <- sprint_alactic_energy_duration_graubner_nixdorf()
 men_alactic_energy
 
-# extract men lactic energy vs duration for the 100, 200 and 400 m 
+# extract men lactic energy vs duration for the 100, 200 and 400 m
 
 men_lactic_energy <- sprint_lactic_energy_duration_graubner_nixdorf()
 men_lactic_energy
-
-
 ```
 
 ### Formulating a Model of Alactic Average Power as a Function of Race Duration
@@ -101,7 +97,6 @@ Although few data points are available, the average alactic power over the 100, 
 The function `sprint_alactic_duration_model_fit` performs the non-linear least-squares fit. The function `sprint_alactic_duration_model_fit_rse` provides the fit residual standard error as provided by Briand et al. (2025) and the function `sprint_alactic_capacity` computes the maximal alactic capacity. 
 
 ```{r}
-
 # Fit alactic model to power
 sprint_alactic_duration_model_fit(men_alactic_energy)
 
@@ -111,8 +106,6 @@ sprint_alactic_duration_model_fit_rse(men_alactic_energy)
 # compute alactic capacity
 
 sprint_alactic_capacity(men_alactic_energy)
-
-
 ```
 
 The function `plot_sprint_alactic_duration_model` can be used to plot the alactic model fit with the average alactic power over the 100, 200 and 400 m.
@@ -136,7 +129,6 @@ The function `sprint_lactic_duration_model_fit` performs the non-linear least-sq
 
 
 ```{r}
-
 # Fit lactic model to power
 sprint_lactic_duration_model_fit(men_lactic_energy)
 
@@ -146,7 +138,6 @@ sprint_lactic_duration_model_fit_rse(men_lactic_energy)
 # compute lactic capacity
 
 sprint_lactic_capacity(men_lactic_energy)
-
 ```
 
 The function `plot_sprint_alactic_duration_model` can be used to plot the alactic model fit with the average alactic power over the 100, 200 and 400 m.

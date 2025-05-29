@@ -2,7 +2,7 @@
 
 test_that("sprint_recover_motion returns expected structure", {
   # Create simple power series
-  power_series <- rep(50, 100)  # 1 second of constant power at dt = 0.01
+  power_series <- rep(50, 100) # 1 second of constant power at dt = 0.01
 
   result <- sprint_recover_motion(power_series)
 
@@ -30,7 +30,7 @@ test_that("sprint_recover_distance returns expected type", {
   # Check return type
   expect_type(result, "double")
   expect_length(result, 1)
-  expect_gte(result, 0)  # Distance should be non-negative
+  expect_gte(result, 0) # Distance should be non-negative
 })
 
 test_that("sprint_modeled_distance_percentage_error returns expected type", {
@@ -38,7 +38,7 @@ test_that("sprint_modeled_distance_percentage_error returns expected type", {
   mock_data <- tibble::tibble(
     time = seq(0, 0.99, by = 0.01),
     power = rep(50, 100),
-    power_mod = rep(55, 100)  # Slightly different power for testing
+    power_mod = rep(55, 100) # Slightly different power for testing
   )
 
   result <- sprint_modeled_distance_percentage_error(mock_data)

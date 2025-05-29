@@ -194,7 +194,6 @@ sprint_bioenergetic_model_adj_R2(
   sprint_motion_data = bolt_100m_motion_data,
   maximal_aerobic_power = 24.5
 )
-
 ```
 
 
@@ -217,7 +216,7 @@ We can try to specifically retrieve the parameters that best fit Bolt's 100 m to
 ```{r}
 # get sprint optimal alactic power parameters
 
-alactic_params <- sprint_alactic_model_optimal_params() |> 
+alactic_params <- sprint_alactic_model_optimal_params() |>
   filter(event == "Men's 100 m")
 
 # extract optimal mu and sigma
@@ -228,7 +227,7 @@ sigma <- alactic_params$sigma
 
 # get sprint optimal lactic power parameters
 
-lactic_params <- sprint_lactic_model_optimal_params() |> 
+lactic_params <- sprint_lactic_model_optimal_params() |>
   filter(event == "Men's 100 m")
 
 k1 <- lactic_params$k1
@@ -245,7 +244,6 @@ sprint_bioenergetic_model_diagnostic(
   maximal_aerobic_power = 24.5,
   histogram_binwidth = 1
 )
-
 ```
 
 We see that the diagnostic of the model is slightly improved. All the metrics (RSE, RMSE, $R^2$ and adjusted $R^2$) show improvements. The main discrepencies are observed in the early moment of the sprint, where the log-normal function of the alactic model doesn't perfectly match the metabolic power. The second discrepency is observed around metabolic eak power, where the alactic model lead to a slight overestimation of the peak power. The last discrepency is related to the transition between the acceleration and the constant-velocity phase, derived from the sprint motion model that reproduces the instantaneous velocity profile from the time splits. The limitations of the sprint bioenergetic model are discussed in further details by Briand et al. (2025).
@@ -273,7 +271,6 @@ round(energy_bioenergetic_model)
 
 percentage_difference <- (energy_bioenergetic_model - energy_estimated) / energy_estimated * 100
 round(percentage_difference, 2)
-
 ```
 
 
@@ -294,7 +291,6 @@ round(lactic_energy)
 # aerobic energy expenditure
 aerobic_energy <- energy_aerobic(bolt_modeled_data)
 round(aerobic_energy)
-
 ```
 
 Finally, we can compute the percentage of energy expenditure from each energy pathway relative to the total energy expenditure estimated using the sprint bioenergetic model.
@@ -316,7 +312,6 @@ round(aerobic_energy_percentage)
 # anaerobic energy percentage
 anaerobic_energy_percentage <- anaerobic_energy_percentage(bolt_modeled_data, type = "power bioenergetic model")
 round(anaerobic_energy_percentage)
-
 ```
 
 ### Computing Maximal Metabolic Power
@@ -335,10 +330,8 @@ round(estimated_max_power_bioenergetic_model)
 
 # percentage difference between the two maximum metabolic power estimates
 
-percentage_difference_max_power <- ( estimated_max_power_bioenergetic_model - estimated_max_power) / estimated_max_power * 100
+percentage_difference_max_power <- (estimated_max_power_bioenergetic_model - estimated_max_power) / estimated_max_power * 100
 round(percentage_difference_max_power, 2)
-
-
 ```
 
 ### Distance Travelled Computation
@@ -349,8 +342,6 @@ The function `sprint_recover_distance` can be used to compute the distance trave
 The Briand et al. (2025) paper mentions that the method to recover the distance travelled from the time series leads to a distance error of less than 0.01%, which can effectively be observed for time steps of 0.001 s. We can observe this in the following example.
 
 ```{r}
-
-
 # Recompute Bolt motion data with a smaller time steps
 
 bolt_motion_small_dt <- sprint_motion_model_data(
@@ -358,7 +349,7 @@ bolt_motion_small_dt <- sprint_motion_model_data(
   time_splits = bolt_100m$splits,
   distance = bolt_100m$distance,
   reaction_time = bolt_100m$reaction_time[1],
-  maximal_velocity = bolt_100m$maximal_velocity[1], 
+  maximal_velocity = bolt_100m$maximal_velocity[1],
   dt = 0.001
 )
 
@@ -369,9 +360,7 @@ distance_actual <- pracma::trapz(bolt_motion_small_dt$time, bolt_motion_small_dt
 distance_recovered <- sprint_recover_distance(bolt_motion_small_dt$power, dt = 0.001)
 
 distance_percentage_diff <- (distance_recovered - distance_actual) / distance_actual * 100
-round(distance_percentage_diff,2)
-
-
+round(distance_percentage_diff, 2)
 ```
 
 Using such small time steps can be computationally heavy and therefore, for the remaining of the calculations, we will use a time step of 0.01 s, which is the default value for the `dt` argument in the `sprint_motion_model_data` function. This leads to slightly larger distance errors recovered from the power time series. The following code chunk also compute the distance difference as derived from di Prampero et al.'s (2005, 2018) equivalent slope approach and the distance recovered from the sprint bioenergetic model power time series. The percentage difference in Bolt's traveled distance over the 100 m is of less than 1 % (0.85 %). It's worth mentionning that the distance obtained from the `sprint_motion_model_data` function is not actually equal to distance traveled by Bolt which should be equal to 100 m. This occurs because the model to reconstruct instantaneous velocity from time splits relies on several assumptions that are discussed at length by Briand et al. (2025).
@@ -384,7 +373,7 @@ distance_actual <- pracma::trapz(bolt_100m_motion_data$time, bolt_100m_motion_da
 distance_recovered <- sprint_recover_distance(bolt_modeled_data$power, dt = 0.01)
 
 distance_percentage_diff <- (distance_recovered - distance_actual) / distance_actual * 100
-round(distance_percentage_diff,2)
+round(distance_percentage_diff, 2)
 
 # Compute the difference between modelled distance (recovered from power)
 
@@ -396,8 +385,6 @@ round(modelled_distance_percentage_diff, 2)
 # A function was written to compute the percentage error between the modelled distance and the recovered distance from the power time series.
 
 round(sprint_modeled_distance_percentage_error(bolt_modeled_data, dt = 0.01), 2)
-
-
 ```
 
 ### Generating Comparison Tables
@@ -407,16 +394,14 @@ The previous computations can be used to generate the tables assessing the sprin
 The goodness of fit metrics of each event can be computed using the function `sprint_bioenergetic_model_gof_metrics` that provides a data frame of the relevant metrics for the chosen event. 
 
 ```{r}
-
 sprint_bioenergetic_model_gof_metrics(bolt_modeled_data, event = "Men's 100 m")
-
 ```
 
 The following function returns a table similar to Table 2 in Briand et al. (2025) article, with the goodness of fit metrics for each event in the Graubner and Nixdorf (2011) dataset. Discrepencies between the table of the article can be due to the fact that the difference in distance travelled in this table was compared to the distance reconstructed from the estimated metabolic pouwer of sprint motion data, while in the article, the distance was compared to the distance traveled by the athlete as obtained from the instantaneous velocity model. Other small differences observed can be due to the choice of integration and integration steps.
 
 
 ```{r}
-sprint_briand_article_gof_table() 
+sprint_briand_article_gof_table()
 ```
 
 The energy contribution from the 3 metabolic pathways of each event can be computed using the function `sprint_energy_contributions` that provides a data frame of the relevant energy contribution and percentage to total energy contribution for the chosen event.

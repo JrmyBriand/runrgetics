@@ -1,4 +1,3 @@
-
 #' Sprint Bioenergetic Model Goodness of Fit Metrics
 #'
 #' Computes a set of metrics that can be used to assess the sprint bioenergetic model's goodness of fit to the observed metabolic power data.
@@ -44,11 +43,10 @@
 #'
 #' sprint_bioenergetic_model_gof_metrics(bolt_modeled_data, event = "Men's 100 m")
 #'
-sprint_bioenergetic_model_gof_metrics <- function(sprint_power_data, event,  mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, dt = 0.01){
-
+sprint_bioenergetic_model_gof_metrics <- function(sprint_power_data, event, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, dt = 0.01) {
   # compute metrics from the sprint power data
 
-  #adjusted_Rsquared
+  # adjusted_Rsquared
 
   adj_Rsquared <- sprint_bioenergetic_model_adj_R2(
     sprint_motion_data = sprint_power_data,
@@ -65,14 +63,14 @@ sprint_bioenergetic_model_gof_metrics <- function(sprint_power_data, event,  mu 
 
   energy_slope_approach <- energy_total(sprint_power_data, type = "power")
 
-  #percentage difference
+  # percentage difference
 
-  energy_percent_diff <- ( energy_total - energy_slope_approach) / energy_slope_approach * 100
+  energy_percent_diff <- (energy_total - energy_slope_approach) / energy_slope_approach * 100
 
 
   # Maximum Metabolic Power
 
- slope_approach_max_power <- sprint_maximum_metabolic_power(sprint_power_data, type = "power")
+  slope_approach_max_power <- sprint_maximum_metabolic_power(sprint_power_data, type = "power")
 
 
   # maximal metabolic power from the sprint bioenergetic model
@@ -80,18 +78,18 @@ sprint_bioenergetic_model_gof_metrics <- function(sprint_power_data, event,  mu 
 
   # percentage difference between the two maximum metabolic power estimates
 
-  percent_diff_max_power <- (bioenergetic_max_power - slope_approach_max_power ) / slope_approach_max_power  * 100
+  percent_diff_max_power <- (bioenergetic_max_power - slope_approach_max_power) / slope_approach_max_power * 100
 
   # traveled distance
 
 
   distance_rec <- sprint_recover_distance(sprint_power_data$power, dt = dt)
 
-  distance_mod_rec<- sprint_recover_distance(sprint_power_data$power_mod, dt = dt)
+  distance_mod_rec <- sprint_recover_distance(sprint_power_data$power_mod, dt = dt)
 
   # Distance percentage_difference
 
-  dist_percent_diff <- ( distance_mod_rec - distance_rec  ) / distance_rec * 100
+  dist_percent_diff <- (distance_mod_rec - distance_rec) / distance_rec * 100
 
   # return a tibble with the metrics
 
@@ -99,11 +97,11 @@ sprint_bioenergetic_model_gof_metrics <- function(sprint_power_data, event,  mu 
     event = event,
     adjusted_Rsquared = round(adj_Rsquared, 2),
     energy_total = round(energy_total, 2),
-    energy_percent_diff = round(energy_percent_diff,2),
-    estimated_max_power = round(bioenergetic_max_power,2),
-    percentage_difference_max_power = round(percent_diff_max_power ,2),
-    distance_modeled_recovered = round(distance_mod_rec,2),
-    distance_percent_diff = round(dist_percent_diff,2)
+    energy_percent_diff = round(energy_percent_diff, 2),
+    estimated_max_power = round(bioenergetic_max_power, 2),
+    percentage_difference_max_power = round(percent_diff_max_power, 2),
+    distance_modeled_recovered = round(distance_mod_rec, 2),
+    distance_percent_diff = round(dist_percent_diff, 2)
   )
 
   return(metrics)
@@ -132,8 +130,7 @@ sprint_bioenergetic_model_gof_metrics <- function(sprint_power_data, event,  mu 
 #'
 #' sprint_briand_article_gof_table()
 #'
-sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01){
-
+sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01) {
   # events
   events <- unique(data$event)
 
@@ -174,17 +171,17 @@ sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints, mu 
     }
 
 
-    sprint_power_data  <-  sprint_bioenergetic_model_data(sprint_data,
-                                                          mu = mu,
-                                                          sigma = sigma,
-                                                          k1 = k1,
-                                                          k2 = k2,
-                                                          maximal_aerobic_power = map)
+    sprint_power_data <- sprint_bioenergetic_model_data(sprint_data,
+      mu = mu,
+      sigma = sigma,
+      k1 = k1,
+      k2 = k2,
+      maximal_aerobic_power = map
+    )
 
     metrics <- sprint_bioenergetic_model_gof_metrics(sprint_power_data, i, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = map, dt = dt)
 
     table <- dplyr::bind_rows(table, metrics)
-
   }
 
   # improve the name of the columns
@@ -202,8 +199,6 @@ sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints, mu 
   )
 
   return(tinytable::tt(table, notes = "Metrics comparing the sprint bioenergetics model to observed metabolic power from di Prampero et al.'s (2005; 2018) methods and Graubner and Nixdorf's (2011) data."))
-
-
 }
 
 
@@ -244,14 +239,11 @@ sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints, mu 
 #'
 #' sprint_energy_contributions(bolt_modeled_data, event = "Men's 100 m")
 #'
-#'
-sprint_energy_contributions <- function(sprint_power_data, event_name){
-
-
+sprint_energy_contributions <- function(sprint_power_data, event_name) {
   # alactic energy
-  al_energy <-energy_alactic(sprint_power_data)
+  al_energy <- energy_alactic(sprint_power_data)
 
-  #lactic_energy
+  # lactic_energy
 
   la_energy <- energy_lactic(sprint_power_data)
 
@@ -290,8 +282,6 @@ sprint_energy_contributions <- function(sprint_power_data, event_name){
   )
 
   return(energy_contributions)
-
-
 }
 
 
@@ -313,11 +303,9 @@ sprint_energy_contributions <- function(sprint_power_data, event_name){
 #'
 #' @examples
 #'
-#' sprint_energy_cont_briand_article_table ()
+#' sprint_energy_cont_briand_article_table()
 #'
-#'
-sprint_energy_cont_briand_article_table <- function(data = graubner_nixdorf_sprints, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01){
-
+sprint_energy_cont_briand_article_table <- function(data = graubner_nixdorf_sprints, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01) {
   # events
   events <- unique(data$event)
 
@@ -358,17 +346,17 @@ sprint_energy_cont_briand_article_table <- function(data = graubner_nixdorf_spri
     }
 
 
-    sprint_power_data  <-  sprint_bioenergetic_model_data(sprint_data,
-                                                          mu = mu,
-                                                          sigma = sigma,
-                                                          k1 = k1,
-                                                          k2 = k2,
-                                                          maximal_aerobic_power = map)
+    sprint_power_data <- sprint_bioenergetic_model_data(sprint_data,
+      mu = mu,
+      sigma = sigma,
+      k1 = k1,
+      k2 = k2,
+      maximal_aerobic_power = map
+    )
 
     metrics <- sprint_energy_contributions(sprint_power_data, i)
 
     table <- dplyr::bind_rows(table, metrics)
-
   }
 
   # improve the name of the columns
@@ -385,8 +373,4 @@ sprint_energy_cont_briand_article_table <- function(data = graubner_nixdorf_spri
   )
 
   return(tinytable::tt(table, notes = "Energy contributions of three energy systems per sprint distance. Percentage values reflect total energy expended per sprint."))
-
-
-
 }
-

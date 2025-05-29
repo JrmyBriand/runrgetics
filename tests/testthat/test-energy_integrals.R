@@ -6,7 +6,7 @@ test_that("energy_total calculates the integral correctly for both power types",
   test_data <- tibble::tibble(
     time = c(0, 1, 2, 3, 4),
     power = c(0, 1, 2, 1, 0),
-    power_mod = c(0, 1, 2, 1, 0)  # Adding modeled power
+    power_mod = c(0, 1, 2, 1, 0) # Adding modeled power
   )
 
   # Expected result using trapezoidal rule: (0+1)/2 + (1+2)/2 + (2+1)/2 + (1+0)/2 = 0.5 + 1.5 + 1.5 + 0.5 = 4
@@ -29,10 +29,14 @@ test_that("energy_total handles unsorted data for both power types", {
     power_mod = c(0, 1, 2, 1, 0)
   )
 
-  expect_equal(energy_total(unsorted_data, type = "power"),
-               energy_total(sorted_data, type = "power"))
-  expect_equal(energy_total(unsorted_data, type = "power bioenergetic model"),
-               energy_total(sorted_data, type = "power bioenergetic model"))
+  expect_equal(
+    energy_total(unsorted_data, type = "power"),
+    energy_total(sorted_data, type = "power")
+  )
+  expect_equal(
+    energy_total(unsorted_data, type = "power bioenergetic model"),
+    energy_total(sorted_data, type = "power bioenergetic model")
+  )
 })
 
 test_that("energy_total works with constant power for both power types", {

@@ -88,7 +88,7 @@ sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lacti
 #' fit <- sprint_bioenergetic_model_fit(bolt_100m_motion_data)
 #' fit
 #'
-sprint_bioenergetic_model_fit <- function(sprint_motion_data,  mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35,  maximal_aerobic_power = 24.5) {
+sprint_bioenergetic_model_fit <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
   fit <- minpack.lm::nlsLM(
     power ~ sprint_bioenergetic_model(time, maximal_alactic_power, maximal_lactic_power, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power),
     data = sprint_motion_data,
@@ -139,7 +139,7 @@ sprint_bioenergetic_model_fit <- function(sprint_motion_data,  mu = -0.4, sigma 
 #' maximal_alactic_power <- sprint_bioenergetic_model_max_al(bolt_100m_motion_data)
 #' maximal_alactic_power
 #'
-sprint_bioenergetic_model_max_al <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35,  maximal_aerobic_power = 24.5) {
+sprint_bioenergetic_model_max_al <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
   fit <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   params <- stats::coef(fit)
@@ -185,7 +185,7 @@ sprint_bioenergetic_model_max_al <- function(sprint_motion_data, mu = -0.4, sigm
 #' maximal_lactic_power <- sprint_bioenergetic_model_max_la(bolt_100m_motion_data)
 #' maximal_lactic_power
 #'
-sprint_bioenergetic_model_max_la <- function(sprint_motion_data,mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5){
+sprint_bioenergetic_model_max_la <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
   fit <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   params <- stats::coef(fit)
@@ -231,7 +231,7 @@ sprint_bioenergetic_model_max_la <- function(sprint_motion_data,mu = -0.4, sigma
 #'
 #' head(bolt_modeled_data)
 #'
-sprint_bioenergetic_model_data <- function(sprint_motion_data,  mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
+sprint_bioenergetic_model_data <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
   # get maximal alactic power
   maximal_alactic_power <- sprint_bioenergetic_model_max_al(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 

@@ -45,13 +45,13 @@ sprint_recover_motion <- function(power_series, dt = 0.01) {
   distance[1] <- 0
 
   # Iterative solution
-  for(i in 2:n) {
+  for (i in 2:n) {
     # Function to minimize (difference between observed and calculated power)
     objective <- function(delta_v) {
       # Calculate acceleration from velocity change
       acc <- delta_v / dt
       # Calculate new velocity
-      vel <- velocity[i-1] + delta_v
+      vel <- velocity[i - 1] + delta_v
       # Calculate power
       calc_power <- cost_running_sprint(acceleration = acc, velocity = vel) * vel
       return((calc_power - power_series[i])^2)
@@ -59,22 +59,23 @@ sprint_recover_motion <- function(power_series, dt = 0.01) {
 
     # Find delta_v that minimizes the difference
     result <- stats::optimize(objective,
-                       interval = c(-0.01, 0.08),
-                       tol = 1e-4)
+      interval = c(-0.01, 0.08),
+      tol = 1e-4
+    )
 
     # Update velocity and acceleration
-    velocity[i] <- velocity[i-1] + result$minimum
+    velocity[i] <- velocity[i - 1] + result$minimum
     acceleration[i] <- result$minimum / dt
 
     # Update distance (trapezoidal integration)
-    distance[i] <- distance[i-1] + (velocity[i] + velocity[i-1])/2 * dt
+    distance[i] <- distance[i - 1] + (velocity[i] + velocity[i - 1]) / 2 * dt
   }
 
   # compute time
 
-  time <- seq(0, (n-1) * dt, by = dt)
+  time <- seq(0, (n - 1) * dt, by = dt)
 
-  #create a tibble with time, distance, velocity, acceleration, and power
+  # create a tibble with time, distance, velocity, acceleration, and power
 
   motion_data <- tibble::tibble(
     time = time,
@@ -120,9 +121,7 @@ sprint_recover_motion <- function(power_series, dt = 0.01) {
 #'
 #' recovered_distance <- sprint_recover_distance(bolt_100m_motion_data$power, dt = 0.01)
 #'
-#'
 sprint_recover_distance <- function(power_series, dt = 0.01) {
-
   motion_data <- sprint_recover_motion(power_series, dt)
 
   # integrate velocity to get distance
@@ -170,15 +169,12 @@ sprint_recover_distance <- function(power_series, dt = 0.01) {
 #'
 #' round(percent_error, 2)
 #'
-sprint_modeled_distance_percentage_error <- function(sprint_power_data, dt = 0.01){
-
+sprint_modeled_distance_percentage_error <- function(sprint_power_data, dt = 0.01) {
   distance_recovered <- sprint_recover_distance(sprint_power_data$power, dt = dt)
 
   distance_recovered_bioenergetic_model <- sprint_recover_distance(sprint_power_data$power_mod, dt = dt)
 
-  modeled_distance_percentage_diff <- (distance_recovered_bioenergetic_model - distance_recovered ) / distance_recovered * 100
+  modeled_distance_percentage_diff <- (distance_recovered_bioenergetic_model - distance_recovered) / distance_recovered * 100
 
   return(modeled_distance_percentage_diff)
 }
-
-

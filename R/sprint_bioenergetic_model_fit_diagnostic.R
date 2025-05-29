@@ -1,4 +1,3 @@
-
 #' Sprint Bioenergetic Model Residual Standard Error
 #'
 #' Computes the residual standard error of the sprint bioenergetic model non-linear least squares fit. The fit is based on sprint metabolic power data derived from
@@ -36,16 +35,12 @@
 #'
 #' sprint_bioenergetic_model_rse(bolt_100m_motion_data)
 #'
-#'
-sprint_bioenergetic_model_rse <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5){
-
-  model <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power =  maximal_aerobic_power)
+sprint_bioenergetic_model_rse <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
+  model <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   rse <- summary(model)$sigma
 
   return(rse)
-
-
 }
 
 #' Sprint Bioenergetic Model Root Mean Squared Error
@@ -85,16 +80,14 @@ sprint_bioenergetic_model_rse <- function(sprint_motion_data, mu = -0.4, sigma =
 #'
 #' sprint_bioenergetic_model_rmse(bolt_100m_motion_data)
 #'
-sprint_bioenergetic_model_rmse <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5){
-
-  model <- sprint_bioenergetic_model_fit(sprint_motion_data,mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power =  maximal_aerobic_power)
+sprint_bioenergetic_model_rmse <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
+  model <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   residuals_vals <- stats::resid(model)
 
   rmse <- sqrt(mean(residuals_vals^2))
 
   return(rmse)
-
 }
 
 #' Sprint Bioenergetic Model R-squared
@@ -134,10 +127,8 @@ sprint_bioenergetic_model_rmse <- function(sprint_motion_data, mu = -0.4, sigma 
 #'
 #' sprint_bioenergetic_model_R2(bolt_100m_motion_data)
 #'
-#'
-sprint_bioenergetic_model_R2 <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35,  maximal_aerobic_power = 24.5){
-
-  model <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power =  maximal_aerobic_power)
+sprint_bioenergetic_model_R2 <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
+  model <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   fitted_vals <- stats::fitted(model)
 
@@ -148,7 +139,6 @@ sprint_bioenergetic_model_R2 <- function(sprint_motion_data, mu = -0.4, sigma = 
   r_squared
 
   return(r_squared)
-
 }
 
 
@@ -188,9 +178,7 @@ sprint_bioenergetic_model_R2 <- function(sprint_motion_data, mu = -0.4, sigma = 
 #'
 #' sprint_bioenergetic_model_adj_R2(bolt_100m_motion_data)
 #'
-#'
 sprint_bioenergetic_model_adj_R2 <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
-
   model <- sprint_bioenergetic_model_fit(
     sprint_motion_data,
     mu = mu,
@@ -209,7 +197,7 @@ sprint_bioenergetic_model_adj_R2 <- function(sprint_motion_data, mu = -0.4, sigm
   r_squared <- 1 - (ss_res / ss_tot)
 
   n <- length(observed_vals)
-  p <- 5  # Number of model parameters: mu, sigma, k1, k2, MAP
+  p <- 5 # Number of model parameters: mu, sigma, k1, k2, MAP
 
   adj_r_squared <- 1 - (1 - r_squared) * ((n - 1) / (n - p - 1))
 
@@ -258,16 +246,14 @@ sprint_bioenergetic_model_adj_R2 <- function(sprint_motion_data, mu = -0.4, sigm
 #'
 #' sprint_bioenergetic_model_diagnostic(bolt_100m_motion_data, maximal_aerobic_power = 24.5)
 #'
-#'
-sprint_bioenergetic_model_diagnostic <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35,  maximal_aerobic_power = 24.5, histogram_binwidth = 1){
-
+sprint_bioenergetic_model_diagnostic <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, histogram_binwidth = 1) {
   # Compute basic GOF metrics
-  rse <- sprint_bioenergetic_model_rse(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power =  maximal_aerobic_power)
-  rmse <- sprint_bioenergetic_model_rmse(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power =  maximal_aerobic_power)
-  r_squared <- sprint_bioenergetic_model_R2(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power =  maximal_aerobic_power)
-  adj_r_squared <- sprint_bioenergetic_model_adj_R2(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power =  maximal_aerobic_power)
+  rse <- sprint_bioenergetic_model_rse(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
+  rmse <- sprint_bioenergetic_model_rmse(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
+  r_squared <- sprint_bioenergetic_model_R2(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
+  adj_r_squared <- sprint_bioenergetic_model_adj_R2(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
-  model <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power =  maximal_aerobic_power)
+  model <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   # Compute fitted and residuals
   fitted_vals <- stats::fitted(model)
@@ -328,6 +314,4 @@ sprint_bioenergetic_model_diagnostic <- function(sprint_motion_data, mu = -0.4, 
       residual_hist = p4
     )
   ))
-
 }
-

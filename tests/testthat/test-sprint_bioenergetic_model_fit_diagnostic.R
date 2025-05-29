@@ -24,7 +24,7 @@ test_that("sprint_bioenergetic_model metrics return expected types", {
   r2 <- sprint_bioenergetic_model_R2(mock_data)
   expect_type(r2, "double")
   expect_length(r2, 1)
-  expect_true(r2 <= 1)  # R2 should be <= 1
+  expect_true(r2 <= 1) # R2 should be <= 1
 
   # Test adjusted R2
   adj_r2 <- sprint_bioenergetic_model_adj_R2(mock_data)
