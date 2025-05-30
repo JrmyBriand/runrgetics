@@ -163,4 +163,32 @@ plot_sprint_lactic_duration(men_lactic_energy)
 
 ### Accumulated Lactate and Kindemann (1977) data
 
+Kindermann's (1977) provides data of blood lactate concentration measured on maximal efforts of different durations. The data is provided in the `kindermann_lactate` dataset. 
 
+```{r}
+head(kindermann_lactate)
+```
+
+Accumulated lactate corresponds to the blood lactate accumulated above resting level concentrations and reflects the expenditure of lactic energy. The function `convert_acc_lactate_to_lactic_energy` can be used to convert accumulated lactate to lactic energy expenditure in J/kg. Alternativeyl, the function `convert_lactic_energy_to_acc_lactate` can be used to convert lactic energy expenditure in J/kg to accumulated lactate in mmol/L.
+From these functions, we can estimate lactic energy from Kindermann's (1977) accumulated blood lacate data.
+
+```{r}
+kindermann_lactic_energy <- kindermann_lactate |> 
+  mutate(lactic_energy = convert_acc_lactate_to_lactic_energy(accumulated_lactate))
+
+head(kindermann_lactic_energy)
+```
+
+In Briand et al. (2025), the lactic energy model was fitted to the Kindermann's (1977) data. The function `plot_sprint_lactic_duration_kindermann` can be used to generate the Figure presented in Briand et al. (2025) article.
+
+```{r}
+plot_sprint_lactic_duration_kindermann()
+```
+
+The fit seems to everestimate the lactic energy expenditude for longer running duration. With a faster decay, the model seems to better fit the estimated lactioc energy using Kindermann's (1977) data. 
+
+```{r}
+plot_sprint_lactic_duration_kindermann(k1 = 20, k2 = 1500)
+```
+
+As mentionned by Briand et al. (2025), further work is needed to asses the shape of the lactic energy model for longer running durations. Kindermann's data represent a way to assess that the biexponential model to map lactic energy expenditure as a function of running duration is a good avenue that needs refinement. Further data are needed and some of the limits of Kindermann's (1977) data to address this challenge are discussed in Briand et al. (2025).

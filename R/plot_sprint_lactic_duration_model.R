@@ -1,5 +1,5 @@
 
-utils::globalVariables(c("duration", "energy", "energy_lactic_model", "lactic_energy", "sex"))
+utils::globalVariables(c("duration", "energy", "energy_lactic_model", "lactic_energy", "sex", "kindermann_lactate", "accumulated_lactate"))
 
 
 #' Plot Sprint Lactic Energy vs Duration with Model Overlay
@@ -85,6 +85,7 @@ plot_sprint_lactic_duration <- function(lactic_energy_duration, k1 = 20, k2 = 20
 #' @param sex_label A string label (e.g., "male", "Female") used for grouping the output.
 #' @param k1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
 #' @param k2 decaying constant of the bi-exponential model (default = 1.5), describing lactic energy behavior over duration.
+#' @param max_duration Maximum duration for which to compute the model (default = 100 s).
 #'
 #' @return A tibble with `duration`, `energy`, and `sex` columns representing the predicted model values.
 #' @export
@@ -92,10 +93,13 @@ plot_sprint_lactic_duration <- function(lactic_energy_duration, k1 = 20, k2 = 20
 #' @examples
 #' data <- sprint_lactic_energy_duration_graubner_nixdorf()
 #' get_lactic_model_data(data, sex_label = "male")
-get_lactic_model_data <- function(data, sex_label, k1 = 20, k2 = 2000) {
-  lactic_capacity <- sprint_lactic_capacity(data,k1 = k1, k2 = k2)
 
-  tibble::tibble(duration = seq(0.01, 100, length.out = 600)) |>
+get_lactic_model_data <- function(data, sex_label, k1 = 20, k2 = 2000, max_duration = 100) {
+
+    lactic_capacity <- sprint_lactic_capacity(data, k1 = k1, k2 = k2)
+
+
+  tibble::tibble(duration = seq(0.01, max_duration, length.out = 600)) |>
     dplyr::mutate(
      energy = sprint_lactic_duration_model(
         duration = duration,
@@ -178,4 +182,85 @@ plot_sprint_lactic_duration_briand_article <- function(
       legend.title = ggplot2::element_text(size = 14)
     )
 }
+
+
+
+#' Plot lactic energy-duration model fits on Kindermann's (1977) accumulated blood lactate data
+#'
+#' Provides observed lactic energy values and model predictions
+#' for male and female athletes using the bi-exponential lactic energy-duration model. Lactic energy
+#' is estimated using the conversion function `convert_acc_lactate_to_lactic_energy`. The accumulated blood lactate values are
+#' provided in the `kindermann_lactate` data set. The function
+#' generates a similar Figure as the one presented in Briand et al. 2025.
+#'
+#' @param data A data frame containing `accumulated_lactate` in mmol/L associated with different running `duration` in s (default: `kindermann_lactate`).
+#' @param k1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
+#' @param k2 decaying constant of the bi-exponential model (default = 2000 s), describing lactic energy behavior over duration.
+#' @param line_color Color for model line (default: "#457B9D").
+#' @param point_color Color for data points (default: "darkblue").
+#'
+#' @return A ggplot object with overlaid male and female model fits and lactic energy over different running durations.
+#' @export
+#'
+#' @examples
+#' plot_sprint_lactic_duration_kindermann()
+
+plot_sprint_lactic_duration_kindermann <- function(
+    data = kindermann_lactate,
+    k1 = 20,
+    k2 = 2000,
+    line_color = "#457B9D",
+    point_color = "darkblue"
+) {
+
+
+  # Separate male and female data
+  male_data <- data |>
+    dplyr::mutate(lactic_energy = convert_acc_lactate_to_lactic_energy(accumulated_lactate, sex = "male"))
+
+  female_data <- data |>
+    dplyr::mutate(lactic_energy = convert_acc_lactate_to_lactic_energy(accumulated_lactate, sex = "female"))
+
+  male_data$sex <- "male"
+  female_data$sex <- "female"
+
+  # Model predictions
+  male_model <- get_lactic_model_data(male_data, sex_label = "male", k1 = k1, k2 = k2, max_duration = max(data$duration))
+  female_model <- get_lactic_model_data(female_data, sex_label = "female", k1 = k1, k2 = k2, max_duration = max(data$duration))
+
+  # Combine data
+  all_data <- dplyr::bind_rows(male_data, female_data)
+  all_model <- dplyr::bind_rows(male_model, female_model)
+
+  # Aesthetic mappings
+  shape_map <- c("male" = 16, "female" = 17)
+  linetype_map <- c("male" = "solid", "female" = "dashed")
+
+  # Plot
+  ggplot2::ggplot(all_data, ggplot2::aes(x = duration, y = lactic_energy)) +
+    ggplot2::geom_point(ggplot2::aes(shape = sex), color = point_color, size = 3) +
+    ggplot2::geom_line(
+      data = all_model,
+      ggplot2::aes(x = duration, y = energy, linetype = sex),
+      color = line_color,
+      linewidth = 1
+    ) +
+    ggplot2::scale_shape_manual(values = shape_map) +
+    ggplot2::scale_linetype_manual(values = linetype_map) +
+    ggplot2::labs(
+      x = "Duration (s)",
+      y = "Energy (J/kg)",
+      shape = "Sex",
+      linetype = "Sex"
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(size = 16, hjust = 0.5),
+      axis.title = ggplot2::element_text(size = 16),
+      axis.text = ggplot2::element_text(size = 16),
+      legend.text = ggplot2::element_text(size = 14),
+      legend.title = ggplot2::element_text(size = 14)
+    )
+}
+
 

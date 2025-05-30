@@ -77,3 +77,50 @@ test_that("model functions respect time constants", {
   # Results should be different with different time constants
   expect_false(identical(result1$energy, result2$energy))
 })
+
+# tests/testthat/test-plot-sprint-lactic-kindermann.R
+
+test_that("plot_sprint_lactic_duration_kindermann returns a ggplot object", {
+  plot <- plot_sprint_lactic_duration_kindermann()
+  expect_s3_class(plot, "ggplot")
+})
+
+test_that("plot_sprint_lactic_duration_kindermann works with custom aesthetics", {
+  plot <- plot_sprint_lactic_duration_kindermann(
+    line_color = "red",
+    point_color = "blue"
+  )
+
+  expect_s3_class(plot, "ggplot")
+})
+
+test_that("plot_sprint_lactic_duration_kindermann works with custom data", {
+  # Create mock data similar to kindermann_lactate structure
+  mock_data <- tibble::tibble(
+    duration = c(30, 60, 120, 300),
+    accumulated_lactate = c(8, 12, 15, 10)
+  )
+
+  plot <- plot_sprint_lactic_duration_kindermann(data = mock_data)
+  expect_s3_class(plot, "ggplot")
+})
+
+test_that("plot_sprint_lactic_duration_kindermann handles custom time constants", {
+  plot <- plot_sprint_lactic_duration_kindermann(
+    k1 = 30,
+    k2 = 3000
+  )
+
+  expect_s3_class(plot, "ggplot")
+})
+
+test_that("plot_sprint_lactic_duration_kindermann produces expected plot elements", {
+  plot <- plot_sprint_lactic_duration_kindermann()
+
+  # Check that the plot has expected labels
+  expect_equal(plot$labels$x, "Duration (s)")
+  expect_equal(plot$labels$y, "Energy (J/kg)")
+  expect_equal(plot$labels$shape, "Sex")
+  expect_equal(plot$labels$linetype, "Sex")
+})
+

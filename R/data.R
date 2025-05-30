@@ -15,3 +15,19 @@
 #' }
 #' @source Graubner, R., & Nixdorf, E. (2009). Biomechanical analysis of the sprint and hurdles events at the 2009 IAAF World Championships in Athletics. Positions, 1(10).
 "graubner_nixdorf_sprints"
+
+
+#' Kindermann lactate data
+#'
+#' Provides lactate and accumulated lactate values over running durations
+#'
+#' @format ## `kindermann_lactate`
+#' A tibble with 10 rows and 3 columns:
+#' \describe{
+#'   \item{duration}{Duration (in s) of the running event over which lactate was measured}
+#'   \item{lactate}{Blood lactate concentration (in mmol/L)}
+#'   \item{accumulated_lactate}{Accumulated lactate above blood lactate resting levels, which are assumed to be 1 mmol/L}
+#' }
+#' @source Kindermann, W. (1977). Lactate acidosis with different forms of sports activities. Can. J. Appl. Sports Sci. https://cir.nii.ac.jp/crid/1574231873976904704
+
+"kindermann_lactate"
