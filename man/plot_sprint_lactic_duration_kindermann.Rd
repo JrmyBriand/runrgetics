@@ -6,8 +6,8 @@
 \usage{
 plot_sprint_lactic_duration_kindermann(
   data = kindermann_lactate,
-  k1 = 20,
-  k2 = 2000,
+  t1 = 20,
+  t2 = 1500,
   line_color = "#457B9D",
   point_color = "darkblue"
 )
@@ -15,9 +15,9 @@ plot_sprint_lactic_duration_kindermann(
 \arguments{
 \item{data}{A data frame containing \code{accumulated_lactate} in mmol/L associated with different running \code{duration} in s (default: \code{kindermann_lactate}).}
 
-\item{k1}{rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.}
+\item{t1}{rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.}
 
-\item{k2}{decaying constant of the bi-exponential model (default = 2000 s), describing lactic energy behavior over duration.}
+\item{t2}{decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.}
 
 \item{line_color}{Color for model line (default: "#457B9D").}
 

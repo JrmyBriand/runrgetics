@@ -185,10 +185,4 @@ In Briand et al. (2025), the lactic energy model was fitted to the Kindermann's 
 plot_sprint_lactic_duration_kindermann()
 ```
 
-The fit seems to everestimate the lactic energy expenditude for longer running duration. With a faster decay, the model seems to better fit the estimated lactioc energy using Kindermann's (1977) data. 
-
-```{r}
-plot_sprint_lactic_duration_kindermann(k1 = 20, k2 = 1500)
-```
-
-As mentionned by Briand et al. (2025), further work is needed to asses the shape of the lactic energy model for longer running durations. Kindermann's data represent a way to assess that the biexponential model to map lactic energy expenditure as a function of running duration is a good avenue that needs refinement. Further data are needed and some of the limits of Kindermann's (1977) data to address this challenge are discussed in Briand et al. (2025).
+As mentionned by Briand et al. (2025), further work is needed to asses the shape of the lactic energy model for longer running durations. Kindermann's data represent a way to assess that the biexponential model to map lactic energy expenditure as a function of running duration is a good avenue that needs refinement. Further data are needed and some of the limits of Kindermann's (1977) data to address this challenge load_allare discussed in Briand et al. (2025).

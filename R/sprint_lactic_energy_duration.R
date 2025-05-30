@@ -159,8 +159,8 @@ sprint_lactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdo
 #'
 #' @param duration A numeric vector representing the duration of the sprint (in seconds).
 #' @param lactic_capacity A numeric value representing the lactic capacity (in J/kg).
-#' @param k1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
-#' @param k2 A double representing to decaying time-constant of the bi-exponential model. Default is 2000.
+#' @param t1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
+#' @param t2 A double representing to decaying time-constant of the bi-exponential model. Default is 1500.
 #'
 #' @returns A numeric vector representing the average lactic energy (in J/kg) as a function of running duration.
 #' @export
@@ -175,10 +175,10 @@ sprint_lactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdo
 #'
 #'
 
-sprint_lactic_duration_model <- function(duration, lactic_capacity, k1 = 20, k2 = 2000) {
-  knorm <- bi_exponential_knorm(t1 = k1, t2 = k2)
+sprint_lactic_duration_model <- function(duration, lactic_capacity, t1 = 20, t2 = 1500) {
+  knorm <- bi_exponential_knorm(t1 = t1, t2 = t2)
 
-  return(lactic_capacity * knorm * (1 - exp(-(duration - 3) / k1)) * exp(-(duration - 3) / k2))
+  return(lactic_capacity * knorm * (1 - exp(-(duration - 3) / t1)) * exp(-(duration - 3) / t2))
 }
 
 
@@ -189,8 +189,8 @@ sprint_lactic_duration_model <- function(duration, lactic_capacity, k1 = 20, k2 
 #' model to the lactic energy over running duration data.
 #'
 #' @param lactic_energy_duration A tibble with the following columns: duration (s), lactic_energy (J/kg), corresponding to the average lactic energy expenditure over running duration. This data is used to fit the lactic energy model.
-#' @param k1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
-#' @param k2 A double representing to decaying time-constant of the bi-exponential model. Default is 2000.
+#' @param t1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
+#' @param t2 A double representing to decaying time-constant of the bi-exponential model. Default is 1500.
 #'
 #' @returns A fitted model object of class "nls" representing the lactic energy model fitted to the lactic energy duration data.
 #' @export
@@ -203,9 +203,9 @@ sprint_lactic_duration_model <- function(duration, lactic_capacity, k1 = 20, k2 
 #'
 #'  sprint_lactic_duration_model_fit(men_lactic_energy)
 #'
-sprint_lactic_duration_model_fit <- function(lactic_energy_duration, k1 = 20, k2 = 2000) {
+sprint_lactic_duration_model_fit <- function(lactic_energy_duration, t1 = 20, t2 = 1500) {
   # Fit the alactic power model to the alactic power duration data
-  fit <- minpack.lm::nlsLM(lactic_energy ~ sprint_lactic_duration_model(duration, lactic_capacity, k1 = k1, k2 = k2),
+  fit <- minpack.lm::nlsLM(lactic_energy ~ sprint_lactic_duration_model(duration, lactic_capacity, t1 = t1, t2 = t2),
     data = lactic_energy_duration,
     start = list(lactic_capacity = 1300)
   )
@@ -220,8 +220,8 @@ sprint_lactic_duration_model_fit <- function(lactic_energy_duration, k1 = 20, k2
 #' running duration data and returns the residual standard error of the fit.
 #'
 #' @param lactic_energy_duration A tibble with the following columns: duration (s), lactic_energy (J/kg), corresponding to the average lactic energy expenditure over running duration. This data is used to fit the lactic energy model.
-#' @param k1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
-#' @param k2 A double representing to decaying time-constant of the bi-exponential model. Default is 2000.
+#' @param t1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
+#' @param t2 A double representing to decaying time-constant of the bi-exponential model. Default is 1500.
 #'
 #' @returns A numeric value representing the residual standard error of the fitted lactic energy model.
 #' @export
@@ -235,9 +235,9 @@ sprint_lactic_duration_model_fit <- function(lactic_energy_duration, k1 = 20, k2
 #'
 #'  sprint_lactic_duration_model_fit_rse(men_lactic_energy)
 #'
-sprint_lactic_duration_model_fit_rse <- function(lactic_energy_duration, k1 = 20, k2 = 2000) {
+sprint_lactic_duration_model_fit_rse <- function(lactic_energy_duration, t1 = 20, t2 = 1500) {
   # Fit the lactic energy model to the lactic energy duration data
-  fit <- sprint_lactic_duration_model_fit(lactic_energy_duration, k1 = k1, k2 = k2)
+  fit <- sprint_lactic_duration_model_fit(lactic_energy_duration, t1 = t1, t2 = t2)
 
   return(summary(fit)$sigma)
 }
@@ -248,8 +248,8 @@ sprint_lactic_duration_model_fit_rse <- function(lactic_energy_duration, k1 = 20
 #' Extracts the lactic capacity from the fitted lactic energy model based on the lactic energy duration data.
 #'
 #' @param lactic_energy_duration A tibble with the following columns: duration (s), lactic_energy (J/kg), corresponding to the average lactic energy expenditure over running duration. This data is used to fit the lactic energy model.
-#' @param k1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
-#' @param k2 A double representing to decaying time-constant of the bi-exponential model. Default is 2000.
+#' @param t1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
+#' @param t2 A double representing to decaying time-constant of the bi-exponential model. Default is 1500.
 #'
 #'
 #' @returns A numeric value representing the lactic capacity (in J/kg) extracted from the fitted lactic energy model.
@@ -263,12 +263,68 @@ sprint_lactic_duration_model_fit_rse <- function(lactic_energy_duration, k1 = 20
 #'
 #'  sprint_lactic_capacity(men_lactic_energy)
 #'
-sprint_lactic_capacity <- function(lactic_energy_duration, k1 = 20, k2 = 2000) {
+sprint_lactic_capacity <- function(lactic_energy_duration, t1 = 20, t2 = 1500) {
   # Fit the lactic energy model to the lactic energy duration data
-  fit <- sprint_lactic_duration_model_fit(lactic_energy_duration, k1 = k1, k2 = k2)
+  fit <- sprint_lactic_duration_model_fit(lactic_energy_duration, t1 = t1, t2 = t2)
 
   # Extract the alactic capacity from the fit
   lactic_capacity <- coef(fit)["lactic_capacity"]
 
   return(lactic_capacity)
 }
+
+
+
+
+#' Find Sprint Maximal Lactic Power
+#'
+#' Knowing an athlete maximal lactic capacity, the function finds
+#' the maximal lactic power that can be sustained over a given sprint duration
+#'
+#' @param duration A numeric value representing the sprint duration (in seconds).
+#' @param lactic_capacity A numeric value representing the lactic capacity (in J/kg).
+#' @param t1 A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.
+#' @param t2 A double representing to decaying time-constant of the bi-exponential model. Default is 1500.
+#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
+#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
+#'
+#' @returns A numeric value representing the maximal lactic power (in W/kg) that can be sustained over the given sprint duration.
+#' @export
+#'
+#' @examples
+#'
+#' duration <- 20
+#' lactic_capacity <- 1350
+#'
+#' find_max_la(duration, lactic_capacity)
+#'
+find_max_la <- function(duration, lactic_capacity, t1 = 20, t2 = 1500, k1 = 2.75, k2 = 35) {
+
+  lactic_energy <- sprint_lactic_duration_model(duration, lactic_capacity, t1 = t1, t2 = t2)
+
+
+  # Define the objective function for optimization
+  objective_function <- function(max_la) {
+    # Numerical integration of pgly over [0, time]
+    integrated_energy <- stats::integrate(
+      function(t) sprint_bioenergetic_model(t, maximal_alactic_power = 0, maximal_lactic_power = max_la, k1 = k1, k2 = k2, output = "lactic power" ),
+      lower = 0, upper = duration,
+      rel.tol = 1e-8
+    )$value
+
+    # Return the squared error
+    (integrated_energy - lactic_energy)^2
+  }
+
+  # Optimize max_la to minimize the objective function
+  result <- stats::optim(
+    par = 1, # Initial guess for max_la
+    fn = objective_function,
+    method = "Brent",
+    lower = 0, upper = 1000 # Define suitable bounds for max_la
+  )
+
+  # Return the optimized value of max_la
+  return(result$par)
+}
+

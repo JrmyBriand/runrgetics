@@ -10,8 +10,8 @@ utils::globalVariables(c("duration", "energy", "energy_lactic_model", "lactic_en
 #' @param lactic_energy_duration A data frame or tibble containing columns `duration` (in seconds)
 #'   and `lactic_energy` (in J/kg), such output can be obtained through the use of Briand et al.' (2025) sprint bioenergetic model
 #'   and of the `sprint_lactic_energy_duration` function .
-#' @param k1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
-#' @param k2 decaying constant of the bi-exponential model (default = 2000 s), describing lactic energy behavior over duration.
+#' @param t1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
+#' @param t2 decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.
 #' @param linetype Line type used for the model curve (default = `"solid"`). Accepts any valid ggplot2 line type.
 #' @param line_color Color of the model prediction line (default = `"#457B9D"`).
 #' @param point_color Color of the observed data points (default = `"darkblue"`).
@@ -30,11 +30,11 @@ utils::globalVariables(c("duration", "energy", "energy_lactic_model", "lactic_en
 #'
 
 
-plot_sprint_lactic_duration <- function(lactic_energy_duration, k1 = 20, k2 = 2000, linetype = "solid", line_color = "#457B9D", point_color = "darkblue", point_shape = 16) {
+plot_sprint_lactic_duration <- function(lactic_energy_duration, t1 = 20, t2 = 1500, linetype = "solid", line_color = "#457B9D", point_color = "darkblue", point_shape = 16) {
 
   # Fit to get maximal lactic capacity
 
-  lactic_capacity <- sprint_lactic_capacity(lactic_energy_duration, k1 = k1, k2 = k2)
+  lactic_capacity <- sprint_lactic_capacity(lactic_energy_duration, t1 = t1, t2 = t2)
 
   # Generate model data
 
@@ -49,8 +49,8 @@ plot_sprint_lactic_duration <- function(lactic_energy_duration, k1 = 20, k2 = 20
       energy_lactic_model = sprint_lactic_duration_model(
         duration = duration,
         lactic_capacity = lactic_capacity,
-        k1 = k1,
-        k2 = k2
+        t1 = t1,
+        t2 = t2
       )
     )
 
@@ -83,8 +83,8 @@ plot_sprint_lactic_duration <- function(lactic_energy_duration, k1 = 20, k2 = 20
 #' @param data A data frame containing at least a `duration` column (in seconds),
 #'   used to estimate the maximal lactic energy capacity.
 #' @param sex_label A string label (e.g., "male", "Female") used for grouping the output.
-#' @param k1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
-#' @param k2 decaying constant of the bi-exponential model (default = 1.5), describing lactic energy behavior over duration.
+#' @param t1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
+#' @param t2 decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.
 #' @param max_duration Maximum duration for which to compute the model (default = 100 s).
 #'
 #' @return A tibble with `duration`, `energy`, and `sex` columns representing the predicted model values.
@@ -94,9 +94,9 @@ plot_sprint_lactic_duration <- function(lactic_energy_duration, k1 = 20, k2 = 20
 #' data <- sprint_lactic_energy_duration_graubner_nixdorf()
 #' get_lactic_model_data(data, sex_label = "male")
 
-get_lactic_model_data <- function(data, sex_label, k1 = 20, k2 = 2000, max_duration = 100) {
+get_lactic_model_data <- function(data, sex_label, t1 = 20, t2 = 1500, max_duration = 100) {
 
-    lactic_capacity <- sprint_lactic_capacity(data, k1 = k1, k2 = k2)
+    lactic_capacity <- sprint_lactic_capacity(data, t1 = t1, t2 = t2)
 
 
   tibble::tibble(duration = seq(0.01, max_duration, length.out = 600)) |>
@@ -104,8 +104,8 @@ get_lactic_model_data <- function(data, sex_label, k1 = 20, k2 = 2000, max_durat
      energy = sprint_lactic_duration_model(
         duration = duration,
         lactic_capacity = lactic_capacity,
-        k1 = k1,
-        k2 = k2
+        t1 = t1,
+        t2 = t2
       ),
       sex = sex_label
     )
@@ -119,8 +119,8 @@ get_lactic_model_data <- function(data, sex_label, k1 = 20, k2 = 2000, max_durat
 #' generates the same Figure as the one presented in Briand et al. 2025.
 #'
 #' @param data A data frame containing sprint lactic energy estimations (default: `graubner_nixdorf_sprints`).
-#' @param k1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
-#' @param k2 decaying constant of the bi-exponential model (default = 2000 s), describing lactic energy behavior over duration.
+#' @param t1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
+#' @param t2 decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.
 #' @param line_color Color for model line (default: "#457B9D").
 #' @param point_color Color for data points (default: "darkblue").
 #'
@@ -131,8 +131,8 @@ get_lactic_model_data <- function(data, sex_label, k1 = 20, k2 = 2000, max_durat
 #' plot_sprint_lactic_duration_briand_article()
 plot_sprint_lactic_duration_briand_article <- function(
     data = graubner_nixdorf_sprints,
-    k1 = 20,
-    k2 = 2000,
+    t1 = 20,
+    t2 = 1500,
     line_color = "#457B9D",
     point_color = "darkblue"
 ) {
@@ -145,8 +145,8 @@ plot_sprint_lactic_duration_briand_article <- function(
   female_data$sex <- "female"
 
   # Model predictions
-  male_model <- get_lactic_model_data(male_data, sex_label = "male", k1 = k1, k2 = k2)
-  female_model <- get_lactic_model_data(female_data, sex_label = "female", k1 = k1, k2 = k2)
+  male_model <- get_lactic_model_data(male_data, sex_label = "male", t1 = t1, t2 = t2)
+  female_model <- get_lactic_model_data(female_data, sex_label = "female", t1 = t1, t2 = t2)
 
   # Combine data
   all_data <- dplyr::bind_rows(male_data, female_data)
@@ -194,8 +194,8 @@ plot_sprint_lactic_duration_briand_article <- function(
 #' generates a similar Figure as the one presented in Briand et al. 2025.
 #'
 #' @param data A data frame containing `accumulated_lactate` in mmol/L associated with different running `duration` in s (default: `kindermann_lactate`).
-#' @param k1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
-#' @param k2 decaying constant of the bi-exponential model (default = 2000 s), describing lactic energy behavior over duration.
+#' @param t1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
+#' @param t2 decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.
 #' @param line_color Color for model line (default: "#457B9D").
 #' @param point_color Color for data points (default: "darkblue").
 #'
@@ -207,8 +207,8 @@ plot_sprint_lactic_duration_briand_article <- function(
 
 plot_sprint_lactic_duration_kindermann <- function(
     data = kindermann_lactate,
-    k1 = 20,
-    k2 = 2000,
+    t1 = 20,
+    t2 = 1500,
     line_color = "#457B9D",
     point_color = "darkblue"
 ) {
@@ -225,8 +225,8 @@ plot_sprint_lactic_duration_kindermann <- function(
   female_data$sex <- "female"
 
   # Model predictions
-  male_model <- get_lactic_model_data(male_data, sex_label = "male", k1 = k1, k2 = k2, max_duration = max(data$duration))
-  female_model <- get_lactic_model_data(female_data, sex_label = "female", k1 = k1, k2 = k2, max_duration = max(data$duration))
+  male_model <- get_lactic_model_data(male_data, sex_label = "male", t1 = t1, t2 = t2, max_duration = max(data$duration))
+  female_model <- get_lactic_model_data(female_data, sex_label = "female", t1 = t1, t2 = t2, max_duration = max(data$duration))
 
   # Combine data
   all_data <- dplyr::bind_rows(male_data, female_data)

@@ -267,3 +267,60 @@ sprint_alactic_capacity <- function(alactic_power_duration, mu_al = 1.75, sigma_
 
   return(alactic_capacity)
 }
+
+#' Find Sprint Maximal Alactic Power
+#'
+#' Knowing an athlete maximal alactic capacity, the function finds
+#' the maximal alactic power that can be sustained over a given sprint duration
+#'
+#' @param duration A numeric value representing the sprint duration (in seconds).
+#' @param alactic_capacity A numeric value representing the lactic capacity (in J/kg).
+#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
+#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
+#' @param mu_al A double representing the peak of the log-normal distribution. Default is 1.75.
+#' @param sigma_al A double representing the decay of the log-normal distribution. Default is 1.5.
+#'
+#'
+#' @returns A numeric value representing the maximal lactic power (in W/kg) that can be sustained over the given sprint duration.
+#' @export
+#'
+#' @examples
+#'
+#' duration <- 20
+#' alactic_capacity <- 350
+#'
+#' find_max_al(duration, alactic_capacity)
+#'
+find_max_al <- function(duration, alactic_capacity, mu = -0.4, sigma = 1, mu_al = 1.75, sigma_al = 1.5) {
+
+  alactic_power <- sprint_alactic_duration_model(duration, alactic_capacity, mu_al = mu_al, sigma_al = sigma_al)
+  alactic_energy <- alactic_power * duration
+
+  # Define the objective function for optimization
+  objective_function <- function(max_al) {
+    # Numerical integration of pgly over [0, time]
+    integrated_energy <- stats::integrate(
+      function(t) sprint_bioenergetic_model(t, maximal_alactic_power = max_al, maximal_lactic_power = 0, mu  = mu, sigma = sigma, output = "alactic power" ),
+      lower = 0, upper = duration,
+      rel.tol = 1e-8
+    )$value
+
+    # Return the squared error
+    (integrated_energy - alactic_energy)^2
+  }
+
+  # Optimize max_la to minimize the objective function
+  result <- stats::optim(
+    par = 1, # Initial guess for max_la
+    fn = objective_function,
+    method = "Brent",
+    lower = 0, upper = 1000 # Define suitable bounds for max_la
+  )
+
+  # Return the optimized value of max_la
+  return(result$par)
+}
+
+
+
+

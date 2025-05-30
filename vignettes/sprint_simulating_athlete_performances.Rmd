@@ -16,4 +16,29 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(runrgetics)
+library(dplyr)
 ```
+
+The last part of Briand et al. (2025) article presents a simulation of fictitious male and female sprinters who could theoretically realsied respectiveley the men's and women's 100, 200 and 400 m performances in the `graubner_nixdorf_sprints` data set. The simulation is based on the sprint bioenergetic model as well as the alactic power-duration and lactic energy duration models.
+
+## Finiding Maximal Lactic and Alactic Power in a Sprint From Capacities
+
+The first step to achieve the simulation involves estimating what are the sprint's maximal alactic and lactic power, which are parameters of the sprint bioenergetic model, given the fictitious athlete's maximal alactic and lactic capacities. 
+
+The function `find_max_al` finds the sprint maximal alactic power, given the sprint duration and the athlete alactic capacity. Similarly, the function `find_max_la` finds the sprint maximal lactic power, given the sprint duration and the athlete lactic capacity. 
+
+```{r}
+
+# set example duration and capacities
+duration <- 20
+lactic_capacity <- 1350
+alactic_capacity <- 350
+
+# find the maximal alactic and lactic power
+find_max_al(duration, alactic_capacity)
+find_max_la(duration, lactic_capacity)
+
+```
+
+
+

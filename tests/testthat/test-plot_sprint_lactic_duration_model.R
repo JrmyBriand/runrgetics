@@ -71,8 +71,8 @@ test_that("model functions respect time constants", {
     lactic_energy = c(200, 300, 900, 1000, 1400)
   )
 
-  result1 <- get_lactic_model_data(mock_data, "male", k1 = 20, k2 = 2000)
-  result2 <- get_lactic_model_data(mock_data, "male", k1 = 30, k2 = 3000)
+  result1 <- get_lactic_model_data(mock_data, "male", t1 = 20, t2 = 2000)
+  result2 <- get_lactic_model_data(mock_data, "male", t1 = 30, t2 = 3000)
 
   # Results should be different with different time constants
   expect_false(identical(result1$energy, result2$energy))
@@ -107,8 +107,8 @@ test_that("plot_sprint_lactic_duration_kindermann works with custom data", {
 
 test_that("plot_sprint_lactic_duration_kindermann handles custom time constants", {
   plot <- plot_sprint_lactic_duration_kindermann(
-    k1 = 30,
-    k2 = 3000
+    t1 = 30,
+    t2 = 3000
   )
 
   expect_s3_class(plot, "ggplot")

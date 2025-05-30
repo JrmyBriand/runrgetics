@@ -76,3 +76,55 @@ test_that("sprint_alactic_capacity returns expected type", {
   expect_length(result, 1)
   expect_gt(result, 0)  # Alactic capacity should be positive
 })
+
+# tests/testthat/test-find-max-al.R
+
+test_that("find_max_al returns expected type", {
+  duration <- 20
+  alactic_capacity <- 350
+
+  result <- find_max_al(duration, alactic_capacity)
+
+  expect_type(result, "double")
+  expect_length(result, 1)
+  expect_gte(result, 0)  # Should be non-negative
+})
+
+test_that("find_max_al works with different durations", {
+  alactic_capacity <- 350
+
+  result1 <- find_max_al(10, alactic_capacity)
+  result2 <- find_max_al(20, alactic_capacity)
+
+  # Different durations should give different results
+  expect_false(identical(result1, result2))
+})
+
+test_that("find_max_al works with different capacities", {
+  duration <- 20
+
+  result1 <- find_max_al(duration, alactic_capacity = 250)
+  result2 <- find_max_al(duration, alactic_capacity = 350)
+
+  # Different capacities should give different results
+  expect_false(identical(result1, result2))
+  # Higher capacity should give higher power
+  expect_gt(result2, result1)
+})
+
+test_that("find_max_al respects distribution parameters", {
+  duration <- 20
+  alactic_capacity <- 350
+
+  result1 <- find_max_al(duration, alactic_capacity, mu_al = 1.75, sigma_al = 1.5)
+  result2 <- find_max_al(duration, alactic_capacity, mu_al = 2.0, sigma_al = 2.0)
+
+  # Different parameters should give different results
+  expect_false(identical(result1, result2))
+})
+
+test_that("find_max_al handles zero capacity", {
+  # Zero capacity should return very small or zero power
+  result <- find_max_al(20, 0)
+  expect_lt(result, 1)  # Should be very small or zero
+})

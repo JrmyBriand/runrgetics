@@ -77,3 +77,56 @@ test_that("sprint_lactic_capacity returns expected type", {
   # Remove strict positivity check as it might depend on the specific data
   expect_true(!is.na(result))  # Check that we get a valid number instead
 })
+
+
+# tests/testthat/test-find-max-la.R
+
+test_that("find_max_la returns expected type", {
+  duration <- 20
+  lactic_capacity <- 1350
+
+  result <- find_max_la(duration, lactic_capacity)
+
+  expect_type(result, "double")
+  expect_length(result, 1)
+  expect_gte(result, 0)  # Should be non-negative
+})
+
+test_that("find_max_la works with different durations", {
+  lactic_capacity <- 1350
+
+  result1 <- find_max_la(10, lactic_capacity)
+  result2 <- find_max_la(20, lactic_capacity)
+
+  # Different durations should give different results
+  expect_false(identical(result1, result2))
+})
+
+test_that("find_max_la works with different capacities", {
+  duration <- 20
+
+  result1 <- find_max_la(duration, lactic_capacity = 1000)
+  result2 <- find_max_la(duration, lactic_capacity = 1500)
+
+  # Different capacities should give different results
+  expect_false(identical(result1, result2))
+  # Higher capacity should give higher power
+  expect_gt(result2, result1)
+})
+
+test_that("find_max_la respects time constants", {
+  duration <- 20
+  lactic_capacity <- 1350
+
+  result1 <- find_max_la(duration, lactic_capacity, t1 = 20, t2 = 1500)
+  result2 <- find_max_la(duration, lactic_capacity, t1 = 30, t2 = 2000)
+
+  # Different time constants should give different results
+  expect_false(identical(result1, result2))
+})
+
+test_that("find_max_la handles zero capacity", {
+  # Zero capacity should return very small or zero power
+  result <- find_max_la(20, 0)
+  expect_lt(result, 1)  # Should be very small or zero
+})

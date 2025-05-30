@@ -4,7 +4,7 @@
 \alias{get_lactic_model_data}
 \title{Generate model predictions for the sprint lactic energy-duration model}
 \usage{
-get_lactic_model_data(data, sex_label, k1 = 20, k2 = 2000, max_duration = 100)
+get_lactic_model_data(data, sex_label, t1 = 20, t2 = 1500, max_duration = 100)
 }
 \arguments{
 \item{data}{A data frame containing at least a \code{duration} column (in seconds),
@@ -12,9 +12,9 @@ used to estimate the maximal lactic energy capacity.}
 
 \item{sex_label}{A string label (e.g., "male", "Female") used for grouping the output.}
 
-\item{k1}{rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.}
+\item{t1}{rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.}
 
-\item{k2}{decaying constant of the bi-exponential model (default = 1.5), describing lactic energy behavior over duration.}
+\item{t2}{decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.}
 
 \item{max_duration}{Maximum duration for which to compute the model (default = 100 s).}
 }

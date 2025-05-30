@@ -4,16 +4,16 @@
 \alias{sprint_lactic_duration_model}
 \title{Sprint Lactic Energy Duration Model}
 \usage{
-sprint_lactic_duration_model(duration, lactic_capacity, k1 = 20, k2 = 2000)
+sprint_lactic_duration_model(duration, lactic_capacity, t1 = 20, t2 = 1500)
 }
 \arguments{
 \item{duration}{A numeric vector representing the duration of the sprint (in seconds).}
 
 \item{lactic_capacity}{A numeric value representing the lactic capacity (in J/kg).}
 
-\item{k1}{A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.}
+\item{t1}{A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.}
 
-\item{k2}{A double representing to decaying time-constant of the bi-exponential model. Default is 2000.}
+\item{t2}{A double representing to decaying time-constant of the bi-exponential model. Default is 1500.}
 }
 \value{
 A numeric vector representing the average lactic energy (in J/kg) as a function of running duration.
