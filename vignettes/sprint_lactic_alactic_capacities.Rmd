@@ -108,7 +108,19 @@ sprint_alactic_duration_model_fit_rse(men_alactic_energy)
 sprint_alactic_capacity(men_alactic_energy)
 ```
 
-The function `plot_sprint_alactic_duration_model` can be used to plot the alactic model fit with the average alactic power over the 100, 200 and 400 m.
+The function `plot_sprint_alactic_duration` can be used to plot the alactic model fit with the average alactic power over the 100, 200 and 400 m.
+
+```{r}
+
+plot_sprint_alactic_duration(men_alactic_energy)
+
+```
+
+The following function `plot_sprint_alactic_duration_briand_article()` reproduces the plot presented in Briand et al. (2025) showing the alactic model fit with the average alactic power over the 100, 200 and 400 m, superposing the model applied to male and female data.
+
+```{r}
+plot_sprint_alactic_duration_briand_article()
+```
 
 
 ### Formulating a Model of Alactic Energy as a Function of Race Duration
@@ -140,7 +152,13 @@ sprint_lactic_duration_model_fit_rse(men_lactic_energy)
 sprint_lactic_capacity(men_lactic_energy)
 ```
 
-The function `plot_sprint_alactic_duration_model` can be used to plot the alactic model fit with the average alactic power over the 100, 200 and 400 m.
+The function `plot_sprint_lactic_duration_model` can be used to plot the lactic model fit with the average lactic energy expenditure over the 100, 200 and 400 m.
+
+
+```{r}
+plot_sprint_lactic_duration(men_lactic_energy)
+                            
+```
 
 
 ### Accumulated Lactate and Kindemann (1977) data
