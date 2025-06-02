@@ -4,7 +4,8 @@
 #' can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The `type` parameter has to be adjusted accordingly.
 #'
 #' @param data A tibble with a time series of power values and associated times. The tibble must minimally have the following columns: time (s), power (W/kg)
-#' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach. "power model" refers to the power estimated using the sprint bioenergetic model.
+#' @param type A string indicating the type of power to integrate. Default is "power" and refers to estimated metabolic power derived from di Prampero et al. equivalent slope approach.
+#' "power bioenergetic model" refers to the power estimated using the sprint bioenergetic model.
 #'
 #' @returns A double with the total energy expended (J/kg)
 #'

@@ -19,7 +19,9 @@
 #' data <- graubner_nixdorf_sprints |>
 #'           dplyr::filter(event == "Men's 100 m")
 #'
-#'  sprint_perf_from_split(time_splits = data$splits, distance = data$distance, reaction_time = data$reaction_time[1])
+#'  sprint_perf_from_split(time_splits = data$splits,
+#'  distance = data$distance,
+#'  reaction_time = data$reaction_time[1])
 #'
 sprint_perf_from_split <- function(time_splits, distance, reaction_time = 0){
 
@@ -67,9 +69,11 @@ graubner_nixdorf_perf_from_splits <- function(){
   )
 
 
+  # create an event list
 
+  event_list <- unique(graubner_nixdorf_sprints$event)
 
-  for(i in graubner_nixdorf_sprints$event){
+  for(i in event_list){
 
     if(i == "Men's 100 m"| i == "Men's 200 m"| i == "Men's 400 m"){
       sex <- "male"

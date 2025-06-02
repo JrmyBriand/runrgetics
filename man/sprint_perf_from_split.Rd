@@ -27,6 +27,8 @@ associated distance at which the time splits were measured.
 data <- graubner_nixdorf_sprints |>
           dplyr::filter(event == "Men's 100 m")
 
- sprint_perf_from_split(time_splits = data$splits, distance = data$distance, reaction_time = data$reaction_time[1])
+ sprint_perf_from_split(time_splits = data$splits,
+ distance = data$distance,
+ reaction_time = data$reaction_time[1])
 
 }

@@ -40,5 +40,47 @@ find_max_la(duration, lactic_capacity)
 
 ```
 
+## Run a Simulation to Estimate Fictitious Athletes Lactic and Alactic Capacities
 
+For the upcoming section we consider that the men's 100, 200 and 400 m performances in the `graubner_nixdorf_sprints`dataset are performed by the same fictitious male athlete and similarly, that the women's 100, 200 and 400 m performances are performed by the same fictitious female athlete. 
+
+The function `graubner_nixdorf_perf_from_splits`estract the performances on each distance of the `graubner_nixdorf_sprints` dataset, which are then used to estimate the alactic and lactic capacities of the fictitious athletes.
+
+```{r}
+performance_table <- graubner_nixdorf_perf_from_splits()
+
+# filter male performances
+
+male_perf_table <- performance_table |> 
+  filter(sex == "male")
+
+male_perf_table
+
+```
+
+The function `sprint_get_capacities_from_perf` estimates the alactic and lactic capacities of the fictitious athletes based on their performances. We won't run the actual function on `male_perf_table`, since the computation take a few minutes, but the user can try the following function call on `male_perf_table`: `sprint_get_capacities_from_perf(male_perf_table)`. It will return an alactic capacity of 328.4066 J/kg and a lactic capacity of 1458.353 J/kg. These values correspond to the ones reported in Briand et al. (2025).
+
+Similarly, the performance table can be filtered to retain only the data from the female athlete. 
+
+```{r}
+female_perf_table <- performance_table |> 
+  filter(sex == "female")
+
+female_perf_table
+```
+We can the function to get capacities from sprint performances on `female_perf_data`. Again we won't run the whole function in a dedicated chunk, as it takes several minutes. to run. To reproduce the values obtained in Briand et al. (2025), the user can run the following script:  `sprint_get_capacities_from_perf(female_perf_table, maximal_aerobic_power = 21,  init_alactic = 250, init_lactic = 1300, lower_bounds = c(200, 1100), upper_bounds = c(295, 1400))`. The function provides an alactic capacity of 215.5259 J/kg, and a lactic capacity of 1303.516 J/kg. These values are vey close to the alactic and lactic capacities reported in Briand et al. (2025), which were of 218 J/kg and 1295 J/kg respectively for the alactic and lactic capacities. As before, these differences are due to small modification in the integration methods and time step for the sake of computational efficiency within the package, compared to the initial approach used when performing the package initial computations. For the same reasons, similar small differences between the vignette output and the values reported in the package were already observed in the package vignette `sprint_bioenergetic_model.Rmd`.
+
+As in Briand et al. (2025), we can generate a table that summarizes the fictitious athletes' simulation, including the distance travelled, the error with respect to actual travelled distance, as well as the total energy expenditure and the energy expenditure from the three energy pathways. A table similar to the one presented in Briand et al. (2025) can be generated using the following code. The function default inputs corresponds to the fictitious male and female alactic and lactic capacities, as well as maximal aerobic power, as reported in Briand et al. article. The parameters can be adjusted and differences between the values generated in the table and the ones reported in Briand et al. (2025) are due to rounding of the capacities. 
+
+```{r}
+sprint_simulation_metrics_briand_article()
+```
+
+
+## Simulate Athlete Performances From Capacities
+
+```{r}
+
+
+```
 
