@@ -79,8 +79,49 @@ sprint_simulation_metrics_briand_article()
 
 ## Simulate Athlete Performances From Capacities
 
+The last step step consists in estimating the male and female sprint time over different distances given their alactic and lactic capacities, as well as their maximal aerobic power. The function `sprint_time_perf_simulation` can be used to simulate the sprint time performances of the fictitious athletes on tagerted distances. We can apply the function on the previously estimated alactic and lactic capacities for the fictioous athlete of 328 J/kg and 1460 J/kg, respectiverly, and a maximal aerobic power of 24.5 W/kg, which is the value used in Briand et al. (2025). The function returns a tibble with the target distance, the running time and the actual time, which includes the reaction time.
+
 ```{r}
+target_distances <- c(60, 100, 200, 300,400)
+alactic_capacity <- 328
+lactic_capacity <- 1460
+
+# run the simulation
+
+sprint_time_perf_simulation(
+  target_distances = target_distances,
+  alactic_capacity = alactic_capacity,
+  lactic_capacity = lactic_capacity
+)
 
 
 ```
+
+The function `sprint_time_perf_simulation` formats the output into a table similar to the one presented in Briand et al. (2025) original artical. We can generate the table on both male and female estimated capacities.
+
+```{r}
+# male table
+sprint_time_perf_simulation_briand_table(
+  target_distances = target_distances,
+  alactic_capacity = alactic_capacity,
+  lactic_capacity = lactic_capacity
+)
+
+# female capacities
+
+female_alactic_capacity <- 218
+female_lactic_capacity <- 1295
+
+
+# generate the table
+
+sprint_time_perf_simulation_briand_table(
+  target_distances = target_distances,
+  alactic_capacity = female_alactic_capacity,
+  lactic_capacity = female_lactic_capacity,
+  maximal_aerobic_power = 21 
+)
+
+```
+
 
