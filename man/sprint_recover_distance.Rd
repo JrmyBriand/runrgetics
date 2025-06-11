@@ -4,12 +4,19 @@
 \alias{sprint_recover_distance}
 \title{Recover Sprint Distance}
 \usage{
-sprint_recover_distance(power_series, dt = 0.01)
+sprint_recover_distance(
+  power_series,
+  dt = 0.01,
+  costnning_flat = 3.6,
+  slope_equation = "original"
+)
 }
 \arguments{
 \item{power_series}{a vector of power values (W/kg) corresponding to instantaneous power output during a sprint.}
 
 \item{dt}{a numeric value representing the time step at which power is provided (in seconds). Default is 0.01 seconds.}
+
+\item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
 }
 \value{
 A numeric value representing the total distance covered during the sprint.

@@ -24,7 +24,7 @@ sprint_bioenergetic_model_fit(
 
 \item{k2}{A double. Time constant of the second decaying exponential (s). Default is 35}
 
-\item{maximal_aerobic_power}{A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.}
+\item{maximal_aerobic_power}{A double. Maximal aerobic power (W/kg). Default is 24.5}
 }
 \value{
 An object of class \code{nls} and \code{nls.lm}, as returned by \code{nlsLM()}. This object contains the fitted model and can be used with generic functions like \code{summary()}, \code{predict()}, and \code{coef()}.

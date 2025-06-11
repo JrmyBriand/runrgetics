@@ -4,12 +4,21 @@
 \alias{sprint_recover_motion}
 \title{Sprint Recover Motion Data}
 \usage{
-sprint_recover_motion(power_series, dt = 0.01)
+sprint_recover_motion(
+  power_series,
+  dt = 0.01,
+  cost_running_flat = 3.6,
+  slope_equation = "original"
+)
 }
 \arguments{
 \item{power_series}{a vector of power values (W/kg) corresponding to instantaneous power output during a sprint.}
 
 \item{dt}{a numeric value representing the time step at which power is provided (in seconds). Default is 0.01 seconds.}
+
+\item{cost_running_flat}{a numeric value representing the cost of running on a flat surface (default is 3.6 J/kg/m, as suggested in Minetti et al. 2002)}
+
+\item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
 }
 \value{
 A tibble containing time, distance, velocity, acceleration, and power.

@@ -4,11 +4,7 @@
 #' available time splits, using the approach proposed by di Prampero et al. (2005, 2018) and as described in Briand et al. (2025).
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
-#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
-#' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
+#' @inheritParams sprint_bioenergetic_model_data
 #'
 #' @returns A double with the residual standard error of the model fit.
 #' @export
@@ -35,7 +31,13 @@
 #'
 #' sprint_bioenergetic_model_rse(bolt_100m_motion_data)
 #'
-sprint_bioenergetic_model_rse <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
+sprint_bioenergetic_model_rse <- function(sprint_motion_data,
+                                          mu = -0.4,
+                                          sigma = 1,
+                                          k1 = 2.75,
+                                          k2 = 35,
+                                          maximal_aerobic_power = 24.5) {
+
   model <- sprint_bioenergetic_model_fit(sprint_motion_data, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power)
 
   rse <- summary(model)$sigma
@@ -49,11 +51,7 @@ sprint_bioenergetic_model_rse <- function(sprint_motion_data, mu = -0.4, sigma =
 #' available time splits, using the approach proposed by di Prampero et al. (2005, 2018) and as described in Briand et al. (2025).
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
-#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
-#' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
+#' @inheritParams sprint_bioenergetic_model_data
 #'
 #' @returns A double with the root mean squared error of the model fit.
 #' @export
@@ -96,11 +94,7 @@ sprint_bioenergetic_model_rmse <- function(sprint_motion_data, mu = -0.4, sigma 
 #' available time splits, using the approach proposed by di Prampero et al. (2005, 2018) and as described in Briand et al. (2025).
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
-#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
-#' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
+#' @inheritParams sprint_bioenergetic_model_data
 #'
 #' @returns A double with the R-squared of the model fit.
 #' @export
@@ -148,11 +142,7 @@ sprint_bioenergetic_model_R2 <- function(sprint_motion_data, mu = -0.4, sigma = 
 #' available time splits, using the approach proposed by di Prampero et al. (2005, 2018) and as described in Briand et al. (2025).
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
-#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
-#' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
+#' @inheritParams sprint_bioenergetic_model_data
 #'
 #' @return Adjusted R-squared of the sprint bioenergetic model.
 #' @export
@@ -215,12 +205,8 @@ sprint_bioenergetic_model_adj_R2 <- function(sprint_motion_data, mu = -0.4, sigm
 #' available time splits, using the approach proposed by di Prampero et al. (2005, 2018) and as described in Briand et al. (2025).
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
-#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
-#' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
 #' @param histogram_binwidth A numeric value representing the binwidth for the histogram of residuals (default is 1)
+#' @inheritParams sprint_bioenergetic_model_data
 #'
 #' @returns A list containing the RMSE, RSE, R-squared, adjusted R-squared, and a list of ggplot objects for each diagnostic plot (observed vs fitted power, residuals vs fitted power, Q-Q plots and histogram of residuals).
 #' @export

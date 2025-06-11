@@ -4,6 +4,7 @@
 #'
 #' @param power_series a vector of power values (W/kg) corresponding to instantaneous power output during a sprint.
 #' @param dt a numeric value representing the time step at which power is provided (in seconds). Default is 0.01 seconds.
+#' @inheritParams cost_running
 #'
 #' @returns A tibble containing time, distance, velocity, acceleration, and power.
 #' @export
@@ -33,7 +34,7 @@
 #' recovered_motion_data <- sprint_recover_motion(bolt_100m_motion_data$power, dt = 0.01)
 #' head(recovered_motion_data)
 #'
-sprint_recover_motion <- function(power_series, dt = 0.01) {
+sprint_recover_motion <- function(power_series, dt = 0.01, cost_running_flat = 3.6, slope_equation = "original") {
   n <- length(power_series)
   velocity <- numeric(n)
   acceleration <- numeric(n)
@@ -53,7 +54,7 @@ sprint_recover_motion <- function(power_series, dt = 0.01) {
       # Calculate new velocity
       vel <- velocity[i - 1] + delta_v
       # Calculate power
-      calc_power <- cost_running_sprint(acceleration = acc, velocity = vel) * vel
+      calc_power <- cost_running_sprint(acceleration = acc, velocity = vel, cost_running_flat = cost_running_flat, slope_equation = slope_equation) * vel
       return((calc_power - power_series[i])^2)
     }
 
@@ -82,7 +83,7 @@ sprint_recover_motion <- function(power_series, dt = 0.01) {
     distance = distance,
     velocity = velocity,
     acceleration = acceleration,
-    power = cost_running_sprint(acceleration, velocity) * velocity
+    power = cost_running_sprint(acceleration, velocity, cost_running_flat = cost_running_flat, slope_equation = slope_equation) * velocity
   )
 
   # Return both the motion parameters and the final distance
@@ -94,6 +95,7 @@ sprint_recover_motion <- function(power_series, dt = 0.01) {
 #'
 #' @param power_series a vector of power values (W/kg) corresponding to instantaneous power output during a sprint.
 #' @param dt a numeric value representing the time step at which power is provided (in seconds). Default is 0.01 seconds.
+#' @inheritParams cost_running
 #'
 #' @returns A numeric value representing the total distance covered during the sprint.
 #' @export
@@ -121,8 +123,8 @@ sprint_recover_motion <- function(power_series, dt = 0.01) {
 #'
 #' recovered_distance <- sprint_recover_distance(bolt_100m_motion_data$power, dt = 0.01)
 #'
-sprint_recover_distance <- function(power_series, dt = 0.01) {
-  motion_data <- sprint_recover_motion(power_series, dt)
+sprint_recover_distance <- function(power_series, dt = 0.01, cost_running_flat = 3.6, slope_equation = "original") {
+  motion_data <- sprint_recover_motion(power_series, dt = dt, cost_running_flat = cost_running_flat, slope_equation = slope_equation)
 
   # integrate velocity to get distance
 
@@ -138,6 +140,7 @@ sprint_recover_distance <- function(power_series, dt = 0.01) {
 #'
 #' @param sprint_power_data A tibble with at leats following columns: time (s), power (W/kg), corresponding to the power estimated by di Prampero et al.'s (2005, 2018) equivalent slope approach, power_mod (W/kg), corresponding to power estimated using Briand et al.'s (2025) sprint bioenergetic model.
 #' @param dt a numeric value representing the time step at which power is provided (in seconds). Default is 0.01 seconds.
+#' @inheritParams cost_running
 #'
 #' @returns A numeric value representing the percentage difference in distance recovered between the two methods.
 #' @export
@@ -169,10 +172,10 @@ sprint_recover_distance <- function(power_series, dt = 0.01) {
 #'
 #' round(percent_error, 2)
 #'
-sprint_modeled_distance_percentage_error <- function(sprint_power_data, dt = 0.01) {
-  distance_recovered <- sprint_recover_distance(sprint_power_data$power, dt = dt)
+sprint_modeled_distance_percentage_error <- function(sprint_power_data, dt = 0.01, cost_running_flat = 3.6, slope_equation = "original") {
+  distance_recovered <- sprint_recover_distance(sprint_power_data$power, dt = dt, cost_running_flat = cost_runnig_flat, slope_equation = slope_equation)
 
-  distance_recovered_bioenergetic_model <- sprint_recover_distance(sprint_power_data$power_mod, dt = dt)
+  distance_recovered_bioenergetic_model <- sprint_recover_distance(sprint_power_data$power_mod, dt = dt, cost_running_flat = cost_running_flat, slope_equation = slope_equation)
 
   modeled_distance_percentage_diff <- (distance_recovered_bioenergetic_model - distance_recovered) / distance_recovered * 100
 
