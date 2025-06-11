@@ -9,7 +9,14 @@ plot_sprint_alactic_duration_briand_article(
   mu_al = 1.75,
   sigma_al = 1.5,
   line_color = "purple",
-  point_color = "darkorchid4"
+  point_color = "darkorchid4",
+  mu = -0.4,
+  sigma = 1,
+  k1 = 2.75,
+  k2 = 35,
+  dt = 0.01,
+  cost_running_flat = 3.8,
+  slope_equation = "original"
 )
 }
 \arguments{
@@ -22,6 +29,18 @@ plot_sprint_alactic_duration_briand_article(
 \item{line_color}{Color for model line (default: "purple").}
 
 \item{point_color}{Color for data points (default: "darkorchid4").}
+
+\item{mu}{A double. Parameter setting the peak of the log-normal distribution.Default is -0.4}
+
+\item{sigma}{A double. Parameter setting the decay of the log-normal distribution. Default is 1}
+
+\item{k1}{A double. Time constant of the first rising exponential (s). Default is 2.75}
+
+\item{k2}{A double. Time constant of the second decaying exponential (s). Default is 35}
+
+\item{cost_running_flat}{a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)}
+
+\item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
 }
 \value{
 A ggplot object with overlaid male and female model fits and alactic power over different running durations.

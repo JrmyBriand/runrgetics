@@ -71,11 +71,9 @@ sprint_alactic_energy_duration <- function(sprint_power_data) {
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
 #' @param athlete_sex A character corresponding the athlete sex for the analysis. Default is "male" and computes energy and power over the Graubner and Nixdorf's (2011) men's 100, 200 and 400 m performances. It also sets the maximal aerobic power to 24.5 W/kg. Similarly, setting athlete_sex to "female" performs the computation on women's performances and sets maximal aerobic power to 21 W/kg.
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
-#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
-#' @param dt A double representing the time step at which power is provided (in seconds). Default is 0.01 seconds.
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
+#' @inheritParams cost_running_sprint
+#' @inheritParams sprint_bioenergetic_model
 #'
 #' @returns A tibble with duration (s), alactic_energy (J/kg), alactic_power (W/kg).
 #' @export
@@ -84,7 +82,9 @@ sprint_alactic_energy_duration <- function(sprint_power_data) {
 #'
 #' sprint_alactic_energy_duration_graubner_nixdorf()
 #'
-sprint_alactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdorf_sprints, athlete_sex = "male", mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01) {
+sprint_alactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdorf_sprints, athlete_sex = "male", mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01,
+                                                            cost_running_flat = 3.8,
+                                                            slope_equation = "original") {
   if (athlete_sex == "male") {
     dat <- data |>
       dplyr::filter(event == "Men's 100 m" |
@@ -127,7 +127,9 @@ sprint_alactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixd
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
       maximal_velocity = event_data$maximal_velocity[1],
-      dt = dt
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
 
@@ -215,8 +217,7 @@ sprint_alactic_duration_model_fit <- function(alactic_power_duration, mu_al = 1.
 #' Performs a non-linear least squares fitting of the alactic power model to the alactic power duration data and returns the residual standard error.
 #'
 #' @param alactic_power_duration A tibble with the following columns: duration (s), alactic_power (W/kg), corresponding to the average alactic power output over the running duration. This data is used to fit the alactic power model.
-#' @param mu_al A double representing the peak of the log-normal distribution. Default is 1.75.
-#' @param sigma_al A double representing the decay of the log-normal distribution. Default is 1.5.
+#' @inheritParams sprint_alactic_duration_model
 #'
 #' @returns A numeric value representing the residual standard error of the fitted alactic power model.
 #' @export

@@ -4,11 +4,15 @@
 \alias{get_alactic_model_data}
 \title{Generate model predictions for the sprint alactic power-duration model}
 \usage{
-get_alactic_model_data(data, sex_label, mu_al = 1.75, sigma_al = 1.5)
+get_alactic_model_data(
+  alactic_power_duration,
+  sex_label,
+  mu_al = 1.75,
+  sigma_al = 1.5
+)
 }
 \arguments{
-\item{data}{A data frame containing at least a \code{duration} column (in seconds),
-used to estimate the maximal alactic energy capacity.}
+\item{alactic_power_duration}{A tibble with the following columns: duration (s), alactic_power (W/kg), corresponding to the average alactic power output over the running duration. This data is used to fit the alactic power model.}
 
 \item{sex_label}{A string label (e.g., "male", "Female") used for grouping the output.}
 

@@ -11,7 +11,9 @@ sprint_alactic_energy_duration_graubner_nixdorf(
   sigma = 1,
   k1 = 2.75,
   k2 = 35,
-  dt = 0.01
+  dt = 0.01,
+  cost_running_flat = 3.8,
+  slope_equation = "original"
 )
 }
 \arguments{
@@ -27,7 +29,9 @@ sprint_alactic_energy_duration_graubner_nixdorf(
 
 \item{k2}{A double. Time constant of the second decaying exponential (s). Default is 35}
 
-\item{dt}{A double representing the time step at which power is provided (in seconds). Default is 0.01 seconds.}
+\item{cost_running_flat}{a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)}
+
+\item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
 }
 \value{
 A tibble with duration (s), alactic_energy (J/kg), alactic_power (W/kg).

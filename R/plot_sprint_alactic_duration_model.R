@@ -6,11 +6,7 @@ utils::globalVariables(c("duration", "alactic_power", "sex"))
 #' Creates a ggplot visualizing observed alactic power output as a function of sprint duration,
 #' overlaid with a model prediction curve based on fitted alactic power duration model.
 #'
-#' @param alactic_power_duration A data frame or tibble containing columns `duration` (in seconds)
-#'   and `alactic_power` (in W/kg), such output can be obtained through the use of Briand et al.' (2025) sprint bioenergetic model
-#'   and of the `sprint_alactic_energy_duration` function .
-#' @param mu_al A double representing the peak of the log-normal distribution. Default is 1.75.
-#' @param sigma_al A double representing the decay of the log-normal distribution. Default is 1.5.
+#' @inheritParams sprint_alactic_capacity
 #' @param linetype Line type used for the model curve (default = `"solid"`). Accepts any valid ggplot2 line type.
 #' @param line_color Color of the model prediction line (default = `"purple"`).
 #' @param point_color Color of the observed data points (default = `"darkorchid4"`).
@@ -122,6 +118,8 @@ get_alactic_model_data <- function(alactic_power_duration, sex_label, mu_al = 1.
 #' @param sigma_al A double representing the decay of the log-normal distribution. Default is 1.5.
 #' @param line_color Color for model line (default: "purple").
 #' @param point_color Color for data points (default: "darkorchid4").
+#' @inheritParams sprint_alactic_capacity
+#' @inheritParams sprint_alactic_energy_duration_graubner_nixdorf
 #'
 #' @return A ggplot object with overlaid male and female model fits and alactic power over different running durations.
 #' @export
@@ -133,12 +131,34 @@ plot_sprint_alactic_duration_briand_article <- function(
     mu_al = 1.75,
     sigma_al = 1.5,
     line_color = "purple",
-    point_color = "darkorchid4"
+    point_color = "darkorchid4",
+    mu = -0.4,
+    sigma = 1,
+    k1 = 2.75,
+    k2 = 35,
+    dt = 0.01,
+    cost_running_flat = 3.8,
+    slope_equation = "original"
 ) {
 
   # Separate male and female data
-  male_data <- sprint_alactic_energy_duration_graubner_nixdorf(athlete_sex = "male")
-  female_data <- sprint_alactic_energy_duration_graubner_nixdorf(athlete_sex = "female")
+  male_data <- sprint_alactic_energy_duration_graubner_nixdorf(athlete_sex = "male",
+                                                               mu = mu,
+                                                               sigma = sigma,
+                                                               k1 = k1,
+                                                               k2 = k2,
+                                                               dt = dt,
+                                                               cost_running_flat = cost_running_flat,
+                                                               slope_equation = slope_equation)
+
+  female_data <- sprint_alactic_energy_duration_graubner_nixdorf(athlete_sex = "female",
+                                                                 mu = mu,
+                                                                 sigma = sigma,
+                                                                 k1 = k1,
+                                                                 k2 = k2,
+                                                                 dt = dt,
+                                                                 cost_running_flat = cost_running_flat,
+                                                                 slope_equation = slope_equation)
 
   male_data$sex <- "male"
   female_data$sex <- "female"

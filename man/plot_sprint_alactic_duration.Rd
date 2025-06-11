@@ -15,9 +15,7 @@ plot_sprint_alactic_duration(
 )
 }
 \arguments{
-\item{alactic_power_duration}{A data frame or tibble containing columns \code{duration} (in seconds)
-and \code{alactic_power} (in W/kg), such output can be obtained through the use of Briand et al.' (2025) sprint bioenergetic model
-and of the \code{sprint_alactic_energy_duration} function .}
+\item{alactic_power_duration}{A tibble with the following columns: duration (s), alactic_power (W/kg), corresponding to the average alactic power output over the running duration. This data is used to fit the alactic power model.}
 
 \item{mu_al}{A double representing the peak of the log-normal distribution. Default is 1.75.}
 
