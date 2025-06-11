@@ -86,11 +86,8 @@ plot_sprint_alactic_duration <- function(alactic_power_duration, mu_al = 1.75, s
 #' Computes the modeled alactic power output across a sequence of durations,
 #' based on the estimated alactic capacity from empirical data and log-normal decay alactic power duration model.
 #'
-#' @param data A data frame containing at least a `duration` column (in seconds),
-#'   used to estimate the maximal alactic energy capacity.
 #' @param sex_label A string label (e.g., "male", "Female") used for grouping the output.
-#' @param mu_al A double representing the peak of the log-normal distribution. Default is 1.75.
-#' @param sigma_al A double representing the decay of the log-normal distribution. Default is 1.5.
+#' @inheritParams sprint_alactic_capacity
 #'
 #' @return A tibble with `duration`, `power`, and `sex` columns representing the predicted model values.
 #' @export
@@ -98,10 +95,10 @@ plot_sprint_alactic_duration <- function(alactic_power_duration, mu_al = 1.75, s
 #' @examples
 #' data <- sprint_alactic_energy_duration_graubner_nixdorf()
 #' get_alactic_model_data(data, sex_label = "male")
-get_alactic_model_data <- function(data, sex_label, mu_al = 1.75, sigma_al = 1.5) {
-  alactic_capacity <- sprint_alactic_capacity(data, mu_al = mu_al, sigma_al = sigma_al)
+get_alactic_model_data <- function(alactic_power_duration, sex_label, mu_al = 1.75, sigma_al = 1.5) {
+  alactic_capacity <- sprint_alactic_capacity(alactic_power_duration, mu_al = mu_al, sigma_al = sigma_al)
 
-  tibble::tibble(duration = seq(0.01, max(data$duration), length.out = 600)) |>
+  tibble::tibble(duration = seq(0.01, max(alactic_power_duration$duration), length.out = 600)) |>
     dplyr::mutate(
       power = sprint_alactic_duration_model(
         duration = duration,

@@ -10,12 +10,14 @@
 #' @param reaction_time A double with the reaction time measured on the starting blocks (s)
 #' @param maximal_velocity A double representing the maximal velocity (in m/s)
 #' @param dt Time step of the model. Default is set at 0.01 s
+#' @inheritParams cost_running
 #'
 #' @returns A tibble with the following columns: time, velocity, acceleration, distance, cost of running and power
 #' @importFrom tibble tibble
 #' @export
 #'
-#' @examples sprint_motion_model_data(
+#' @examples
+#' sprint_motion_model_data(
 #'   mean_velocity_splits = c(0, 5.77, 9.99),
 #'   time_splits = c(0, 1.88, 2.88),
 #'   distance = c(0, 10, 20),
@@ -23,7 +25,13 @@
 #'   maximal_velocity = 12.34
 #' )
 #'
-sprint_motion_model_data <- function(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = NA, dt = 0.01) {
+sprint_motion_model_data <- function(mean_velocity_splits,
+                                     time_splits, distance,
+                                     reaction_time,
+                                     maximal_velocity = NA,
+                                     dt = 0.01,
+                                     cost_running_flat = 3.6,
+                                     slope_equation = "original") {
   # 1. Times associated with velocities
 
   times_velocity <- find_time_velocity(time_splits, reaction_time)
@@ -123,8 +131,10 @@ sprint_motion_model_data <- function(mean_velocity_splits, time_splits, distance
   )
 
   sprint_data$cost_running <- cost_running_sprint(
-    sprint_data$acceleration,
-    sprint_data$velocity
+    acceleration = sprint_data$acceleration,
+    velocity = sprint_data$velocity,
+    cost_running_flat = cost_running_flat,
+    slope_equation = slope_equation
   )
 
   # 13. Calculate the power at each time point

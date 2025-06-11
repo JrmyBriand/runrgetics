@@ -47,7 +47,7 @@ The data from the `graubner_nixdorf_sprints` are subject to a certain level of u
 
 To make the model useful and applicable, we will set the parameters of the lactic and alactic model such that they represent a compromise between the fitted parameters over each distances for men and women. By setting the parameters $\mu$ and $\sigma$ of the alactic model and the $\k_1$ and $\k_2$ parameters of the lactic model, the only parameters that will determine the alactic and lactic power model are the maximal alactic and lactic power over the race duration. Based on the values of the fitted parameters over all the sprint events, the values of $\mu$ and $\sigma$ for the alactic model are set to -0.4 and 1, respectively. Similarly, The values of $\k_1$ and $\k_2$ for the lactic model are set to 2.75 and 35 s, respectively.
 
-The following function generates tables that compare the parameters and goodness of fit metrics of the optimal fit, where the values of $\mu$, $\sigma$, $k_1$ and $k_2$ are variables that can be fitters, with the a formalized or simplified fit where the values of $\mu$, $\sigma$, $k_1$ and $k_2$ are set to the values mentioned above. The following code chunk generates the comparison tables. The cells in red to the optimal model fit and the cells in blue correspond to the formalized model fit. 
+The following function generates tables that compare the parameters and goodness of fit metrics of the optimal fit, where the values of $\mu$, $\sigma$, $k_1$ and $k_2$ are variables that can be fitted, with the a formalized or simplified fit where the values of $\mu$, $\sigma$, $k_1$ and $k_2$ are set to the values mentioned above. The following code chunk generates the comparison tables. The cells in red to the optimal model fit and the cells in blue correspond to the formalized model fit. 
 
 ```{r}
 # alactic model comparison table
@@ -62,8 +62,7 @@ As expected, because the formalized model corresponds to a compromise between th
 
 Based on the above, the choice of set parameters therefore seems a reasonable compromise between the optimal model and a simplified model that can be easily applied across all sprint events. The same observations can be made of the $R^2$ values. 
 
-
-## The Formalised Model
+The sprint running bioenergetic model as presented in Briand et al. (2025) has the following formalisation: the values of $\mu$ and $\sigma$ for the alactic model are set to -0.4 and 1, respectively. Further details and applications are provided in the `sprint_bioenergetic_model` vignette. 
 
 
 

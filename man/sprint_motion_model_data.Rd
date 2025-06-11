@@ -10,7 +10,9 @@ sprint_motion_model_data(
   distance,
   reaction_time,
   maximal_velocity = NA,
-  dt = 0.01
+  dt = 0.01,
+  cost_running_flat = 3.6,
+  slope_equation = "original"
 )
 }
 \arguments{
@@ -25,6 +27,10 @@ sprint_motion_model_data(
 \item{maximal_velocity}{A double representing the maximal velocity (in m/s)}
 
 \item{dt}{Time step of the model. Default is set at 0.01 s}
+
+\item{cost_running_flat}{a numeric value representing the cost of running on a flat surface (default is 3.6 J/kg/m, as suggested in Minetti et al. 2002)}
+
+\item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
 }
 \value{
 A tibble with the following columns: time, velocity, acceleration, distance, cost of running and power

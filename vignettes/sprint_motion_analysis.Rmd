@@ -209,6 +209,8 @@ diagnose_velocity_model_acc(
 )
 ```
 
+We can apply a similar diagnostic for the whole sprint motion model using the function `diagnose_sprint_model`. This function will return the RMSE and RSE of the model, along with 4 plots: observed vs. fitted values, residuals vs. fitted values, Q–Q plot of residuals, and histogram of residuals.
+
 ```{r}
 diagnose_sprint_model(
   mean_velocity_splits = men_100$velocity,
@@ -219,7 +221,7 @@ diagnose_sprint_model(
 )
 ```
 
-
+The same plot can be generated for each event. In this case, it is generated for the 400 m. 
 
 ```{r}
 diagnose_sprint_model(

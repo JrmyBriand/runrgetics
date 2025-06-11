@@ -1,4 +1,4 @@
-
+utils::globalVariables(c("Optimal_Time", "Actual_Time"))
 
 #' Sprint Simulation Race Time Error Function
 #'

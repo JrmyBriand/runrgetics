@@ -4,12 +4,21 @@
 \alias{cost_running_sprint}
 \title{Cost of Running (Sprint Version)}
 \usage{
-cost_running_sprint(acceleration, velocity)
+cost_running_sprint(
+  acceleration,
+  velocity,
+  cost_running_flat = 3.6,
+  slope_equation = "original"
+)
 }
 \arguments{
 \item{acceleration}{a vector of accelerations (m/s^2)}
 
 \item{velocity}{a vector of velocities (m/s)}
+
+\item{cost_running_flat}{a numeric value representing the cost of running on a flat surface (default is 3.6 J/kg/m, as suggested in Minetti et al. 2002)}
+
+\item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
 }
 \value{
 a vector of costs of running (J/kg/m)
