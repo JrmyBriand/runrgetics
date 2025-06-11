@@ -19,10 +19,6 @@ plot_sprint_lactic_duration(
 and \code{lactic_energy} (in J/kg), such output can be obtained through the use of Briand et al.' (2025) sprint bioenergetic model
 and of the \code{sprint_lactic_energy_duration} function .}
 
-\item{t1}{rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.}
-
-\item{t2}{decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.}
-
 \item{linetype}{Line type used for the model curve (default = \code{"solid"}). Accepts any valid ggplot2 line type.}
 
 \item{line_color}{Color of the model prediction line (default = \code{"#457B9D"}).}

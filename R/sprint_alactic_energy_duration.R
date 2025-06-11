@@ -73,7 +73,7 @@ sprint_alactic_energy_duration <- function(sprint_power_data) {
 #' @param athlete_sex A character corresponding the athlete sex for the analysis. Default is "male" and computes energy and power over the Graubner and Nixdorf's (2011) men's 100, 200 and 400 m performances. It also sets the maximal aerobic power to 24.5 W/kg. Similarly, setting athlete_sex to "female" performs the computation on women's performances and sets maximal aerobic power to 21 W/kg.
 #' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #' @inheritParams cost_running_sprint
-#' @inheritParams sprint_bioenergetic_model
+#' @inheritParams sprint_bioenergetic_model_data
 #'
 #' @returns A tibble with duration (s), alactic_energy (J/kg), alactic_power (W/kg).
 #' @export
@@ -187,8 +187,7 @@ sprint_alactic_duration_model <- function(duration, alactic_capacity, mu_al = 1.
 #' Performs a non-linear least squares fitting of the alactic power model to the alactic power duration data.
 #'
 #' @param alactic_power_duration A tibble with the following columns: duration (s), alactic_power (W/kg), corresponding to the average alactic power output over the running duration. This data is used to fit the alactic power model.
-#' @param mu_al A double representing the peak of the log-normal distribution. Default is 1.75.
-#' @param sigma_al A double representing the decay of the log-normal distribution. Default is 1.5.
+#' @inheritParams sprint_alactic_duration_model
 #'
 #' @returns A fitted model object of class "nls" representing the alactic power model fitted to the alactic power duration data.
 #' @export
@@ -244,8 +243,7 @@ sprint_alactic_duration_model_fit_rse <- function(alactic_power_duration, mu_al 
 #' Computes the alactic capacity from alactic power duration data by fitting the alactic power over running duration model to the data.
 #'
 #' @param alactic_power_duration A tibble with the following columns: duration (s), alactic_power (W/kg), corresponding to the average alactic power output over the running duration. This data is used to fit the alactic power model.
-#' @param mu_al A double representing the peak of the log-normal distribution. Default is 1.75.
-#' @param sigma_al A double representing the decay of the log-normal distribution. Default is 1.5.
+#' @inheritParams sprint_alactic_duration_model
 #'
 #' @returns A numeric value representing the alactic capacity (in J/kg) estimated from the alactic power duration data.
 #' @export
@@ -276,10 +274,8 @@ sprint_alactic_capacity <- function(alactic_power_duration, mu_al = 1.75, sigma_
 #'
 #' @param duration A numeric value representing the sprint duration (in seconds).
 #' @param alactic_capacity A numeric value representing the lactic capacity (in J/kg).
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param mu_al A double representing the peak of the log-normal distribution. Default is 1.75.
-#' @param sigma_al A double representing the decay of the log-normal distribution. Default is 1.5.
+#' @inheritParams sprint_bioenergetic_model
+#' @inheritParams sprint_alactic_duration_model
 #'
 #'
 #' @returns A numeric value representing the maximal lactic power (in W/kg) that can be sustained over the given sprint duration.

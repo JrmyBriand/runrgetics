@@ -260,3 +260,5 @@ plot_sprint_approx_lactic_power_model <- function(sprint_approx_power_distributi
 
   return(plot)
 }
+
+

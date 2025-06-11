@@ -10,8 +10,7 @@ utils::globalVariables(c("duration", "energy", "energy_lactic_model", "lactic_en
 #' @param lactic_energy_duration A data frame or tibble containing columns `duration` (in seconds)
 #'   and `lactic_energy` (in J/kg), such output can be obtained through the use of Briand et al.' (2025) sprint bioenergetic model
 #'   and of the `sprint_lactic_energy_duration` function .
-#' @param t1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
-#' @param t2 decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.
+#' @inheritParams sprint_lactic_capacity
 #' @param linetype Line type used for the model curve (default = `"solid"`). Accepts any valid ggplot2 line type.
 #' @param line_color Color of the model prediction line (default = `"#457B9D"`).
 #' @param point_color Color of the observed data points (default = `"darkblue"`).
@@ -80,12 +79,9 @@ plot_sprint_lactic_duration <- function(lactic_energy_duration, t1 = 20, t2 = 15
 #' Computes the modeled lactic energy output across a sequence of durations,
 #' based on the estimated lactic capacity from empirical data and bi-exponential lactic energy-duration model.
 #'
-#' @param data A data frame containing at least a `duration` column (in seconds),
-#'   used to estimate the maximal lactic energy capacity.
 #' @param sex_label A string label (e.g., "male", "Female") used for grouping the output.
-#' @param t1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
-#' @param t2 decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.
 #' @param max_duration Maximum duration for which to compute the model (default = 100 s).
+#' @inheritParams sprint_lactic_capacity
 #'
 #' @return A tibble with `duration`, `energy`, and `sex` columns representing the predicted model values.
 #' @export
@@ -94,9 +90,9 @@ plot_sprint_lactic_duration <- function(lactic_energy_duration, t1 = 20, t2 = 15
 #' data <- sprint_lactic_energy_duration_graubner_nixdorf()
 #' get_lactic_model_data(data, sex_label = "male")
 
-get_lactic_model_data <- function(data, sex_label, t1 = 20, t2 = 1500, max_duration = 100) {
+get_lactic_model_data <- function(lactic_energy_duration, sex_label, t1 = 20, t2 = 1500, max_duration = 100) {
 
-    lactic_capacity <- sprint_lactic_capacity(data, t1 = t1, t2 = t2)
+    lactic_capacity <- sprint_lactic_capacity(lactic_energy_duration, t1 = t1, t2 = t2)
 
 
   tibble::tibble(duration = seq(0.01, max_duration, length.out = 600)) |>
@@ -119,10 +115,10 @@ get_lactic_model_data <- function(data, sex_label, t1 = 20, t2 = 1500, max_durat
 #' generates the same Figure as the one presented in Briand et al. 2025.
 #'
 #' @param data A data frame containing sprint lactic energy estimations (default: `graubner_nixdorf_sprints`).
-#' @param t1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
-#' @param t2 decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.
 #' @param line_color Color for model line (default: "#457B9D").
 #' @param point_color Color for data points (default: "darkblue").
+#' @inheritParams sprint_lactic_capacity
+#' @inheritParams sprint_lactic_energy_duration_graubner_nixdorf
 #'
 #' @return A ggplot object with overlaid male and female model fits and lactic energy over different running durations.
 #' @export
@@ -134,12 +130,34 @@ plot_sprint_lactic_duration_briand_article <- function(
     t1 = 20,
     t2 = 1500,
     line_color = "#457B9D",
-    point_color = "darkblue"
+    point_color = "darkblue",
+    mu = -0.4,
+    sigma = 1,
+    k1 = 2.75,
+    k2 = 35,
+    dt = 0.01,
+    cost_running_flat = 3.8,
+    slope_equation = "original"
 ) {
 
   # Separate male and female data
-  male_data <- sprint_lactic_energy_duration_graubner_nixdorf(athlete_sex = "male")
-  female_data <- sprint_lactic_energy_duration_graubner_nixdorf(athlete_sex = "female")
+  male_data <- sprint_lactic_energy_duration_graubner_nixdorf(athlete_sex = "male",
+                                                              mu = mu,
+                                                              sigma = sigma,
+                                                              k1 = k1,
+                                                              k2 = k2,
+                                                              dt = dt,
+                                                              cost_running_flat = cost_running_flat,
+                                                              slope_equation = slope_equation)
+
+  female_data <- sprint_lactic_energy_duration_graubner_nixdorf(athlete_sex = "female",
+                                                                mu = mu,
+                                                                sigma = sigma,
+                                                                k1 = k1,
+                                                                k2 = k2,
+                                                                dt = dt,
+                                                                cost_running_flat = cost_running_flat,
+                                                                slope_equation = slope_equation)
 
   male_data$sex <- "male"
   female_data$sex <- "female"
@@ -194,10 +212,9 @@ plot_sprint_lactic_duration_briand_article <- function(
 #' generates a similar Figure as the one presented in Briand et al. 2025.
 #'
 #' @param data A data frame containing `accumulated_lactate` in mmol/L associated with different running `duration` in s (default: `kindermann_lactate`).
-#' @param t1 rising constant of the bi-exponential model (default = 20 s), describing lactic energy behavior over duration.
-#' @param t2 decaying constant of the bi-exponential model (default = 1500 s), describing lactic energy behavior over duration.
 #' @param line_color Color for model line (default: "#457B9D").
 #' @param point_color Color for data points (default: "darkblue").
+#' @inheritParams sprint_lactic_capacity
 #'
 #' @return A ggplot object with overlaid male and female model fits and lactic energy over different running durations.
 #' @export

@@ -25,7 +25,7 @@ plot_sprint_bioenergetic_model(
 
 \item{k2}{A double. Time constant of the second decaying exponential (s). Default is 35}
 
-\item{maximal_aerobic_power}{A double representing the maximal aerobic power (W/kg) of the athlete. Default is 24.5 W/kg.}
+\item{maximal_aerobic_power}{A double. Maximal aerobic power (W/kg). Default is 24.5}
 
 \item{scale_max_power}{A double representing the maximum y-axis value for the plot. Default is 160 W/kg.}
 }

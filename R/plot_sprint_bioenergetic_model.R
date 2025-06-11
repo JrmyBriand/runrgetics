@@ -3,12 +3,8 @@ utils::globalVariables(c("power_mod"))
 #' Plot Sprint Bioenergetic Model Power
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
-#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
-#' @param maximal_aerobic_power A double representing the maximal aerobic power (W/kg) of the athlete. Default is 24.5 W/kg.
 #' @param scale_max_power A double representing the maximum y-axis value for the plot. Default is 160 W/kg.
+#' @inheritParams sprint_bioenergetic_model
 #'
 #' @returns A ggplot object comparing the modeled metabolic power from the sprint bioenergetic model to the observed metabolic power from the sprint motion data.
 #' @export

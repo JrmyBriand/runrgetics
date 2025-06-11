@@ -11,10 +11,6 @@ find_max_la(duration, lactic_capacity, t1 = 20, t2 = 1500, k1 = 2.75, k2 = 35)
 
 \item{lactic_capacity}{A numeric value representing the lactic capacity (in J/kg).}
 
-\item{t1}{A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.}
-
-\item{t2}{A double representing to decaying time-constant of the bi-exponential model. Default is 1500.}
-
 \item{k1}{A double. Time constant of the first rising exponential (s). Default is 2.75}
 
 \item{k2}{A double. Time constant of the second decaying exponential (s). Default is 35}

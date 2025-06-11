@@ -12,10 +12,6 @@ sprint_lactic_duration_model_fit_rse(
 }
 \arguments{
 \item{lactic_energy_duration}{A tibble with the following columns: duration (s), lactic_energy (J/kg), corresponding to the average lactic energy expenditure over running duration. This data is used to fit the lactic energy model.}
-
-\item{t1}{A double corresponding to the rising time-constant of the bi-exponential model. Default is 20.}
-
-\item{t2}{A double representing to decaying time-constant of the bi-exponential model. Default is 1500.}
 }
 \value{
 A numeric value representing the residual standard error of the fitted lactic energy model.
