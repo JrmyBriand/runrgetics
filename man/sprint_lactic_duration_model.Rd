@@ -10,6 +10,10 @@ sprint_lactic_duration_model(duration, lactic_capacity, t1 = 20, t2 = 1500)
 \item{duration}{A numeric vector representing the duration of the sprint (in seconds).}
 
 \item{lactic_capacity}{A numeric value representing the lactic capacity (in J/kg).}
+
+\item{t1}{A numeric value representing the time constant for the first exponential decay (default is 20 seconds).}
+
+\item{t2}{A numeric value representing the time constant for the second exponential decay (default is 1500 seconds).}
 }
 \value{
 A numeric vector representing the average lactic energy (in J/kg) as a function of running duration.

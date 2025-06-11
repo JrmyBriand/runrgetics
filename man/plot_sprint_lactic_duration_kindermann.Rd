@@ -15,6 +15,10 @@ plot_sprint_lactic_duration_kindermann(
 \arguments{
 \item{data}{A data frame containing \code{accumulated_lactate} in mmol/L associated with different running \code{duration} in s (default: \code{kindermann_lactate}).}
 
+\item{t1}{A numeric value representing the time constant for the first exponential decay (default is 20 seconds).}
+
+\item{t2}{A numeric value representing the time constant for the second exponential decay (default is 1500 seconds).}
+
 \item{line_color}{Color for model line (default: "#457B9D").}
 
 \item{point_color}{Color for data points (default: "darkblue").}

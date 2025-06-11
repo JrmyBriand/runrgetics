@@ -165,7 +165,8 @@ sprint_lactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixdo
 #'
 #' @param duration A numeric vector representing the duration of the sprint (in seconds).
 #' @param lactic_capacity A numeric value representing the lactic capacity (in J/kg).
-#' @inheritParams sprint_lactic_capacity
+#' @param t1 A numeric value representing the time constant for the first exponential decay (default is 20 seconds).
+#' @param t2 A numeric value representing the time constant for the second exponential decay (default is 1500 seconds).
 #'
 #' @returns A numeric vector representing the average lactic energy (in J/kg) as a function of running duration.
 #' @export
@@ -194,7 +195,7 @@ sprint_lactic_duration_model <- function(duration, lactic_capacity, t1 = 20, t2 
 #' model to the lactic energy over running duration data.
 #'
 #' @param lactic_energy_duration A tibble with the following columns: duration (s), lactic_energy (J/kg), corresponding to the average lactic energy expenditure over running duration. This data is used to fit the lactic energy model.
-#' @inheritParams sprint_lactic_capacity
+#' @inheritParams sprint_lactic_duration_model
 #'
 #' @returns A fitted model object of class "nls" representing the lactic energy model fitted to the lactic energy duration data.
 #' @export

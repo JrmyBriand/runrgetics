@@ -11,7 +11,9 @@ plot_sprint_metabolic_power(
   reaction_time,
   maximal_velocity = NA,
   dt = 0.01,
-  color = "purple"
+  color = "purple",
+  cost_running_flat = 3.6,
+  slope_equation = "original"
 )
 }
 \arguments{
@@ -28,6 +30,10 @@ plot_sprint_metabolic_power(
 \item{dt}{Time step of the model. Default is set at 0.01 s}
 
 \item{color}{A string with the color of the plot's line and points. Default is set at "purple"}
+
+\item{cost_running_flat}{a numeric value representing the cost of running on a flat surface (default is 3.6 J/kg/m, as suggested in Minetti et al. 2002)}
+
+\item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
 }
 \value{
 A ggplot object

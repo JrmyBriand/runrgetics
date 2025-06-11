@@ -12,6 +12,10 @@ sprint_lactic_duration_model_fit_rse(
 }
 \arguments{
 \item{lactic_energy_duration}{A tibble with the following columns: duration (s), lactic_energy (J/kg), corresponding to the average lactic energy expenditure over running duration. This data is used to fit the lactic energy model.}
+
+\item{t1}{A numeric value representing the time constant for the first exponential decay (default is 20 seconds).}
+
+\item{t2}{A numeric value representing the time constant for the second exponential decay (default is 1500 seconds).}
 }
 \value{
 A numeric value representing the residual standard error of the fitted lactic energy model.

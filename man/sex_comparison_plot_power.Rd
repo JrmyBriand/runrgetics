@@ -11,9 +11,9 @@ sex_comparison_plot_power(
 )
 }
 \arguments{
-\item{sprint_data_male}{A data frame with sprint motion model data extracted from males data}
+\item{sprint_data_male}{A data frame with \code{sprint_motion_model_data} extracted from males data}
 
-\item{sprint_data_female}{A data frame with sprint motion model data extracted from females data}
+\item{sprint_data_female}{A data frame with \code{sprint_motion_model_data} extracted from females data}
 
 \item{color}{A string with the color of the plot's line and points. Default is set at "darkgreen"}
 }

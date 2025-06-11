@@ -19,6 +19,10 @@ plot_sprint_lactic_duration(
 and \code{lactic_energy} (in J/kg), such output can be obtained through the use of Briand et al.' (2025) sprint bioenergetic model
 and of the \code{sprint_lactic_energy_duration} function .}
 
+\item{t1}{A numeric value representing the time constant for the first exponential decay (default is 20 seconds).}
+
+\item{t2}{A numeric value representing the time constant for the second exponential decay (default is 1500 seconds).}
+
 \item{linetype}{Line type used for the model curve (default = \code{"solid"}). Accepts any valid ggplot2 line type.}
 
 \item{line_color}{Color of the model prediction line (default = \code{"#457B9D"}).}

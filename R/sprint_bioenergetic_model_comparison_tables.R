@@ -7,12 +7,8 @@
 #'
 #' @param sprint_power_data A tibble with at least the following columns: time (s), power (W/kg), power_mod (W/kg), corresponding respectively to the power estimated by di Prampero et al.'s (2005, 2018) equivalent slope approach, and the power estimated using Briand et al.'s (2025) sprint bioenergetic model.
 #' @param event A character corresponding to the name of the events from which the sprint power data was derived.
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
-#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
-#' @param maximal_aerobic_power A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.
-#' @param dt A double representing the time step at which power is provided (in seconds). Default is 0.01 seconds.
+#' @inheritParams sprint_bioenergetic_model_data
+#' @inheritParams sprint_motion_model_data
 #'
 #' @returns A tibble with the following columns: event, adjusted_Rsquared, energy_total, energy_percent_diff, estimated_max_power, percentage_difference_max_power, distance_modeled_recovered, distance_percent_diff.
 #' @export
@@ -43,7 +39,14 @@
 #'
 #' sprint_bioenergetic_model_gof_metrics(bolt_modeled_data, event = "Men's 100 m")
 #'
-sprint_bioenergetic_model_gof_metrics <- function(sprint_power_data, event, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, dt = 0.01) {
+sprint_bioenergetic_model_gof_metrics <- function(sprint_power_data,
+                                                  event,
+                                                  mu = -0.4,
+                                                  sigma = 1,
+                                                  k1 = 2.75,
+                                                  k2 = 35,
+                                                  maximal_aerobic_power = 24.5,
+                                                  dt = 0.01) {
   # compute metrics from the sprint power data
 
   # adjusted_Rsquared
@@ -117,11 +120,10 @@ sprint_bioenergetic_model_gof_metrics <- function(sprint_power_data, event, mu =
 #' provided in Graubner and Nixdorf's (2011) dataset. The table includes metrics such as adjusted R-squared, total energy contribution, percentage difference in energy contribution, estimated maximum metabolic power, percentage difference in maximum metabolic power, modeled recovered distance, and percentage difference in recovered distance. The metrics are computed for each event in the provided data set.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
-#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
-#' @param dt A double representing the time step at which power is provided (in seconds). Default is 0.01 seconds.
+#' @inheritParams sprint_bioenergetic_model_data
+#' @inheritParams sprint_motion_model_data
+#' @inheritParams cost_running
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tinytable object with the following columns: event, adjusted_Rsquared, energy_total, energy_percent_diff, estimated_max_power, percentage_difference_max_power, distance_modeled_recovered, distance_percent_diff.
 #' @export
@@ -130,7 +132,14 @@ sprint_bioenergetic_model_gof_metrics <- function(sprint_power_data, event, mu =
 #'
 #' sprint_briand_article_gof_table()
 #'
-sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01) {
+sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints,
+                                            mu = -0.4,
+                                            sigma = 1,
+                                            k1 = 2.75,
+                                            k2 = 35,
+                                            dt = 0.01,
+                                            cost_running_flat = 3.8,
+                                            slope_equation = "original") {
   # events
   events <- unique(data$event)
 
@@ -159,7 +168,9 @@ sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints, mu 
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
       maximal_velocity = event_data$maximal_velocity[1],
-      dt = dt
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
@@ -292,11 +303,7 @@ sprint_energy_contributions <- function(sprint_power_data, event_name) {
 #' The table computes the energy contribution in the men's and women's 100, 200 and 400 m and corresponds to Table 3 from Briand et al. (2025).
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
-#' @param mu A double. Parameter setting the peak of the log-normal distribution.Default is -0.4
-#' @param sigma A double. Parameter setting the decay of the log-normal distribution. Default is 1
-#' @param k1 A double. Time constant of the first rising exponential (s). Default is 2.75
-#' @param k2 A double. Time constant of the second decaying exponential (s). Default is 35
-#' @param dt A double representing the time step at which power is provided (in seconds). Default is 0.01 seconds.
+#' @inheritParams sprint_briand_article_gof_table
 #'
 #' @returns A tinytable object with the following columns: event, alactic_energy, lactic_energy, aerobic_energy, total_energy, alactic_percentage, lactic_percentage, aerobic_percentage.
 #' @export
@@ -305,7 +312,14 @@ sprint_energy_contributions <- function(sprint_power_data, event_name) {
 #'
 #' sprint_energy_cont_briand_article_table()
 #'
-sprint_energy_cont_briand_article_table <- function(data = graubner_nixdorf_sprints, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, dt = 0.01) {
+sprint_energy_cont_briand_article_table <- function(data = graubner_nixdorf_sprints,
+                                                    mu = -0.4,
+                                                    sigma = 1,
+                                                    k1 = 2.75,
+                                                    k2 = 35,
+                                                    dt = 0.01,
+                                                    cost_running_flat = 3.8,
+                                                    slope_equation = "original") {
   # events
   events <- unique(data$event)
 
@@ -334,7 +348,9 @@ sprint_energy_cont_briand_article_table <- function(data = graubner_nixdorf_spri
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
       maximal_velocity = event_data$maximal_velocity[1],
-      dt = dt
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event

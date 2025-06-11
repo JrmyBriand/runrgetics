@@ -22,6 +22,10 @@ plot_sprint_lactic_duration_briand_article(
 \arguments{
 \item{data}{A data frame containing sprint lactic energy estimations (default: \code{graubner_nixdorf_sprints}).}
 
+\item{t1}{A numeric value representing the time constant for the first exponential decay (default is 20 seconds).}
+
+\item{t2}{A numeric value representing the time constant for the second exponential decay (default is 1500 seconds).}
+
 \item{line_color}{Color for model line (default: "#457B9D").}
 
 \item{point_color}{Color for data points (default: "darkblue").}

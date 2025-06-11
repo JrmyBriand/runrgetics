@@ -6,12 +6,7 @@ utils::globalVariables(c("time", "velocity", "acceleration", "power", "color", "
 #' Plot of modeled sprint distance as a function of time with points
 #' representing time splits measured at the corresponding distances.
 #'
-#' @param mean_velocity_splits A vector with mean velocity splits over each distance interval (m/s)
-#' @param time_splits A vector with time splits over each distance interval (s)
-#' @param distance A vector with the distances at which time splits were measured (m)
-#' @param reaction_time A double with the reaction time measured on the starting blocks (s)
-#' @param maximal_velocity A double representing the maximal velocity (in m/s)
-#' @param dt Time step of the model. Default is set at 0.01 s
+#' @inheritParams sprint_motion_model_data
 #' @param color A string with the color of the plot's line and points. Default is set at "darkgreen"
 #'
 #' @returns A ggplot object
@@ -28,7 +23,14 @@ utils::globalVariables(c("time", "velocity", "acceleration", "power", "color", "
 #'   maximal_velocity = 12.34
 #' )
 #'
-plot_sprint_distance <- function(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = NA, dt = 0.01, color = "darkgreen") {
+plot_sprint_distance <- function(mean_velocity_splits,
+                                 time_splits, distance,
+                                 reaction_time,
+                                 maximal_velocity = NA,
+                                 dt = 0.01,
+                                 color = "darkgreen",
+                                 cost_running_flat = 3.6,
+                                 slope_equation = "original") {
   # get sprint motion metrics
 
   sprint_data <- sprint_motion_model_data(
@@ -36,7 +38,9 @@ plot_sprint_distance <- function(mean_velocity_splits, time_splits, distance, re
     time_splits = time_splits,
     distance = distance,
     reaction_time = reaction_time,
-    maximal_velocity = maximal_velocity
+    maximal_velocity = maximal_velocity,
+    cost_running_flat = cost_running_flat,
+    slope_equation = slope_equation
   )
 
   # the sprint data considers data without the reaction time
@@ -77,12 +81,7 @@ plot_sprint_distance <- function(mean_velocity_splits, time_splits, distance, re
 #' Plot of modeled sprint velocity as a function of time with points
 #' representing time splits measured at the corresponding distances.
 #'
-#' @param mean_velocity_splits A vector with mean velocity splits over each distance interval (m/s)
-#' @param time_splits A vector with time splits over each distance interval (s)
-#' @param distance A vector with the distances at which time splits were measured (m)
-#' @param reaction_time A double with the reaction time measured on the starting blocks (s)
-#' @param maximal_velocity A double representing the maximal velocity (in m/s)
-#' @param dt Time step of the model. Default is set at 0.01 s
+#' @inheritParams sprint_motion_model_data
 #' @param color A string with the color of the plot's line and points. Default is set at "darkred"
 #'
 #'
@@ -100,7 +99,15 @@ plot_sprint_distance <- function(mean_velocity_splits, time_splits, distance, re
 #'   maximal_velocity = 12.34
 #' )
 #'
-plot_sprint_velocity <- function(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = NA, dt = 0.01, color = "darkred") {
+plot_sprint_velocity <- function(mean_velocity_splits,
+                                 time_splits,
+                                 distance,
+                                 reaction_time,
+                                 maximal_velocity = NA,
+                                 dt = 0.01,
+                                 color = "darkred",
+                                 cost_running_flat = 3.6,
+                                 slope_equation = "original") {
   # get sprint motion metrics
 
   sprint_data <- sprint_motion_model_data(
@@ -108,7 +115,9 @@ plot_sprint_velocity <- function(mean_velocity_splits, time_splits, distance, re
     time_splits = time_splits,
     distance = distance,
     reaction_time = reaction_time,
-    maximal_velocity = maximal_velocity
+    maximal_velocity = maximal_velocity,
+    cost_running_flat = cost_running_flat,
+    slope_equation = slope_equation
   )
 
   # the sprint data considers data without the reaction time (the points start at 0, 0, no reaction time)
@@ -150,12 +159,7 @@ plot_sprint_velocity <- function(mean_velocity_splits, time_splits, distance, re
 #'
 #' Plot of modeled sprint acceleration as a function of time.
 #'
-#' @param mean_velocity_splits A vector with mean velocity splits over each distance interval (m/s)
-#' @param time_splits A vector with time splits over each distance interval (s)
-#' @param distance A vector with the distances at which time splits were measured (m)
-#' @param reaction_time A double with the reaction time measured on the starting blocks (s)
-#' @param maximal_velocity A double representing the maximal velocity (in m/s)
-#' @param dt Time step of the model. Default is set at 0.01 s
+#' @inheritParams sprint_motion_model_data
 #' @param color A string with the color of the plot's line and points. Default is set at "blue"
 #'
 #'
@@ -172,7 +176,15 @@ plot_sprint_velocity <- function(mean_velocity_splits, time_splits, distance, re
 #'   maximal_velocity = 12.34
 #' )
 #'
-plot_sprint_acceleration <- function(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = NA, dt = 0.01, color = "blue") {
+plot_sprint_acceleration <- function(mean_velocity_splits,
+                                     time_splits,
+                                     distance,
+                                     reaction_time,
+                                     maximal_velocity = NA,
+                                     dt = 0.01,
+                                     color = "blue",
+                                     cost_running_flat = 3.6,
+                                     slope_equation = "original") {
   # get sprint motion metrics
 
   sprint_data <- sprint_motion_model_data(
@@ -180,7 +192,9 @@ plot_sprint_acceleration <- function(mean_velocity_splits, time_splits, distance
     time_splits = time_splits,
     distance = distance,
     reaction_time = reaction_time,
-    maximal_velocity = maximal_velocity
+    maximal_velocity = maximal_velocity,
+    cost_running_flat = cost_running_flat,
+    slope_equation = slope_equation
   )
 
 
@@ -209,12 +223,7 @@ plot_sprint_acceleration <- function(mean_velocity_splits, time_splits, distance
 #' Plot of modeled sprint metabolic as a function of time. The power computation is based on the method
 #' proposed by di Prampero et al. (2005, 2018) and as described in Briand et al. (2025).
 #'
-#' @param mean_velocity_splits A vector with mean velocity splits over each distance interval (m/s)
-#' @param time_splits A vector with time splits over each distance interval (s)
-#' @param distance A vector with the distances at which time splits were measured (m)
-#' @param reaction_time A double with the reaction time measured on the starting blocks (s)
-#' @param maximal_velocity A double representing the maximal velocity (in m/s)
-#' @param dt Time step of the model. Default is set at 0.01 s
+#' @inheritParams sprint_motion_model_data
 #' @param color A string with the color of the plot's line and points. Default is set at "purple"
 #'
 #'
@@ -231,7 +240,15 @@ plot_sprint_acceleration <- function(mean_velocity_splits, time_splits, distance
 #'   maximal_velocity = 12.34
 #' )
 #'
-plot_sprint_metabolic_power <- function(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = NA, dt = 0.01, color = "purple") {
+plot_sprint_metabolic_power <- function(mean_velocity_splits,
+                                        time_splits,
+                                        distance,
+                                        reaction_time,
+                                        maximal_velocity = NA,
+                                        dt = 0.01,
+                                        color = "purple",
+                                        cost_running_flat = 3.6,
+                                        slope_equation = "original") {
   # get sprint motion metrics
 
   sprint_data <- sprint_motion_model_data(
@@ -239,7 +256,9 @@ plot_sprint_metabolic_power <- function(mean_velocity_splits, time_splits, dista
     time_splits = time_splits,
     distance = distance,
     reaction_time = reaction_time,
-    maximal_velocity = maximal_velocity
+    maximal_velocity = maximal_velocity,
+    cost_running_flat = cost_running_flat,
+    slope_equation = slope_equation
   )
 
 
@@ -266,12 +285,11 @@ plot_sprint_metabolic_power <- function(mean_velocity_splits, time_splits, dista
 #'
 #' Plot of modeled sprint distance, velocity, acceleration and power as a function of time.
 #'
-#' @param mean_velocity_splits A vector with mean velocity splits over each distance interval (m/s)
-#' @param time_splits A vector with time splits over each distance interval (s)
-#' @param distance A vector with the distances at which time splits were measured (m)
-#' @param reaction_time A double with the reaction time measured on the starting blocks (s)
-#' @param maximal_velocity A double representing the maximal velocity (in m/s)
-#' @param dt Time step of the model. Default is set at 0.01 s
+#' @inheritParams sprint_motion_model_data
+#' @param color_distance A string with the color of the distance plot's line and points. Default is set at "darkgreen"
+#' @param color_velocity A string with the color of the velocity plot's line and points. Default is set at "darkred"
+#' @param color_acceleration A string with the color of the acceleration plot's line and points. Default is set at "blue"
+#' @param color_power A string with the color of the power plot's line and points. Default is set at "purple"
 #'
 #' @returns A ggplot object
 #'
@@ -288,11 +306,60 @@ plot_sprint_metabolic_power <- function(mean_velocity_splits, time_splits, dista
 #'   maximal_velocity = 12.34
 #' )
 #'
-plot_sprint_motion_analysis <- function(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = NA, dt = 0.01) {
-  dist_plot <- plot_sprint_distance(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = maximal_velocity)
-  velocity_plot <- plot_sprint_velocity(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = maximal_velocity)
-  acceleration_plot <- plot_sprint_acceleration(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = maximal_velocity)
-  power_plot <- plot_sprint_metabolic_power(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = maximal_velocity)
+plot_sprint_motion_analysis <- function(mean_velocity_splits,
+                                        time_splits,
+                                        distance,
+                                        reaction_time,
+                                        maximal_velocity = NA,
+                                        dt = 0.01,
+                                        cost_running_flat = 3.6,
+                                        slope_equation = "original",
+                                        color_distance = "darkgreen",
+                                        color_velocity = "darkred",
+                                        color_acceleration =  "blue" ,
+                                        color_power = "purple") {
+
+  dist_plot <- plot_sprint_distance(mean_velocity_splits,
+                                    time_splits,
+                                    distance,
+                                    reaction_time,
+                                    maximal_velocity = maximal_velocity,
+                                    dt = dt,
+                                    color = color_distance,
+                                    cost_running_flat = cost_running_flat,
+                                    slope_equation = slope_equation)
+
+
+  velocity_plot <- plot_sprint_velocity(mean_velocity_splits,
+                                        time_splits,
+                                        distance,
+                                        reaction_time,
+                                        maximal_velocity = maximal_velocity,
+                                        dt = dt,
+                                        color = color_velocity,
+                                        cost_running_flat = cost_running_flat,
+                                        slope_equation = slope_equation)
+
+  acceleration_plot <- plot_sprint_acceleration(mean_velocity_splits,
+                                                time_splits,
+                                                distance,
+                                                reaction_time,
+                                                maximal_velocity = maximal_velocity,
+                                                dt = dt,
+                                                color = color_acceleration,
+                                                cost_running_flat = cost_running_flat,
+                                                slope_equation = slope_equation)
+
+  power_plot <- plot_sprint_metabolic_power(mean_velocity_splits,
+                                            time_splits,
+                                            distance,
+                                            reaction_time,
+                                            maximal_velocity = maximal_velocity,
+                                            dt = dt,
+                                            color = color_power,
+                                            cost_running_flat = cost_running_flat,
+                                            slope_equation = slope_equation)
+
 
   combined_plot <- (dist_plot + velocity_plot) / (acceleration_plot + power_plot)
 
@@ -416,8 +483,8 @@ sex_comparison_plot_velocity <- function(sprint_data_male, sprint_data_female, o
 #' for both male and females as presented in Briand et al. (2025), using
 #' sprint data from Graubner and Nixdorf (2011).
 #'
-#' @param sprint_data_male A data frame with sprint motion model data extracted from males data
-#' @param sprint_data_female A data frame with sprint motion model data extracted from females data
+#' @param sprint_data_male A data frame with `sprint_motion_model_data` extracted from males data
+#' @param sprint_data_female A data frame with `sprint_motion_model_data` extracted from females data
 #' @param color A string with the color of the plot's line and points. Default is set at "darkgreen"
 #' @returns A ggplot object
 #'

@@ -10,7 +10,13 @@ plot_sprint_motion_analysis(
   distance,
   reaction_time,
   maximal_velocity = NA,
-  dt = 0.01
+  dt = 0.01,
+  cost_running_flat = 3.6,
+  slope_equation = "original",
+  color_distance = "darkgreen",
+  color_velocity = "darkred",
+  color_acceleration = "blue",
+  color_power = "purple"
 )
 }
 \arguments{
@@ -25,6 +31,18 @@ plot_sprint_motion_analysis(
 \item{maximal_velocity}{A double representing the maximal velocity (in m/s)}
 
 \item{dt}{Time step of the model. Default is set at 0.01 s}
+
+\item{cost_running_flat}{a numeric value representing the cost of running on a flat surface (default is 3.6 J/kg/m, as suggested in Minetti et al. 2002)}
+
+\item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
+
+\item{color_distance}{A string with the color of the distance plot's line and points. Default is set at "darkgreen"}
+
+\item{color_velocity}{A string with the color of the velocity plot's line and points. Default is set at "darkred"}
+
+\item{color_acceleration}{A string with the color of the acceleration plot's line and points. Default is set at "blue"}
+
+\item{color_power}{A string with the color of the power plot's line and points. Default is set at "purple"}
 }
 \value{
 A ggplot object

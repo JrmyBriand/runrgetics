@@ -30,7 +30,7 @@ sprint_bioenergetic_model_gof_metrics(
 
 \item{maximal_aerobic_power}{A double corresponding to the estimated maximal aerobic power of the sprinter (W/kg). Default is 24.5.}
 
-\item{dt}{A double representing the time step at which power is provided (in seconds). Default is 0.01 seconds.}
+\item{dt}{Time step of the model. Default is set at 0.01 s}
 }
 \value{
 A tibble with the following columns: event, adjusted_Rsquared, energy_total, energy_percent_diff, estimated_max_power, percentage_difference_max_power, distance_modeled_recovered, distance_percent_diff.

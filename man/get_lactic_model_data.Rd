@@ -17,6 +17,10 @@ get_lactic_model_data(
 
 \item{sex_label}{A string label (e.g., "male", "Female") used for grouping the output.}
 
+\item{t1}{A numeric value representing the time constant for the first exponential decay (default is 20 seconds).}
+
+\item{t2}{A numeric value representing the time constant for the second exponential decay (default is 1500 seconds).}
+
 \item{max_duration}{Maximum duration for which to compute the model (default = 100 s).}
 }
 \value{
