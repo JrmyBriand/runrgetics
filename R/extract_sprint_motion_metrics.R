@@ -182,5 +182,4 @@ sprint_maximum_metabolic_power <- function(sprint_motion_data, type = "power") {
   } else if (type == "power bioenergetic model") {
     return(max(sprint_motion_data$power_mod))
   }
-  max(sprint_motion_data$power)
 }

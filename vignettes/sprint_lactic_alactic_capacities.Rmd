@@ -47,7 +47,8 @@ bolt_100m_motion_data <- sprint_motion_model_data(
   time_splits = bolt_100m$splits,
   distance = bolt_100m$distance,
   reaction_time = bolt_100m$reaction_time[1],
-  maximal_velocity = bolt_100m$maximal_velocity[1]
+  maximal_velocity = bolt_100m$maximal_velocity[1], 
+  cost_running_flat = 3.8
 )
 
 # Compute sprint power data using Briand et al.'s (2025) sprint bioenergetic model
@@ -159,6 +160,13 @@ The function `plot_sprint_lactic_duration_model` can be used to plot the lactic 
 plot_sprint_lactic_duration(men_lactic_energy)
                             
 ```
+
+As before, the plot providing both male and female fit can be generated. 
+
+```{r}
+plot_sprint_lactic_duration_briand_article()
+```
+
 
 
 ### Accumulated Lactate and Kindemann (1977) data

@@ -22,6 +22,8 @@ The goal of this vignette is to explore simple functions that explore sprint met
 
 A visual representation of the sprint motion data reveals metabolic peak powers attained within the first second of the sprint. These peaks are presumed to result from anaerobic alactic energy sources. The following chunk shows the metabolic power contribution as a function of time for the men's 100 m sprint event. 
 
+As mentioned in the `sprint_motion_analysis` vignette, to recover similar values as the ones presented in Briand et al. (2025) article, the cost of running on flat ground has to be set to 3.8 J/kg/m. The choice of the value was made to be consistent with the different values of energy cost of running on flat ground in the litterature. The default value of 3.6 J/kg/m can also be used. This value was proposed by Minetti et al. (2002) and Minetti and Pavei (2018).
+
 ```{r}
 men_100 <- graubner_nixdorf_sprints |>
   dplyr::filter(event == "Men's 100 m")
@@ -31,7 +33,8 @@ plot_sprint_metabolic_power(
   time_splits = men_100$splits,
   distance = men_100$distance,
   reaction_time = men_100$reaction_time[1],
-  maximal_velocity = men_100$maximal_velocity[1]
+  maximal_velocity = men_100$maximal_velocity[1],
+  cost_running_flat = 3.8
 )
 ```
 
@@ -44,7 +47,8 @@ sprint_data_100 <- sprint_motion_model_data(
   time_splits = men_100$splits,
   distance = men_100$distance,
   reaction_time = men_100$reaction_time[1],
-  maximal_velocity = men_100$maximal_velocity[1]
+  maximal_velocity = men_100$maximal_velocity[1],
+  cost_running_flat = 3.8
 )
 
 # calculate maximal power

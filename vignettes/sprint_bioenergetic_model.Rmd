@@ -91,7 +91,8 @@ bolt_100m_motion_data <- sprint_motion_model_data(
   time_splits = bolt_100m$splits,
   distance = bolt_100m$distance,
   reaction_time = bolt_100m$reaction_time[1],
-  maximal_velocity = bolt_100m$maximal_velocity[1]
+  maximal_velocity = bolt_100m$maximal_velocity[1], 
+  cost_running_flat = 3.8
 )
 
 # extract maximal alactic and maximal lactic powers
@@ -102,6 +103,84 @@ maximal_alactic_power
 maximal_lactic_power <- sprint_bioenergetic_model_max_la(bolt_100m_motion_data)
 maximal_lactic_power
 ```
+
+### Cost of running
+
+As mentioned in the `sprint_motion_analysis` vignette, to recover similar values as the ones presented in Briand et al. (2025) article, the cost of running on flat ground has to be set to 3.8 J/kg/m. The choice of the value was made to be consistent with the different values of energy cost of running on flat ground in the litterature. The default value of 3.6 J/kg/m can also be used. This value was proposed by Minetti et al. (2002) and Minetti and Pavei (2018).
+
+We can compare the energy expended using a cost of running on falt terrain of 3.8 J/kg/m and 3.6 J/kg/m.
+
+```{r}
+
+# compute with cost of running on flat terrain of 3.6 J/kg/m
+
+bolt_motion_data_3_6 <- sprint_motion_model_data(
+  mean_velocity_splits = bolt_100m$velocity,
+  time_splits = bolt_100m$splits,
+  distance = bolt_100m$distance,
+  reaction_time = bolt_100m$reaction_time[1],
+  maximal_velocity = bolt_100m$maximal_velocity[1],
+  cost_running_flat = 3.6, 
+  dt = 0.01
+)
+
+# compute max power and total energy exepnded
+
+max_3_8 <- sprint_maximum_metabolic_power(bolt_100m_motion_data)
+max_3_6 <- sprint_maximum_metabolic_power(bolt_motion_data_3_6)
+
+max_3_8 - max_3_6
+
+
+
+# total energy expended
+
+total_energy_3_8 <- energy_total(bolt_100m_motion_data, type = "power")
+total_energy_3_6 <- energy_total(bolt_motion_data_3_6, type = "power")
+
+total_energy_3_8 - total_energy_3_6
+
+
+```
+
+With Bolt data, we obtained the same maximum, because for high Equivalent Slope, the correction proposed by di Prampero and Osgnach (2018) leads to the same result. The energy difference is around 20 J/kg, which corresponds to approximately a 2.5 % difference over the total energy expenditure. 
+
+For high acceleration, the method proposed by Minette and Pavei (2018) can be used since they used data from Giovanelli et al. (2016), that measured the energy cost of running on greater slopes than the ones sutided by Minetti et al. (2002)
+
+```{r}
+
+# compute cost of running using Minetti and Pavei extended equation
+
+bolt_motion_data_extended <- sprint_motion_model_data(
+  mean_velocity_splits = bolt_100m$velocity,
+  time_splits = bolt_100m$splits,
+  distance = bolt_100m$distance,
+  reaction_time = bolt_100m$reaction_time[1],
+  maximal_velocity = bolt_100m$maximal_velocity[1],
+  slope_equation = "extended"
+)
+
+max_ext <- sprint_maximum_metabolic_power(bolt_motion_data_extended)
+max_3_6 <- sprint_maximum_metabolic_power(bolt_motion_data_3_6)
+
+max_ext - max_3_6
+
+
+
+# total energy expended
+
+total_energy_ext <- energy_total(bolt_motion_data_extended, type = "power")
+total_energy_3_6 <- energy_total(bolt_motion_data_3_6, type = "power")
+
+total_energy_ext - total_energy_3_6
+
+```
+
+There is a small difference of 4.73 J/kg in energy expended, which represents a 0.6 % difference over the total energy expenditure. The maximum metabolic power is also slightly higher with the original equation, this suggests that the maximal power could have been slighlty overestimated with the original method extrpolating energy cost for greater slopes. 
+
+Briand et al. (2025) compared the results obtained from both approaches and discuss their implications. While the differences don't affect the bioenergetic model application and its utility, it is important to be aware of the differences in the energy expenditure estimates when using different cost of running equations. It is also worth understanding the limits of the original approach.
+
+## Extracting Sprint Maximal Alactic and Maximal Lactic from Women's Sprint Motion Data
 
 As presented in Briand et al. (2025), for elite sprinters available in the Graubner and Nixdrof (2011) dataset, the maximal aerobic power can be estimated to be 24.5 W/kg for male sprinters and 21 W/kg for female sprinter. The default parameter was set at 24.5 W/kg for the maximal aerobic power. When dealing with female athletes' performances, the maximal aerobic power can be adjusted accordingly. 
 
@@ -121,7 +200,8 @@ FP_100m_motion_data <- sprint_motion_model_data(
   time_splits = FP_100m$splits,
   distance = FP_100m$distance,
   reaction_time = FP_100m$reaction_time[1],
-  maximal_velocity = FP_100m$maximal_velocity[1]
+  maximal_velocity = FP_100m$maximal_velocity[1], 
+  cost_running_flat = 3.8
 )
 
 # extract maximal alactic and maximal lactic powers
@@ -350,14 +430,15 @@ bolt_motion_small_dt <- sprint_motion_model_data(
   distance = bolt_100m$distance,
   reaction_time = bolt_100m$reaction_time[1],
   maximal_velocity = bolt_100m$maximal_velocity[1],
-  dt = 0.001
+  dt = 0.001, 
+  cost_running_flat = 3.8
 )
 
 # Estimate distance through numerical integration of velocity
 
 distance_actual <- pracma::trapz(bolt_motion_small_dt$time, bolt_motion_small_dt$velocity)
 
-distance_recovered <- sprint_recover_distance(bolt_motion_small_dt$power, dt = 0.001)
+distance_recovered <- sprint_recover_distance(bolt_motion_small_dt$power, dt = 0.001, cost_running_flat = 3.8)
 
 distance_percentage_diff <- (distance_recovered - distance_actual) / distance_actual * 100
 round(distance_percentage_diff, 2)
@@ -370,21 +451,21 @@ Using such small time steps can be computationally heavy and therefore, for the 
 
 distance_actual <- pracma::trapz(bolt_100m_motion_data$time, bolt_100m_motion_data$velocity)
 
-distance_recovered <- sprint_recover_distance(bolt_modeled_data$power, dt = 0.01)
+distance_recovered <- sprint_recover_distance(bolt_modeled_data$power, dt = 0.01, cost_running_flat = 3.8)
 
 distance_percentage_diff <- (distance_recovered - distance_actual) / distance_actual * 100
 round(distance_percentage_diff, 2)
 
 # Compute the difference between modelled distance (recovered from power)
 
-distance_recovered_bioenergetic_model <- sprint_recover_distance(bolt_modeled_data$power_mod, dt = 0.01)
+distance_recovered_bioenergetic_model <- sprint_recover_distance(bolt_modeled_data$power_mod, dt = 0.01, cost_running_flat = 3.8)
 
 modelled_distance_percentage_diff <- (distance_recovered_bioenergetic_model - distance_recovered) / distance_recovered * 100
 round(modelled_distance_percentage_diff, 2)
 
 # A function was written to compute the percentage error between the modelled distance and the recovered distance from the power time series.
 
-round(sprint_modeled_distance_percentage_error(bolt_modeled_data, dt = 0.01), 2)
+round(sprint_modeled_distance_percentage_error(bolt_modeled_data, dt = 0.01, cost_running_flat = 3.8), 2)
 ```
 
 ### Generating Comparison Tables
@@ -418,3 +499,103 @@ The following function returns a table similar to Table 3 in Briand et al. (2025
 sprint_energy_cont_briand_article_table()
 ```
 Briand et al.'s (2025) article discuss the energy contribution of the metabolic pathways and puts the results in perspective with the literature. 
+
+
+## Further cost of running comparison on longer sprint distances
+
+The initial comparison was made on Bolt's 100 m, where the acceleration is strong. We can further test on Merrit's 400 m 
+
+```{r}
+# Extract Bolt's 100 m data from Graubner and Nixdorf data set.
+men_400 <- graubner_nixdorf_sprints |>
+  dplyr::filter(
+    athlete == "Merritt",
+    event == "Men's 400 m"
+  )
+
+# Compute sprint motion data
+
+men_400_motion_data <- sprint_motion_model_data(
+  mean_velocity_splits = men_400$velocity,
+  time_splits = men_400$splits,
+  distance = men_400$distance,
+  reaction_time = men_400$reaction_time[1],
+  maximal_velocity = men_400$maximal_velocity[1], 
+  cost_running_flat = 3.8
+)
+
+
+# compute with cost of running on flat terrain of 3.6 J/kg/m
+
+men_400_3_6 <- sprint_motion_model_data(
+  mean_velocity_splits = men_400$velocity,
+  time_splits = men_400$splits,
+  distance = men_400$distance,
+  reaction_time = men_400$reaction_time[1],
+  maximal_velocity = men_400$maximal_velocity[1],
+  cost_running_flat = 3.6, 
+  dt = 0.01
+)
+
+# compute max power and total energy exepnded
+
+max_3_8 <- sprint_maximum_metabolic_power(men_400_motion_data)
+max_3_6 <- sprint_maximum_metabolic_power(men_400_3_6)
+
+max_3_8 - max_3_6
+
+
+
+# total energy expended
+
+total_energy_3_8 <- energy_total(men_400_motion_data, type = "power")
+total_energy_3_6 <- energy_total(men_400_3_6, type = "power")
+
+total_energy_3_8 - total_energy_3_6
+
+```
+
+We observe a very small difference in maximal power. A difference is observed in total energy expenditure, which is due to the difference in the cost of running on flat terrain. The difference in cost shifts the power curve slightly, over longer duration, this leads to a difference in energy expenditure.
+
+```{r}
+men_400_motion_data$power[length(men_400_motion_data$power)] - men_400_3_6$power[length(men_400_3_6$power)] 
+```
+
+At the end of the 400 m , the difference in power output is less than 2 W/kg. As the power is only shifted, the bioenergetic model will apply with different energy cost values on flat terrain, just as it applies with women performances, who display smaller power output, while maintaining the overall shape of the power distribution. 
+
+As a final exercise, we can plot the sprint bioenergetic model for Merrit's 400 m sprint, using the cost of running on flat terrain of 3.8 J/kg/m and 3.6 J/kg/m.
+
+```{r}
+plot_sprint_metabolic_power(mean_velocity_splits = men_400$velocity,
+  time_splits = men_400$splits,
+  distance = men_400$distance,
+  reaction_time = men_400$reaction_time[1],
+  maximal_velocity = men_400$maximal_velocity[1], 
+  cost_running_flat = 3.8) + geom_line(data = men_400_3_6, aes(x = time, y = power), color = "darkred")
+  
+```
+
+## Application of the bioenergtic model on modified energy cost equations
+
+Finally, we can apply the bioenergtic model to this data (with energy cost of running of 3.6)
+
+```{r}
+
+plot_sprint_bioenergetic_model(
+  sprint_motion_data = men_400_3_6
+)
+
+```
+
+It fits the data reasonable good even with different cost of running on flat terrain. 
+
+We can also test the application of sprint motion data obtained from Minetti and Pavei (2018) extended slope equation
+
+```{r}
+plot_sprint_bioenergetic_model(
+  sprint_motion_data = bolt_motion_data_extended
+)
+
+```
+
+Again, bioenergtic model appears to be reasonable good. Therefore, the choice of the energy cost of running on flat terrain has little impact on the model value and application. 

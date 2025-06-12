@@ -52,6 +52,10 @@ From the data by Grabner and Nixdrof (2011) present time-splits recorded over di
 From the energy cost of running the metabolic power can be computed as the product of the energy cost and running velocity. 
 To apply this method, we need to estimate the instantaneous velocity and acceleration of the runner using the avalailable information from Graubner and Nixdorf (2011). A simple model to obtain the instanatenous vlocity and acceleration during a sprint has been described by di Prampero et al. (2018) and Briand et al. (2025). The function `sprint_motion_model_data` can be used to extract intantaneous distance, velocity, acceleration and metabolic power from `graubner_nixdorf_sprints` data. the following code chunk shows how to extract the data for Bolt's 100m event.
 
+The `sprint_motion_model_data` function allows to adjust the parameter corresponding to the running energy cost on flat terrain. In the original equation proposed by Minetti et al. (2002), the cost of running on flat terrain shows an interindivual variability and different values have been reported over the years. di Prampero et al. (1986) reported slightly higher values of 3.8 J/kg/m and up to 3.86 J/kg/m. It was also suggested that for running at higher intensity, the energy cost was slightly increasd, up to around 3.8 J/kg/m. To remain consistent with these values, the default value for the cost of running of flat ground in Briand et al. (2025)'s article was set at 3.8 J/kg/m. To recover values similar to those presented in Briand et al.'s (2025) paper, 3.8 J/kg/m have to be set. However, using the default value of 3.6 J/kg/m will yield similar result results and will not affect the analysis of the general conceptualisation of the model. Along these lines, a small demonstration will be made in the `sprint_bioenergetic_model` vignette. 
+
+Also, the method to compute the "Equivalent-Slope" of the acceleration can be adjusted. The `original` method is based on the energy cost of constant running velocity on different slopes proposed by Minetti et al. (2002). The `extended` method is based on the energy cost of running on extended slopes proposed by Minetti and Pavei (2018). The default value is set to `original` in the function.
+
 
 ```{r}
 bolt_100m_motion_data <- sprint_motion_model_data(
@@ -59,7 +63,9 @@ bolt_100m_motion_data <- sprint_motion_model_data(
   time_splits = bolt_100m$splits,
   distance = bolt_100m$distance,
   reaction_time = bolt_100m$reaction_time[1],
-  maximal_velocity = bolt_100m$maximal_velocity[1]
+  maximal_velocity = bolt_100m$maximal_velocity[1],
+  cost_running_flat = 3.8, 
+  slope_equation = "original"
 )
 
 head(bolt_100m_motion_data)
@@ -75,7 +81,8 @@ plot_sprint_motion_analysis(
   time_splits = bolt_100m$splits,
   distance = bolt_100m$distance,
   reaction_time = bolt_100m$reaction_time[1],
-  maximal_velocity = bolt_100m$maximal_velocity[1]
+  maximal_velocity = bolt_100m$maximal_velocity[1],
+  cost_running_flat = 3.8
 )
 ```
 
@@ -96,7 +103,8 @@ merritt_400m_motion_data <- sprint_motion_model_data(
   mean_velocity_splits = merritt_400m$velocity,
   time_splits = merritt_400m$splits,
   distance = merritt_400m$distance,
-  reaction_time = merritt_400m$reaction_time[1]
+  reaction_time = merritt_400m$reaction_time[1],
+  cost_running_flat = 3.8
 )
 
 # Visualize sprint motion analysis
@@ -105,7 +113,8 @@ plot_sprint_motion_analysis(
   mean_velocity_splits = merritt_400m$velocity,
   time_splits = merritt_400m$splits,
   distance = merritt_400m$distance,
-  reaction_time = merritt_400m$reaction_time[1]
+  reaction_time = merritt_400m$reaction_time[1],
+  cost_running_flat = 3.8
 )
 ```
 ## Instantaneous Velocity and Power Sex Comparison
@@ -129,7 +138,8 @@ sprint_data_men_100 <- sprint_motion_model_data(
   time_splits = men_100$splits,
   distance = men_100$distance,
   reaction_time = men_100$reaction_time[1],
-  maximal_velocity = men_100$maximal_velocity[1]
+  maximal_velocity = men_100$maximal_velocity[1],
+  cost_running_flat = 3.8
 )
 
 sprint_data_women_100 <- sprint_motion_model_data(
@@ -137,7 +147,8 @@ sprint_data_women_100 <- sprint_motion_model_data(
   time_splits = women_100$splits,
   distance = women_100$distance,
   reaction_time = women_100$reaction_time[1],
-  maximal_velocity = women_100$maximal_velocity[1]
+  maximal_velocity = women_100$maximal_velocity[1],
+  cost_running_flat = 3.8
 )
 
 
@@ -218,6 +229,7 @@ diagnose_sprint_model(
   distance = men_100$distance,
   reaction_time = men_100$reaction_time[1],
   maximal_velocity = men_100$maximal_velocity[1],
+  cost_running_flat = 3.8
 )
 ```
 
@@ -230,12 +242,9 @@ diagnose_sprint_model(
   distance = merritt_400m$distance,
   reaction_time = merritt_400m$reaction_time[1],
   maximal_velocity = merritt_400m$maximal_velocity[1],
+  cost_running_flat = 3.8
 )
 ```
-
-
-
-
 
 
 ## References
