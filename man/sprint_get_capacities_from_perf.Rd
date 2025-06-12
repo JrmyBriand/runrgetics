@@ -49,6 +49,8 @@ alactic and lactic capacities respectively (default = c(400, 2000))}
 
 \item{k2}{A double. Time constant of the second decaying exponential (s). Default is 35}
 
+\item{cost_running_flat}{a numeric value representing the cost of running on a flat surface (default is 3.6 J/kg/m, as suggested in Minetti et al. 2002)}
+
 \item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
 }
 \value{

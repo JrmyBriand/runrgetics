@@ -31,6 +31,8 @@ utils::globalVariables(c(
 #' and women's 100, 200 and 400 m.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tibble with the optimal parameters for the alactic model: event (character), pal_max (W/kg), mu and sigma.
 #' @export
@@ -39,7 +41,10 @@ utils::globalVariables(c(
 #'
 #' sprint_alactic_model_optimal_params()
 #'
-sprint_alactic_model_optimal_params <- function(data = graubner_nixdorf_sprints) {
+sprint_alactic_model_optimal_params <- function(data = graubner_nixdorf_sprints,
+                                                dt = 0.01,
+                                                cost_running_flat = 3.8,
+                                                slope_equation = "original") {
   # events
   events <- unique(data$event)
 
@@ -63,7 +68,10 @@ sprint_alactic_model_optimal_params <- function(data = graubner_nixdorf_sprints)
       time_splits = event_data$splits,
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
-      maximal_velocity = event_data$maximal_velocity[1]
+      maximal_velocity = event_data$maximal_velocity[1],
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
@@ -110,6 +118,8 @@ sprint_alactic_model_optimal_params <- function(data = graubner_nixdorf_sprints)
 #' and women's 100, 200 and 400 m.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
+#' @inheritParams sprint_motion_model_data
 #'
 #' @returns A tinytable containing the optimal parameters for the alactic model: event (character), pal_max (W/kg), mu and sigma.
 #' @export
@@ -118,12 +128,19 @@ sprint_alactic_model_optimal_params <- function(data = graubner_nixdorf_sprints)
 #'
 #' sprint_alactic_model_optimal_params_table()
 #'
-sprint_alactic_model_optimal_params_table <- function(data = graubner_nixdorf_sprints) {
-  # generates a tidyer output for the vignette or document
+sprint_alactic_model_optimal_params_table <- function(data = graubner_nixdorf_sprints,
+                                                      dt = 0.01,
+                                                      cost_running_flat = 3.8,
+                                                      slope_equation = "original") {
+
+   # generates a tidyer output for the vignette or document
 
   # run the function
 
-  table <- sprint_alactic_model_optimal_params(data)
+  table <- sprint_alactic_model_optimal_params(data,
+                                              dt = dt,
+                                              cost_running_flat = cost_running_flat,
+                                              slope_equation = slope_equation)
 
   # round the columns
 
@@ -200,6 +217,8 @@ fit_alactic_power_params <- function(sprint_approx_power_distribution, mu = -0.4
 #' The only fitted value is therefore the maximal alactic power. The set value correspond to a compromise of the observed fitted values over the different sprint events.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tibble with the parameters for the formalized/simplified alactic model: event (character), pal_max (W/kg), mu and sigma.
 #' @export
@@ -208,7 +227,10 @@ fit_alactic_power_params <- function(sprint_approx_power_distribution, mu = -0.4
 #'
 #' sprint_alactic_model_params()
 #'
-sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints) {
+sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints,
+                                        dt = 0.01,
+                                        cost_running_flat = 3.8,
+                                        slope_equation = "original") {
   # events
   events <- unique(data$event)
 
@@ -232,7 +254,10 @@ sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints) {
       time_splits = event_data$splits,
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
-      maximal_velocity = event_data$maximal_velocity[1]
+      maximal_velocity = event_data$maximal_velocity[1],
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
@@ -280,6 +305,8 @@ sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints) {
 #' The only fitted value is therefore the maximal alactic power. The set value correspond to a compromise of the observed fitted values over the different sprint events.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tinytable containing the optimal parameters for the alactic model: event (character), pal_max (W/kg), mu and sigma.
 #' @export
@@ -288,12 +315,19 @@ sprint_alactic_model_params <- function(data = graubner_nixdorf_sprints) {
 #'
 #' sprint_alactic_model_params_table()
 #'
-sprint_alactic_model_params_table <- function(data = graubner_nixdorf_sprints) {
+sprint_alactic_model_params_table <- function(data = graubner_nixdorf_sprints,
+                                               dt = 0.01,
+                                               cost_running_flat = 3.8,
+                                               slope_equation = "original") {
   # generates a tidyer output for the vignette or document
 
   # run the function
 
-  table <- sprint_alactic_model_params(data)
+  table <- sprint_alactic_model_params(data,
+                                       dt = dt,
+                                       cost_running_flat = cost_running_flat,
+                                       slope_equation = slope_equation
+                                    )
 
   # round the columns
 
@@ -322,6 +356,8 @@ sprint_alactic_model_params_table <- function(data = graubner_nixdorf_sprints) {
 #' and women's 100, 200 and 400 m. The optimal model is a model where the maximal alactic power as well as mu and sigma parameters of the log-normal distribution are fitted to the data.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tibble with the goodness of fit metrics for the optimal alactic model: event (character), AIC, BIC, residual squared error and R-squared.
 #' @export
@@ -330,7 +366,10 @@ sprint_alactic_model_params_table <- function(data = graubner_nixdorf_sprints) {
 #'
 #'
 #' sprint_alactic_model_optimal_gof_metrics()
-sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_sprints) {
+sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_sprints,
+                                                      dt = 0.01,
+                                                      cost_running_flat = 3.8,
+                                                      slope_equation = "original") {
   # events
   events <- unique(data$event)
 
@@ -353,7 +392,10 @@ sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spr
       time_splits = event_data$splits,
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
-      maximal_velocity = event_data$maximal_velocity[1]
+      maximal_velocity = event_data$maximal_velocity[1],
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
@@ -400,6 +442,8 @@ sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spr
 #'
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tinytable containing the goodness of fit metrics for the optimale alactic model: event (character), AIC, BIC, residual squared error and R-squared.
 #' @export
@@ -408,12 +452,18 @@ sprint_alactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spr
 #'
 #' sprint_alactic_model_optimal_gof_metrics_table()
 #'
-sprint_alactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdorf_sprints) {
+sprint_alactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdorf_sprints,
+                                                           dt = 0.01,
+                                                           cost_running_flat = 3.8,
+                                                           slope_equation = "original") {
   # generates a tidyer output for the vignette or document
 
   # run the function
 
-  table <- sprint_alactic_model_optimal_gof_metrics(data)
+  table <- sprint_alactic_model_optimal_gof_metrics(data,
+                                                    dt = dt,
+                                                    cost_running_flat = cost_running_flat,
+                                                    slope_equation = slope_equation)
 
   # round the columns
 
@@ -512,6 +562,8 @@ fit_alactic_gof_metrics <- function(data, mu = -0.4, sigma = 1) {
 #' and women's 100, 200 and 400 m.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tibble with the goodness of fit metrics for the formalized/simplified alactic model: event (character), AIC, BIC, residual squared error and R-squared.
 #' @export
@@ -521,7 +573,10 @@ fit_alactic_gof_metrics <- function(data, mu = -0.4, sigma = 1) {
 #'
 #' sprint_alactic_model_gof_metrics()
 #'
-sprint_alactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints) {
+sprint_alactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints,
+                                             dt = 0.01,
+                                             cost_running_flat = 3.8,
+                                             slope_equation = "original") {
   # events
   events <- unique(data$event)
 
@@ -544,7 +599,10 @@ sprint_alactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints) {
       time_splits = event_data$splits,
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
-      maximal_velocity = event_data$maximal_velocity[1]
+      maximal_velocity = event_data$maximal_velocity[1],
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
@@ -629,6 +687,8 @@ sprint_alactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprin
 #' The formalized model is a model where the mu and sigma parameters of the log-normal distribution are set at -0.4 and 1 respectively.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tibble comparing the optimal and formalized/simplified alactic model fitted parameters and goodness of fit metrics over different events: event (character), pal_max (W/kg), mu, sigma, AIC, BIC and R-squared.
 #'
@@ -638,18 +698,35 @@ sprint_alactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprin
 #'
 #' sprint_alactic_model_gof_comp()
 #'
-sprint_alactic_model_gof_comp <- function(data = graubner_nixdorf_sprints) {
+sprint_alactic_model_gof_comp <- function(data = graubner_nixdorf_sprints,
+                                           dt = 0.01,
+                                           cost_running_flat = 3.8,
+                                           slope_equation = "original") {
   # For each event, compare the parameters and the gof metrics of the optimal as well as the formalized/simplified version of the model.
 
   # get parameters and gof of the optimized model
 
-  optimal_params <- sprint_alactic_model_optimal_params(data)
-  optimal_gof <- sprint_alactic_model_optimal_gof_metrics(data)
+  optimal_params <- sprint_alactic_model_optimal_params(data,
+                                                       dt = dt,
+                                                       cost_running_flat = cost_running_flat,
+                                                       slope_equation = slope_equation)
+
+  optimal_gof <- sprint_alactic_model_optimal_gof_metrics(data,
+                                                          dt = dt,
+                                                          cost_running_flat = cost_running_flat,
+                                                          slope_equation = slope_equation)
 
   # get parameters and gof of the formalized/simplified model
 
-  formalized_params <- sprint_alactic_model_params(data)
-  formalized_gof <- sprint_alactic_model_gof_metrics(data)
+  formalized_params <- sprint_alactic_model_params(data,
+                                                   dt = dt,
+                                                   cost_running_flat = cost_running_flat,
+                                                   slope_equation = slope_equation)
+
+  formalized_gof <- sprint_alactic_model_gof_metrics(data,
+                                                     dt = dt,
+                                                     cost_running_flat = cost_running_flat,
+                                                     slope_equation = slope_equation)
 
 
   # merge the table and put the columns of each parameters side by side comparing optimal and formalized/simplified model
@@ -685,6 +762,8 @@ sprint_alactic_model_gof_comp <- function(data = graubner_nixdorf_sprints) {
 #' The formalized model is a model where the mu and sigma parameters of the log-normal distribution are set at -0.4 and 1 respectively.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tinytable comparing the optimal and formalized/simplified alactic model fitted parameters and goodness of fit metrics over different events: event (character), pal_max (W/kg), mu, sigma, AIC, BIC and R-squared.
 #' @export
@@ -692,10 +771,16 @@ sprint_alactic_model_gof_comp <- function(data = graubner_nixdorf_sprints) {
 #' @examples
 #' sprint_alactic_model_gof_comp_table()
 #'
-sprint_alactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints) {
+sprint_alactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints,
+                                                 dt = 0.01,
+                                                 cost_running_flat = 3.8,
+                                                 slope_equation = "original") {
   # create a tidy table for the comparison of the optimal and formalized/simplified model
 
-  table <- sprint_alactic_model_gof_comp(data)
+  table <- sprint_alactic_model_gof_comp(data,
+                                         dt = dt,
+                                         cost_running_flat = cost_running_flat,
+                                         slope_equation = slope_equation)
 
   # round the columns
 
@@ -769,6 +854,8 @@ sprint_alactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints)
 #' and women's 100, 200 and 400 m.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tibble with the optimal parameters for the lactic model: event (character), p_la_max (W/kg), k1 and k2.
 #' @export
@@ -777,7 +864,10 @@ sprint_alactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints)
 #'
 #' sprint_lactic_model_optimal_params()
 #'
-sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints) {
+sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints,
+                                               dt = 0.01,
+                                               cost_running_flat = 3.8,
+                                               slope_equation = "original") {
   # events
   events <- unique(data$event)
 
@@ -801,7 +891,10 @@ sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints) 
       time_splits = event_data$splits,
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
-      maximal_velocity = event_data$maximal_velocity[1]
+      maximal_velocity = event_data$maximal_velocity[1],
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
@@ -848,6 +941,8 @@ sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints) 
 #' and women's 100, 200 and 400 m.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tinytable containing the optimal parameters for the lactic model: event (character), p_la_max (W/kg), k1 and k2.
 #' @export
@@ -856,12 +951,18 @@ sprint_lactic_model_optimal_params <- function(data = graubner_nixdorf_sprints) 
 #'
 #' sprint_lactic_model_optimal_params_table()
 #'
-sprint_lactic_model_optimal_params_table <- function(data = graubner_nixdorf_sprints) {
+sprint_lactic_model_optimal_params_table <- function(data = graubner_nixdorf_sprints,
+                                                     dt = 0.01,
+                                                     cost_running_flat = 3.8,
+                                                     slope_equation = "original") {
   # generates a tidyer output for the vignette or document
 
   # run the function
 
-  table <- sprint_lactic_model_optimal_params(data)
+  table <- sprint_lactic_model_optimal_params(data,
+                                              dt = dt,
+                                              cost_running_flat = cost_running_flat,
+                                              slope_equation = slope_equation)
 
   # round the columns
 
@@ -946,6 +1047,8 @@ fit_lactic_power_params <- function(sprint_approx_power_distribution, k1 = 2.75,
 #' The only fitted value is therefore the maximal lactic power. The set value correspond to a compromise of the observed fitted values over the different sprint events.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tibble with the parameters for the formalized/simplified lactic model: event (character), p_la_max (W/kg), k1 (s) and k2 (s).
 #' @export
@@ -954,7 +1057,10 @@ fit_lactic_power_params <- function(sprint_approx_power_distribution, k1 = 2.75,
 #'
 #' sprint_lactic_model_params()
 #'
-sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints) {
+sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints,
+                                       dt = 0.01,
+                                       cost_running_flat = 3.8,
+                                       slope_equation = "original") {
   # events
   events <- unique(data$event)
 
@@ -978,7 +1084,10 @@ sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints) {
       time_splits = event_data$splits,
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
-      maximal_velocity = event_data$maximal_velocity[1]
+      maximal_velocity = event_data$maximal_velocity[1],
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
@@ -1026,6 +1135,8 @@ sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints) {
 #' The only fitted value is therefore the maximal lactic power (W/kg). The set value correspond to a compromise of the observed fitted values over the different sprint events.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tinytable containing the optimal parameters for the formalized/simplified lactic model: event (character), p_la_max (W/kg), k1 (s) and k2(s).
 #' @export
@@ -1034,12 +1145,18 @@ sprint_lactic_model_params <- function(data = graubner_nixdorf_sprints) {
 #'
 #' sprint_lactic_model_params_table()
 #'
-sprint_lactic_model_params_table <- function(data = graubner_nixdorf_sprints) {
+sprint_lactic_model_params_table <- function(data = graubner_nixdorf_sprints,
+                                             dt = 0.01,
+                                             cost_running_flat = 3.8,
+                                             slope_equation = "original") {
   # generates a tidyer output for the vignette or document
 
   # run the function
 
-  table <- sprint_lactic_model_params(data)
+  table <- sprint_lactic_model_params(data,
+                                      dt = dt,
+                                      cost_running_flat = cost_running_flat,
+                                      slope_equation = slope_equation)
 
   # round the columns
 
@@ -1066,6 +1183,8 @@ sprint_lactic_model_params_table <- function(data = graubner_nixdorf_sprints) {
 #' and women's 100, 200 and 400 m. The optimal model is a model where the maximal lactic power as well as k1 and k2 parameters of the bi-exponential distribution are fitted to the data.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tibble with the goodness of fit metrics for the optimal lactic model: event (character), AIC, BIC and R-squared.
 #' @export
@@ -1074,7 +1193,10 @@ sprint_lactic_model_params_table <- function(data = graubner_nixdorf_sprints) {
 #'
 #'
 #' sprint_lactic_model_optimal_gof_metrics()
-sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_sprints) {
+sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_sprints,
+                                                    dt = 0.01,
+                                                    cost_running_flat = 3.8,
+                                                    slope_equation = "original") {
   # events
   events <- unique(data$event)
 
@@ -1097,7 +1219,10 @@ sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spri
       time_splits = event_data$splits,
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
-      maximal_velocity = event_data$maximal_velocity[1]
+      maximal_velocity = event_data$maximal_velocity[1],
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
@@ -1142,6 +1267,8 @@ sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spri
 #'
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tinytable containing the goodness of fit metrics for the optimal lactic model: event (character), AIC, BIC and R-squared.
 #' @export
@@ -1150,12 +1277,18 @@ sprint_lactic_model_optimal_gof_metrics <- function(data = graubner_nixdorf_spri
 #'
 #' sprint_lactic_model_optimal_gof_metrics_table()
 #'
-sprint_lactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdorf_sprints) {
+sprint_lactic_model_optimal_gof_metrics_table <- function(data = graubner_nixdorf_sprints,
+                                                           dt = 0.01,
+                                                           cost_running_flat = 3.8,
+                                                           slope_equation = "original") {
   # generates a tidyer output for the vignette or document
 
   # run the function
 
-  table <- sprint_lactic_model_optimal_gof_metrics(data)
+  table <- sprint_lactic_model_optimal_gof_metrics(data,
+                                                   dt = dt,
+                                                   cost_running_flat = cost_running_flat,
+                                                   slope_equation = slope_equation)
 
   # round the columns
 
@@ -1260,6 +1393,8 @@ fit_lactic_gof_metrics <- function(data, k1 = 2.75, k2 = 35) {
 #' and women's 100, 200 and 400 m.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tibble with the goodness of fit metrics for the formalized/simplified lactic model: event (character), AIC, BIC and R-squared.
 #' @export
@@ -1269,7 +1404,10 @@ fit_lactic_gof_metrics <- function(data, k1 = 2.75, k2 = 35) {
 #'
 #' sprint_lactic_model_gof_metrics()
 #'
-sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints) {
+sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints,
+                                            dt = 0.01,
+                                            cost_running_flat = 3.8,
+                                            slope_equation = "original") {
   # events
   events <- unique(data$event)
 
@@ -1292,7 +1430,10 @@ sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints) {
       time_splits = event_data$splits,
       distance = event_data$distance,
       reaction_time = event_data$reaction_time[1],
-      maximal_velocity = event_data$maximal_velocity[1]
+      maximal_velocity = event_data$maximal_velocity[1],
+      dt = dt,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
@@ -1336,6 +1477,8 @@ sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints) {
 #'
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tinytable containing the goodness of fit metrics for the oformalized lactic model: event (character), AIC, BIC and R-squared.
 #' @export
@@ -1344,12 +1487,18 @@ sprint_lactic_model_gof_metrics <- function(data = graubner_nixdorf_sprints) {
 #'
 #' sprint_lactic_model_gof_metrics_table()
 #'
-sprint_lactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprints) {
+sprint_lactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprints,
+                                                  dt = 0.01,
+                                                  cost_running_flat = 3.8,
+                                                  slope_equation = "original") {
   # generates a tidyer output for the vignette or document
 
   # run the function
 
-  table <- sprint_lactic_model_gof_metrics(data)
+  table <- sprint_lactic_model_gof_metrics(data,
+                                           dt = dt,
+                                           cost_running_flat = cost_running_flat,
+                                           slope_equation = slope_equation)
 
   # round the columns
 
@@ -1377,6 +1526,8 @@ sprint_lactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprint
 #' The formalized model is a model where the k1 and k2 parameters of the bi-exponential distribution are set at 2.75 and 35 s, respectively.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tibble comparing the optimal and formalized/simplified lactic model fitted parameters and goodness of fit metrics over different events: event (character), p_la_max (W/kg), k1, k2, AIC, BIC and R-squared.
 #'
@@ -1386,18 +1537,35 @@ sprint_lactic_model_gof_metrics_table <- function(data = graubner_nixdorf_sprint
 #'
 #' sprint_lactic_model_gof_comp()
 #'
-sprint_lactic_model_gof_comp <- function(data = graubner_nixdorf_sprints) {
+sprint_lactic_model_gof_comp <- function(data = graubner_nixdorf_sprints,
+                                         dt = 0.01,
+                                         cost_running_flat = 3.8,
+                                         slope_equation = "original") {
   # For each event, compare the parameters and the gof metrics of the optimal as well as the formalized/simplified version of the model.
 
   # get parameters and gof of the optimized model
 
-  optimal_params <- sprint_lactic_model_optimal_params(data)
-  optimal_gof <- sprint_lactic_model_optimal_gof_metrics(data)
+  optimal_params <- sprint_lactic_model_optimal_params(data,
+                                                      dt = dt,
+                                                      cost_running_flat = cost_running_flat,
+                                                      slope_equation = slope_equation)
+
+  optimal_gof <- sprint_lactic_model_optimal_gof_metrics(data,
+                                                         dt = dt,
+                                                         cost_running_flat = cost_running_flat,
+                                                         slope_equation = slope_equation)
 
   # get parameters and gof of the formalized/simplified model
 
-  formalized_params <- sprint_lactic_model_params(data)
-  formalized_gof <- sprint_lactic_model_gof_metrics(data)
+  formalized_params <- sprint_lactic_model_params(data,
+                                                  dt = dt,
+                                                  cost_running_flat = cost_running_flat,
+                                                  slope_equation = slope_equation)
+
+  formalized_gof <- sprint_lactic_model_gof_metrics(data,
+                                                   dt = dt,
+                                                   cost_running_flat = cost_running_flat,
+                                                   slope_equation = slope_equation)
 
 
   # merge the table and put the columns of each parameters side by side comparing optimal and formalized/simplified model
@@ -1433,6 +1601,8 @@ sprint_lactic_model_gof_comp <- function(data = graubner_nixdorf_sprints) {
 #' The formalized model is a model where the k1 and k2 parameters of the bi-exponential distribution are set at 2.75 and 35 s, respectively.
 #'
 #' @param data A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tinytable comparing the optimal and formalized/simplified lactic models fitted parameters and goodness of fit metrics over different events: event (character), p_la_max (W/kg), k1 (s), k2 (s), AIC, BIC and R-squared.
 #' @export
@@ -1440,10 +1610,16 @@ sprint_lactic_model_gof_comp <- function(data = graubner_nixdorf_sprints) {
 #' @examples
 #' sprint_lactic_model_gof_comp_table()
 #'
-sprint_lactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints) {
+sprint_lactic_model_gof_comp_table <- function(data = graubner_nixdorf_sprints,
+                                               dt = 0.01,
+                                               cost_running_flat = 3.8,
+                                               slope_equation = "original") {
   # create a tidy table for the comparison of the optimal and formalized/simplified model
 
-  table <- sprint_lactic_model_gof_comp(data)
+  table <- sprint_lactic_model_gof_comp(data,
+                                        dt = dt,
+                                        cost_running_flat = cost_running_flat,
+                                        slope_equation = slope_equation)
 
   # round the columns
 

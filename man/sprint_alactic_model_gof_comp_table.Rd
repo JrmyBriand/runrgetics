@@ -4,10 +4,21 @@
 \alias{sprint_alactic_model_gof_comp_table}
 \title{Formated Table of Comparison of the Optimal and Formalized/Simplified Alactic Model Parameters and Goodness of Fit Metrics (On Berlin 2009 Sprint Performances)}
 \usage{
-sprint_alactic_model_gof_comp_table(data = graubner_nixdorf_sprints)
+sprint_alactic_model_gof_comp_table(
+  data = graubner_nixdorf_sprints,
+  dt = 0.01,
+  cost_running_flat = 3.8,
+  slope_equation = "original"
+)
 }
 \arguments{
 \item{data}{A tibble with the following: distance (m), splits (s), velocity (m/s), reaction_time (s), maximal_velocity (m/s) and event (character). Default is Graubner and Nixdorf (2009) sprint data.}
+
+\item{dt}{Time step of the model. Default is set at 0.01 s}
+
+\item{cost_running_flat}{a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)}
+
+\item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
 }
 \value{
 A tinytable comparing the optimal and formalized/simplified alactic model fitted parameters and goodness of fit metrics over different events: event (character), pal_max (W/kg), mu, sigma, AIC, BIC and R-squared.
