@@ -119,6 +119,7 @@ get_lactic_model_data <- function(lactic_energy_duration, sex_label, t1 = 20, t2
 #' @param point_color Color for data points (default: "darkblue").
 #' @inheritParams sprint_lactic_capacity
 #' @inheritParams sprint_lactic_energy_duration_graubner_nixdorf
+#' @inheritParams sprint_motion_model_data
 #'
 #' @return A ggplot object with overlaid male and female model fits and lactic energy over different running durations.
 #' @export

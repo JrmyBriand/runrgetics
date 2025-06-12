@@ -10,7 +10,9 @@ diagnose_sprint_model(
   distance,
   reaction_time,
   maximal_velocity = NA,
-  dt = 0.01
+  dt = 0.01,
+  cost_running_flat = 3.8,
+  slope_equation = "original"
 )
 }
 \arguments{
@@ -25,6 +27,10 @@ diagnose_sprint_model(
 \item{maximal_velocity}{A double representing the maximal velocity (in m/s)}
 
 \item{dt}{Time step of the model. Default is set at 0.01 s}
+
+\item{cost_running_flat}{a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)}
+
+\item{slope_equation}{a string indicating the slope equation to use, either "original" or "extended". The "original" equation is based on the equation relating running at constant speed on different slopes porposed by Minetti et al. (2002), while the "extended" equation is based on similar equation for extended slopes proposed by Minetti and Pavei (2018).}
 }
 \value{
 A list containing the RMSE, RSE, a tibble with observed vs fitted velocities and a list of ggplot objects for each diagnostic plot.

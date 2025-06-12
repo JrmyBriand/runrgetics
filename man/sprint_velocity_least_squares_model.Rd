@@ -9,9 +9,9 @@ sprint_velocity_least_squares_model(time, velocity, reaction_time)
 \arguments{
 \item{time}{A vector of time points (in s)}
 
-\item{velocity}{A vector of estimated instantaneous velocity associated to each time points (in m/s)}
+\item{velocity}{A vector containing average velocity over each interval (in m/s)}
 
-\item{reaction_time}{A numeric value representing the reaction time (in s)}
+\item{reaction_time}{A double corresponding to the reaction time (in s)}
 }
 \value{
 A fitted nlsLM model object.

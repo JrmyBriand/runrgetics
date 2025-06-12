@@ -9,9 +9,9 @@ find_tau(time, velocity, reaction_time)
 \arguments{
 \item{time}{A vector of time points (in s)}
 
-\item{velocity}{A vector of velocities (in s)}
+\item{velocity}{A vector containing average velocity over each interval (in m/s)}
 
-\item{reaction_time}{A double representing the reaction time (in s)}
+\item{reaction_time}{A double corresponding to the reaction time (in s)}
 }
 \value{
 A double representing the time constant of the exponential rise in velocity (in s)

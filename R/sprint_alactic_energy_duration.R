@@ -74,6 +74,7 @@ sprint_alactic_energy_duration <- function(sprint_power_data) {
 #' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #' @inheritParams cost_running_sprint
 #' @inheritParams sprint_bioenergetic_model_data
+#' @inheritParams sprint_motion_model_data
 #'
 #' @returns A tibble with duration (s), alactic_energy (J/kg), alactic_power (W/kg).
 #' @export

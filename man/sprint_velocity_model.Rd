@@ -16,15 +16,15 @@ sprint_velocity_model(
 \arguments{
 \item{time}{A vector of time points (in s)}
 
-\item{time_maximal_velocity}{A double representing the time at which maximal velocity is reached (in s)}
+\item{time_maximal_velocity}{A double, time at which maximal velocity is reached (in s)}
 
-\item{maximal_velocity}{A double representing the maximal velocity (in m/s)}
+\item{maximal_velocity}{A double, maximal velocity attained during the sprint (in m/s)}
 
-\item{tau}{A double representing the time constant of the exponential rise in velocity (in s)}
+\item{tau}{A double, time constant of the exponential rise in velocity (in s)}
 
-\item{fitted_maximal_velocity}{A double representing the maximal velocity fitted using the model for instantaneous velocity in acceleration phase (in m/s)}
+\item{fitted_maximal_velocity}{A double, maximal velocity fitted using the model for instantaneous velocity in acceleration phase (in m/s)}
 
-\item{decel_rate}{A double representing the rate of deceleration (in m/s^2)}
+\item{decel_rate}{A double, rate of deceleration (in m/s^2)}
 }
 \value{
 A vector of instantaneous velocities (in m/s)

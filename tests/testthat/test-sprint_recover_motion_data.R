@@ -4,7 +4,7 @@ test_that("sprint_recover_motion returns expected structure", {
   # Create simple power series
   power_series <- rep(50, 100) # 1 second of constant power at dt = 0.01
 
-  result <- sprint_recover_motion(power_series)
+  result <- sprint_recover_motion(power_series, cost_running_flat = 3.8)
 
   # Check structure
   expect_s3_class(result, "tbl_df")
@@ -25,7 +25,7 @@ test_that("sprint_recover_distance returns expected type", {
   # Create simple power series
   power_series <- rep(50, 100)
 
-  result <- sprint_recover_distance(power_series)
+  result <- sprint_recover_distance(power_series, cost_running_flat = 3.8)
 
   # Check return type
   expect_type(result, "double")
@@ -41,7 +41,7 @@ test_that("sprint_modeled_distance_percentage_error returns expected type", {
     power_mod = rep(55, 100) # Slightly different power for testing
   )
 
-  result <- sprint_modeled_distance_percentage_error(mock_data)
+  result <- sprint_modeled_distance_percentage_error(mock_data, cost_running_flat = 3.8)
 
   # Check return type
   expect_type(result, "double")
@@ -52,7 +52,7 @@ test_that("sprint_recover_motion handles zero power", {
   # Test with zero power
   power_series <- rep(0, 100)
 
-  result <- sprint_recover_motion(power_series)
+  result <- sprint_recover_motion(power_series, cost_running_flat = 3.8)
 
   # Should have near-zero velocity and acceleration (allowing for numerical precision)
   expect_equal(sum(result$velocity), 0, tolerance = 1e-3)

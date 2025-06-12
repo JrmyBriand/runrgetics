@@ -10,7 +10,9 @@ utils::globalVariables(c("Optimal_Time", "Actual_Time"))
 #' @param alactic_capacity A numeric value representing the alactic capacity of the athlete (in J/kg).
 #' @param lactic_capacity A numeric value representing the lactic capacity of the athlete (in J/kg).
 #' @param maximal_aerobic_power A numeric value representing the maximal aerobic power of the athlete (in W/kg). Default is set at 24.5 W/kg.
-#' @param dt A numeric value representing the time step for the simulation (in s). Default is set at 0.01 s.
+#' @inheritParams sprint_bioenergetic_model
+#' @inheritParams sprint_recover_distance
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A numeric value representing the distance traveled during the sprint (in m).
 #' @export
@@ -34,7 +36,17 @@ utils::globalVariables(c("Optimal_Time", "Actual_Time"))
 #' sprint_race_time_error_function(performance_running_time, alactic_capacity, lactic_capacity)
 #'
 #'
-sprint_race_time_error_function <- function(time_performance, alactic_capacity, lactic_capacity, maximal_aerobic_power = 24.5, dt = 0.01) {
+sprint_race_time_error_function <- function(time_performance,
+                                            alactic_capacity,
+                                            lactic_capacity,
+                                            maximal_aerobic_power = 24.5,
+                                            mu = -0.4,
+                                            sigma = 1,
+                                            k1 = 2.75,
+                                            k2 = 35,
+                                            dt = 0.01,
+                                            cost_running_flat = 3.8,
+                                            slope_equation = "original" ) {
 
   # estimate max_al based on alactic capacity for all distances
   max_al <- find_max_al(time_performance, alactic_capacity)
@@ -50,7 +62,11 @@ sprint_race_time_error_function <- function(time_performance, alactic_capacity, 
     time = time,
     maximal_alactic_power = max_al,
     maximal_lactic_power = max_la,
-    maximal_aerobic_power = maximal_aerobic_power
+    maximal_aerobic_power = maximal_aerobic_power,
+    mu = mu,
+    sigma = sigma,
+    k1 = k1,
+    k2 = k2
   )
 
   # Recover motion and calculate total distances
@@ -73,9 +89,11 @@ sprint_race_time_error_function <- function(time_performance, alactic_capacity, 
 #' @param target_distances A numeric vector representing the target distances for the sprint simulation (in m).
 #' @param alactic_capacity A numeric value representing the alactic capacity of the athlete (in J/kg).
 #' @param lactic_capacity A numeric value representing the lactic capacity of the athlete (in J/kg).
-#' @param maximal_aerobic_power A numeric value representing the maximal aerobic power of the athlete (in W/kg). Default is set at 24.5 W/kg.
-#' @param dt A numeric value representing the time step for the simulation (in s). Default is set at 0.01 s.
 #' @param reaction_time A numeric value representing the reaction time of the athlete (in s). Default is set at 0.15 s.
+#' @inheritParams sprint_bioenergetic_model
+#' @inheritParams sprint_recover_distance
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
+#'
 #'
 #' @returns A tibble with the following columns:
 #'  \itemize{
@@ -96,13 +114,46 @@ sprint_race_time_error_function <- function(time_performance, alactic_capacity, 
 #'
 #' sprint_time_perf_simulation(target_distances, alactic_capacity, lactic_capacity)
 #'
-sprint_time_perf_simulation <- function(target_distances, alactic_capacity, lactic_capacity, maximal_aerobic_power = 24.5, dt = 0.01, reaction_time = 0.15){
+sprint_time_perf_simulation <- function(target_distances,
+                                        alactic_capacity,
+                                        lactic_capacity,
+                                        maximal_aerobic_power = 24.5,
+                                        mu = -0.4,
+                                        sigma = 1,
+                                        k1 = 2.75,
+                                        k2 = 35,
+                                        dt = 0.01,
+                                        cost_running_flat = 3.8,
+                                        slope_equation = "original" ,
+                                        reaction_time = 0.15){
 
   # Helper function to find optimal time for a given distance
-  find_running_time <- function(target_distance, alactic_capacity, lactic_capacity, maximal_aerobic_power, dt) {
+  find_running_time <- function(target_distance,
+                                alactic_capacity,
+                                lactic_capacity,
+                                maximal_aerobic_power,
+                                mu ,
+                                sigma ,
+                                k1 ,
+                                k2 ,
+                                dt ,
+                                cost_running_flat,
+                                slope_equation ) {
     # Objective function: Minimize squared error between calculated and target distance
     objective_function <- function(time) {
-      distance <- sprint_race_time_error_function(time, alactic_capacity, lactic_capacity, maximal_aerobic_power, dt)
+
+      distance <- sprint_race_time_error_function(time_performance = time,
+                                                  alactic_capacity = alactic_capacity,
+                                                  lactic_capacity = lactic_capacity,
+                                                  maximal_aerobic_power = maximal_aerobic_power,
+                                                  mu = mu,
+                                                  sigma = sigma,
+                                                  k1 = k1,
+                                                  k2 = k2,
+                                                  dt = dt,
+                                                  cost_running_flat = cost_running_flat,
+                                                  slope_equation = slope_equation )
+
       return((distance - target_distance)^2)
     }
 
@@ -123,7 +174,13 @@ sprint_time_perf_simulation <- function(target_distances, alactic_capacity, lact
       alactic_capacity = alactic_capacity,
       lactic_capacity = lactic_capacity,
       maximal_aerobic_power = maximal_aerobic_power,
-      dt = dt
+      mu = mu ,
+      sigma = sigma ,
+      k1 = k1,
+      k2 = k2 ,
+      dt = dt ,
+      cost_running_flat = cost_running_flat,
+      slope_equation = slope_equation
     )
   })
 
@@ -147,12 +204,7 @@ sprint_time_perf_simulation <- function(target_distances, alactic_capacity, lact
 #' The simulation is based on the sprint bioenergetic model. The returned results present the `Running Time`, which corresponds to running time in s, as well as `Performance Time`,
 #' which corresponds to the running time plus reaction time (in s). The reaction time can be provided as a function parameter. The simulation can be used to estimate the running time of a sprint on classical sprint distances (e.g. 100 m, 200 m, etc.).
 #'
-#' @param target_distances A numeric vector representing the target distances for the sprint simulation (in m).
-#' @param alactic_capacity A numeric value representing the alactic capacity of the athlete (in J/kg).
-#' @param lactic_capacity A numeric value representing the lactic capacity of the athlete (in J/kg).
-#' @param maximal_aerobic_power A numeric value representing the maximal aerobic power of the athlete (in W/kg). Default is set at 24.5 W/kg.
-#' @param dt A numeric value representing the time step for the simulation (in s). Default is set at 0.01 s.
-#' @param reaction_time A numeric value representing the reaction time of the athlete (in s). Default is set at 0.15 s.
+#' @inheritParams sprint_time_perf_simulation
 #'
 #' @returns A tinytable with the following columns:
 #'  \itemize{
@@ -172,14 +224,31 @@ sprint_time_perf_simulation <- function(target_distances, alactic_capacity, lact
 #' # apply the simulation
 #'
 #' sprint_time_perf_simulation_briand_table(target_distances, alactic_capacity, lactic_capacity)
-sprint_time_perf_simulation_briand_table <- function(target_distances, alactic_capacity, lactic_capacity, maximal_aerobic_power = 24.5, dt = 0.01, reaction_time = 0.15){
+sprint_time_perf_simulation_briand_table <- function(target_distances,
+                                                     alactic_capacity,
+                                                     lactic_capacity,
+                                                     maximal_aerobic_power = 24.5,
+                                                     mu = -0.4,
+                                                     sigma = 1,
+                                                     k1 = 2.75,
+                                                     k2 = 35,
+                                                     dt = 0.01,
+                                                     cost_running_flat = 3.8,
+                                                     slope_equation = "original" ,
+                                                     reaction_time = 0.15){
 
   table <- sprint_time_perf_simulation(
     target_distances = target_distances,
     alactic_capacity = alactic_capacity,
     lactic_capacity = lactic_capacity,
     maximal_aerobic_power = maximal_aerobic_power,
+    mu = mu,
+    sigma = sigma,
+    k1 = k1,
+    k2 = k2,
     dt = dt,
+    cost_running_flat = cost_running_flat,
+    slope_equation = slope_equation ,
     reaction_time = reaction_time
   )
 

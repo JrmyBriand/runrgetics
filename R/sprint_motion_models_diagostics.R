@@ -8,9 +8,7 @@ utils::globalVariables(c(
 #'
 #' Fits a non-linear least-squares model to the sprint acceleration velocity data.
 #'
-#' @param time A vector of time points (in s)
-#' @param velocity A vector of estimated instantaneous velocity associated to each time points (in m/s)
-#' @param reaction_time A numeric value representing the reaction time (in s)
+#' @inheritParams find_tau
 #'
 #' @returns A fitted nlsLM model object.
 #' @export
@@ -150,12 +148,8 @@ diagnose_velocity_model_acc <- function(mean_velocity_splits, time_splits, dista
 
 #' Test the Assumptions of the Sprint Motion Model Fit
 #'
-#' @param mean_velocity_splits A vector with mean velocity splits over each distance interval (m/s)
-#' @param time_splits A vector with time splits over each distance interval (s)
-#' @param distance A vector with the distances at which time splits were measured (m)
-#' @param reaction_time A double with the reaction time measured on the starting blocks (s)
-#' @param maximal_velocity A double representing the maximal velocity (in m/s)
-#' @param dt Time step of the model. Default is set at 0.01 s
+#' @inheritParams sprint_motion_model_data
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A list containing the RMSE, RSE, a tibble with observed vs fitted velocities and a list of ggplot objects for each diagnostic plot.
 #' @export
@@ -173,9 +167,15 @@ diagnose_velocity_model_acc <- function(mean_velocity_splits, time_splits, dista
 #'   maximal_velocity = men_200$maximal_velocity[1]
 #' )
 #'
-diagnose_sprint_model <- function(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity = NA, dt = 0.01) {
+diagnose_sprint_model <- function(mean_velocity_splits,
+                                  time_splits, distance,
+                                  reaction_time,
+                                  maximal_velocity = NA,
+                                  dt = 0.01,
+                                  cost_running_flat  = 3.8,
+                                  slope_equation = "original") {
   # Run your model
-  model_df <- sprint_motion_model_data(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity, dt)
+  model_df <- sprint_motion_model_data(mean_velocity_splits, time_splits, distance, reaction_time, maximal_velocity, dt, cost_running_flat, slope_equation)
 
   # Get modeled velocities at the original split time points (not interpolated)
   times_velocity <- find_time_velocity(time_splits, reaction_time)

@@ -173,7 +173,7 @@ sprint_recover_distance <- function(power_series, dt = 0.01, cost_running_flat =
 #' round(percent_error, 2)
 #'
 sprint_modeled_distance_percentage_error <- function(sprint_power_data, dt = 0.01, cost_running_flat = 3.6, slope_equation = "original") {
-  distance_recovered <- sprint_recover_distance(sprint_power_data$power, dt = dt, cost_running_flat = cost_runnig_flat, slope_equation = slope_equation)
+  distance_recovered <- sprint_recover_distance(sprint_power_data$power, dt = dt, cost_running_flat = cost_running_flat, slope_equation = slope_equation)
 
   distance_recovered_bioenergetic_model <- sprint_recover_distance(sprint_power_data$power_mod, dt = dt, cost_running_flat = cost_running_flat, slope_equation = slope_equation)
 
