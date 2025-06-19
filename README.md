@@ -4,9 +4,23 @@
 # runrgetics
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
-The goal of runrgetics is to …
+The `runrgetics` package offers a comprehensive framework to compute,
+quantify, and analyze energy expenditure and metabolic power production
+during running activities. It includes tools to calculate metabolic
+power based on running velocity and acceleration. Furthermore, it
+provides functions to estimate the contributions of different energy
+pathways (alactic, lactic, and aerobic) to the total metabolic power
+during sprint events. These calculations are grounded in the sprint
+bioenergetic model proposed by [Briand et
+al. (2025)](https://doi.org/10.1007/s00421-025-05831-0).
+
+Additional updates to the package README will be made soon.
+
+Further details on the article’s calculations are available in the
+various vignettes included with the package.
 
 ## Installation
 
@@ -14,39 +28,5 @@ You can install the development version of runrgetics from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("pak")
-pak::pak("JrmyBriand/runrgetics")
+#devtools::install_github("JrmyBriand/runrgetics")
 ```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(runrgetics)
-## basic example code
-```
-
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
-
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
-
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.

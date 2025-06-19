@@ -12,7 +12,6 @@ utils::globalVariables(c("Optimal_Time", "Actual_Time"))
 #' @param maximal_aerobic_power A numeric value representing the maximal aerobic power of the athlete (in W/kg). Default is set at 24.5 W/kg.
 #' @inheritParams sprint_bioenergetic_model
 #' @inheritParams sprint_recover_distance
-#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A numeric value representing the distance traveled during the sprint (in m).
 #' @export
@@ -45,7 +44,7 @@ sprint_race_time_error_function <- function(time_performance,
                                             k1 = 2.75,
                                             k2 = 35,
                                             dt = 0.01,
-                                            cost_running_flat = 3.8,
+                                            cost_running_flat = 3.6,
                                             slope_equation = "original" ) {
 
   # estimate max_al based on alactic capacity for all distances
@@ -92,7 +91,6 @@ sprint_race_time_error_function <- function(time_performance,
 #' @param reaction_time A numeric value representing the reaction time of the athlete (in s). Default is set at 0.15 s.
 #' @inheritParams sprint_bioenergetic_model
 #' @inheritParams sprint_recover_distance
-#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #'
 #' @returns A tibble with the following columns:
@@ -123,7 +121,7 @@ sprint_time_perf_simulation <- function(target_distances,
                                         k1 = 2.75,
                                         k2 = 35,
                                         dt = 0.01,
-                                        cost_running_flat = 3.8,
+                                        cost_running_flat = 3.6,
                                         slope_equation = "original" ,
                                         reaction_time = 0.15){
 
@@ -205,6 +203,7 @@ sprint_time_perf_simulation <- function(target_distances,
 #' which corresponds to the running time plus reaction time (in s). The reaction time can be provided as a function parameter. The simulation can be used to estimate the running time of a sprint on classical sprint distances (e.g. 100 m, 200 m, etc.).
 #'
 #' @inheritParams sprint_time_perf_simulation
+#' @param cost_running_flat a numeric value representing the cost of running on a flat surface (default for this function is 3.8 J/kg/m, as used in Briand et al. 2025)
 #'
 #' @returns A tinytable with the following columns:
 #'  \itemize{

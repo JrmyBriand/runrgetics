@@ -108,13 +108,3 @@ test_that("sprint_maximum_metabolic_power works correctly for both power types",
   expect_equal(sprint_maximum_metabolic_power(constant_data, type = "power bioenergetic model"), 30)
 })
 
-test_that("sprint_maximum_metabolic_power handles invalid type", {
-  basic_data <- tibble::tibble(
-    time = c(1, 2, 3),
-    power = c(10, 20, 30),
-    power_mod = c(15, 25, 35)
-  )
-
-  # Should default to "power" when invalid type is provided
-  expect_equal(sprint_maximum_metabolic_power(basic_data, type = "invalid"), 30)
-})

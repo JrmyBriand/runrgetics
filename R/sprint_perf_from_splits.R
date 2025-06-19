@@ -55,7 +55,7 @@ sprint_perf_from_split <- function(time_splits, distance, reaction_time = 0){
 #' @export
 #'
 #' @examples
-#' #' graubner_nixdorf_perf_from_splits()
+#' #graubner_nixdorf_perf_from_splits()
 #'
 graubner_nixdorf_perf_from_splits <- function(){
 

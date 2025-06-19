@@ -13,6 +13,6 @@ A tibble with the time performance, over each distance of the graubner_nixdorf_s
 Extracts the sprint performance (time to cover the total distance) for each event in the Graubner and Nixdorf (2011) dataset.
 }
 \examples{
-#' graubner_nixdorf_perf_from_splits()
+#graubner_nixdorf_perf_from_splits()
 
 }
