@@ -2,7 +2,7 @@
 % Please edit documentation in R/sprint_motion_computations.R
 \name{sprint_dec_distance_model}
 \alias{sprint_dec_distance_model}
-\title{Instantaneous Distance During Sprint Running Decceleration Phase}
+\title{Instantaneous Distance During Sprint Running Deceleration Phase}
 \usage{
 sprint_dec_distance_model(
   time,

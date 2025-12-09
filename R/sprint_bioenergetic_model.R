@@ -24,9 +24,12 @@
 #' sprint_bioenergetic_model(time, maximal_alactic_power, maximal_lactic_power)
 #'
 sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lactic_power, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, output = "total power") {
+  valid_outputs <- c("total power", "alactic power", "lactic power", "aerobic power")
+  if (!output %in% valid_outputs) {
+    stop("output must be one of: ", paste(valid_outputs, collapse = ", "))
+  }
+
   # glycolytic normalisation constant
-
-
   knorm <- bi_exponential_knorm(k1, k2)
 
   # Calculate power contributions for each time point
@@ -37,18 +40,12 @@ sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lacti
   # Total sprint power
   p_total <- palact + pgly + paer
 
-  if (output == "total power") {
-    return(p_total)
-  }
-  if (output == "alactic power") {
-    return(palact)
-  }
-  if (output == "lactic power") {
-    return(pgly)
-  }
-  if (output == "aerobic power") {
-    return(paer)
-  }
+  switch(output,
+    "total power" = p_total,
+    "alactic power" = palact,
+    "lactic power" = pgly,
+    "aerobic power" = paer
+  )
 }
 
 

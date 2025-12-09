@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_sprint_motion_metrics.R
 \name{sprint_maximum_metabolic_power}
 \alias{sprint_maximum_metabolic_power}
-\title{Maximum Matebolic Power}
+\title{Maximum Metabolic Power}
 \usage{
 sprint_maximum_metabolic_power(sprint_motion_data, type = "power")
 }

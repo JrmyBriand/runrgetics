@@ -57,35 +57,19 @@ sprint_perf_from_split <- function(time_splits, distance, reaction_time = 0){
 #' @examples
 #' #graubner_nixdorf_perf_from_splits()
 #'
-graubner_nixdorf_perf_from_splits <- function(){
-
-  #prepare table
-
-  perf_table <- tibble::tibble(
-    distance = numeric(),
-    performance = numeric(),
-    sex = character(),
-    event = character()
-  )
-
-
+graubner_nixdorf_perf_from_splits <- function() {
   # create an event list
-
   event_list <- unique(graubner_nixdorf_sprints$event)
 
-  for(i in event_list){
-
-    if(i == "Men's 100 m"| i == "Men's 200 m"| i == "Men's 400 m"){
-      sex <- "male"
+  # compute performance for each event
+  results <- purrr::map(event_list, function(i) {
+    sex <- if (i %in% c("Men's 100 m", "Men's 200 m", "Men's 400 m")) {
+      "male"
+    } else {
+      "female"
     }
-    if(i == "Women's 100 m"| i == "Women's 200 m"| i == "Women's 400 m"){
-      sex <- "female"
-    }
-
-     race <- i
 
     # get the perf
-
     dat <- graubner_nixdorf_sprints |>
       dplyr::filter(event == i)
 
@@ -95,19 +79,11 @@ graubner_nixdorf_perf_from_splits <- function(){
       reaction_time = dat$reaction_time[1]
     )
 
+    perf |>
+      dplyr::mutate(sex = sex, event = i)
+  })
 
-    sub_perf_tab <- perf |>
-      dplyr::mutate(sex = sex,
-                    event = race)
-
-    # append table
-
-    perf_table <- dplyr::bind_rows(perf_table, sub_perf_tab)
-
-  }
-
-  return(perf_table)
-
+  dplyr::bind_rows(results)
 }
 
 

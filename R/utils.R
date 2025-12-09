@@ -6,6 +6,7 @@
 #' @param t2 a double representing the time of the second boundary of the interval (in s)
 #'
 #' @returns a double representing the midpoint time (in s)
+#' @keywords internal
 #' @export
 #'
 #' @examples
@@ -26,6 +27,7 @@ middle_point <- function(t1, t2) {
 #' @param t2 a double representing the time constant of the decaying exponential term (in s)
 #'
 #' @returns a double representing the normalization constant
+#' @keywords internal
 #' @export
 #'
 #' @examples
@@ -34,4 +36,27 @@ middle_point <- function(t1, t2) {
 #'
 bi_exponential_knorm <- function(t1, t2) {
   return((t1 + t2) / (t2 * (t1 / (t1 + t2))^(t1 / t2)))
+}
+
+
+#' Rename Table Columns
+#'
+#' Renames columns in a data frame based on a named vector mapping old names to new names.
+#'
+#' @param table A data frame whose columns should be renamed.
+#' @param mapping A named character vector where names are old column names and values are new column names.
+#'
+#' @returns The data frame with renamed columns.
+#' @keywords internal
+#' @export
+#'
+#' @examples
+#' df <- data.frame(a = 1, b = 2)
+#' rename_columns(df, c(a = "A", b = "B"))
+#'
+rename_columns <- function(table, mapping) {
+  for (old_name in names(mapping)) {
+    names(table)[names(table) == old_name] <- mapping[[old_name]]
+  }
+  table
 }

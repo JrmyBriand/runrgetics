@@ -20,18 +20,25 @@
 #' energy_total(data)
 #'
 energy_total <- function(data, type = "power") {
-  if (type == "power") {
-    # Ensure the data are sorted by time
-    data <- data |> arrange(time)
-
-    # Use the trapezoidal rule to calculate the integral of power over time
-    integral <- pracma::trapz(data$time, data$power)
+  if (!type %in% c("power", "power bioenergetic model")) {
+    stop("type must be either 'power' or 'power bioenergetic model'")
   }
-  if (type == "power bioenergetic model") {
-    # Ensure the data are sorted by time
-    data <- data |> arrange(time)
+  if (!"time" %in% names(data)) {
+    stop("data must contain a 'time' column")
+  }
 
-    # Use the trapezoidal rule to calculate the integral of power over time
+  # Ensure the data are sorted by time (once, before conditional)
+  data <- data |> dplyr::arrange(time)
+
+  if (type == "power") {
+    if (!"power" %in% names(data)) {
+      stop("data must contain a 'power' column when type = 'power'")
+    }
+    integral <- pracma::trapz(data$time, data$power)
+  } else {
+    if (!"power_mod" %in% names(data)) {
+      stop("data must contain a 'power_mod' column when type = 'power bioenergetic model'")
+    }
     integral <- pracma::trapz(data$time, data$power_mod)
   }
 
@@ -58,10 +65,14 @@ energy_total <- function(data, type = "power") {
 #' energy_aerobic(data)
 #'
 energy_aerobic <- function(data) {
-  # Ensure the data are sorted by time
-  data <- data |> arrange(time)
+  if (!"time" %in% names(data)) {
+    stop("data must contain a 'time' column")
+  }
+  if (!"power_aerobic" %in% names(data)) {
+    stop("data must contain a 'power_aerobic' column")
+  }
 
-  # Use the trapezoidal rule to calculate the integral of power over time
+  data <- data |> dplyr::arrange(time)
   integral <- pracma::trapz(data$time, data$power_aerobic)
 
   return(integral)
@@ -87,10 +98,14 @@ energy_aerobic <- function(data) {
 #' energy_anaerobic(data)
 #'
 energy_anaerobic <- function(data) {
-  # Ensure the data are sorted by time
-  data <- data |> arrange(time)
+  if (!"time" %in% names(data)) {
+    stop("data must contain a 'time' column")
+  }
+  if (!"power_anaerobic" %in% names(data)) {
+    stop("data must contain a 'power_anaerobic' column")
+  }
 
-  # Use the trapezoidal rule to calculate the integral of power over time
+  data <- data |> dplyr::arrange(time)
   integral <- pracma::trapz(data$time, data$power_anaerobic)
 
   return(integral)
@@ -117,10 +132,14 @@ energy_anaerobic <- function(data) {
 #' energy_lactic(data)
 #'
 energy_lactic <- function(data) {
-  # Ensure the data are sorted by time
-  data <- data |> arrange(time)
+  if (!"time" %in% names(data)) {
+    stop("data must contain a 'time' column")
+  }
+  if (!"power_lactic" %in% names(data)) {
+    stop("data must contain a 'power_lactic' column")
+  }
 
-  # Use the trapezoidal rule to calculate the integral of power over time
+  data <- data |> dplyr::arrange(time)
   integral <- pracma::trapz(data$time, data$power_lactic)
 
   return(integral)
@@ -147,10 +166,14 @@ energy_lactic <- function(data) {
 #' energy_alactic(data)
 #'
 energy_alactic <- function(data) {
-  # Ensure the data are sorted by time
-  data <- data |> arrange(time)
+  if (!"time" %in% names(data)) {
+    stop("data must contain a 'time' column")
+  }
+  if (!"power_alactic" %in% names(data)) {
+    stop("data must contain a 'power_alactic' column")
+  }
 
-  # Use the trapezoidal rule to calculate the integral of power over time
+  data <- data |> dplyr::arrange(time)
   integral <- pracma::trapz(data$time, data$power_alactic)
 
   return(integral)

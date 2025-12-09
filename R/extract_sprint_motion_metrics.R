@@ -147,7 +147,7 @@ sprint_motion_model_data <- function(mean_velocity_splits,
 }
 
 
-#' Maximum Matebolic Power
+#' Maximum Metabolic Power
 #'
 #' Computes the maximal metabolic power generated during a sprint event.The maximum of the estimated power using the sprint bioenergetic model
 #'  can also be computed by entering an extra column (power_mod) corresponding to the power derived from the sprint bioenergetic model.The `type` parameter has to be adjusted accordingly.

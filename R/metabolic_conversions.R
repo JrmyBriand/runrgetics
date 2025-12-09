@@ -20,11 +20,13 @@
 #'
 #'
 convert_acc_lactate_to_lactic_energy <- function(acc_lactate, sex = "male"){
-
-  if(sex == "male"){
-    acc_lactate_o2_eq <- 3
+  if (!sex %in% c("male", "female")) {
+    stop("sex must be either 'male' or 'female'")
   }
-  if(sex == "female"){
+
+  if (sex == "male") {
+    acc_lactate_o2_eq <- 3
+  } else {
     acc_lactate_o2_eq <- 2.7
   }
 
@@ -56,11 +58,13 @@ convert_acc_lactate_to_lactic_energy <- function(acc_lactate, sex = "male"){
 #'
 #'
 convert_lactic_energy_to_acc_lactate <- function(lactic_energy, sex = "male"){
-
-  if(sex == "male"){
-    acc_lactate_o2_eq <- 3
+  if (!sex %in% c("male", "female")) {
+    stop("sex must be either 'male' or 'female'")
   }
-  if(sex == "female"){
+
+  if (sex == "male") {
+    acc_lactate_o2_eq <- 3
+  } else {
     acc_lactate_o2_eq <- 2.7
   }
 

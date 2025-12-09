@@ -34,3 +34,4 @@ lactic_capacity <- 1350
 find_max_la(duration, lactic_capacity)
 
 }
+\keyword{internal}

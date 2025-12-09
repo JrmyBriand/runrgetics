@@ -23,3 +23,4 @@ ensuring that the amplitude term preceding the exponential functions matches the
 bi_exponential_knorm(2, 40)
 
 }
+\keyword{internal}

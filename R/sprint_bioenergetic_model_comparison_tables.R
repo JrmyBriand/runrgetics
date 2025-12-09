@@ -143,24 +143,10 @@ sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints,
   # events
   events <- unique(data$event)
 
-
-  # initialize table
-
-  table <- tibble::tibble(
-    event = character(),
-    adjusted_Rsquared = numeric(),
-    energy_total = numeric(),
-    energy_percent_diff = numeric(),
-    estimated_max_power = numeric(),
-    percentage_difference_max_power = numeric(),
-    distance_modeled_recovered = numeric(),
-    distance_percent_diff = numeric()
-  )
-
-  for (i in events) {
+  # compute metrics for each event
+  results <- purrr::map(events, function(i) {
     event_data <- data |>
       dplyr::filter(event == i)
-
 
     sprint_data <- sprint_motion_model_data(
       mean_velocity_splits = event_data$velocity,
@@ -174,13 +160,7 @@ sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints,
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
-
-    if (i == "Men's 100 m" | i == "Men's 200 m" | i == "Men's 400 m") {
-      map <- 24.5
-    } else {
-      map <- 21
-    }
-
+    map <- if (i %in% c("Men's 100 m", "Men's 200 m", "Men's 400 m")) 24.5 else 21
 
     sprint_power_data <- sprint_bioenergetic_model_data(sprint_data,
       mu = mu,
@@ -190,10 +170,10 @@ sprint_briand_article_gof_table <- function(data = graubner_nixdorf_sprints,
       maximal_aerobic_power = map
     )
 
-    metrics <- sprint_bioenergetic_model_gof_metrics(sprint_power_data, i, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = map, dt = dt)
+    sprint_bioenergetic_model_gof_metrics(sprint_power_data, i, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = map, dt = dt)
+  })
 
-    table <- dplyr::bind_rows(table, metrics)
-  }
+  table <- dplyr::bind_rows(results)
 
   # improve the name of the columns
 
@@ -323,24 +303,10 @@ sprint_energy_cont_briand_article_table <- function(data = graubner_nixdorf_spri
   # events
   events <- unique(data$event)
 
-
-  # initialize table
-
-  table <- tibble::tibble(
-    event = character(),
-    alactic_energy = numeric(),
-    lactic_energy = numeric(),
-    aerobic_energy = numeric(),
-    total_energy = numeric(),
-    alactic_percentage = numeric(),
-    lactic_percentage = numeric(),
-    aerobic_percentage = numeric()
-  )
-
-  for (i in events) {
+  # compute energy contributions for each event
+  results <- purrr::map(events, function(i) {
     event_data <- data |>
       dplyr::filter(event == i)
-
 
     sprint_data <- sprint_motion_model_data(
       mean_velocity_splits = event_data$velocity,
@@ -354,13 +320,7 @@ sprint_energy_cont_briand_article_table <- function(data = graubner_nixdorf_spri
     )
 
     # set a max aerobic power of 24.5 for men's event and 21 for Women's event
-
-    if (i == "Men's 100 m" | i == "Men's 200 m" | i == "Men's 400 m") {
-      map <- 24.5
-    } else {
-      map <- 21
-    }
-
+    map <- if (i %in% c("Men's 100 m", "Men's 200 m", "Men's 400 m")) 24.5 else 21
 
     sprint_power_data <- sprint_bioenergetic_model_data(sprint_data,
       mu = mu,
@@ -370,10 +330,10 @@ sprint_energy_cont_briand_article_table <- function(data = graubner_nixdorf_spri
       maximal_aerobic_power = map
     )
 
-    metrics <- sprint_energy_contributions(sprint_power_data, i)
+    sprint_energy_contributions(sprint_power_data, i)
+  })
 
-    table <- dplyr::bind_rows(table, metrics)
-  }
+  table <- dplyr::bind_rows(results)
 
   # improve the name of the columns
 
