@@ -4,3 +4,8 @@
 ^data-raw$
 ^README\.Rmd$
 ^tools$
+\.DS_Store$
+^\.Rhistory$
+^CLAUDE\.md$
+^CLAUDE\.local\.md$
+^\.claude$

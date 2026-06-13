@@ -5,3 +5,15 @@
 .DS_Store
 .quarto
 inst/doc
+
+# Local Claude Code context (do not commit)
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+# Large raw recordings — shipped gzipped under inst/extdata instead
+data-raw/*.csv
+data-raw/*.fit
+# Local-only athlete data and build diagnostics (never commit)
+data-raw/SLS/
+data-raw/diagnostics/
