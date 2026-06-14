@@ -22,17 +22,24 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Depends: 
-    R (>= 3.5)
+Depends:
+    R (>= 4.1)
 LazyData: true
 Imports: 
     dplyr,
+    FITfileR (>= 0.1.11),
     ggplot2,
     minpack.lm,
     patchwork,
     pracma,
+    readr,
+    signal,
     stats,
     tibble,
     tinytable,
-    utils
+    TTR,
+    utils,
+    zoo
 VignetteBuilder: knitr
+Remotes: 
+    grimbough/FITfileR

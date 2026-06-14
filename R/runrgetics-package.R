@@ -24,6 +24,8 @@
 #' @importFrom ggplot2 theme_minimal
 #' @importFrom minpack.lm nlsLM
 #' @importFrom pracma trapz
+#' @importFrom signal butter
+#' @importFrom signal sgolayfilt
 #' @importFrom stats approx
 #' @importFrom stats coef
 #' @importFrom stats fitted
@@ -35,6 +37,8 @@
 #' @importFrom tinytable group_tt
 #' @importFrom tinytable style_tt
 #' @importFrom tinytable tt
+#' @importFrom TTR EMA
 #' @importFrom utils globalVariables
+#' @importFrom zoo rollmean
 ## usethis namespace: end
 NULL
