@@ -29,7 +29,11 @@ runrgetics_pal <- function(n = NULL) {
   if (is.null(n)) {
     return(pal)
   }
-  rep_len(pal, n)
+  if (n <= length(pal)) {
+    return(pal[seq_len(n)])
+  }
+  # more groups than base colours: interpolate to keep them distinct
+  grDevices::colorRampPalette(pal)(n)
 }
 
 #' runrgetics ggplot2 theme
