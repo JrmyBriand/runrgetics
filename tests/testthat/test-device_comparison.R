@@ -29,6 +29,31 @@ test_that("plot_device_comparison returns a ggplot and rejects unknown signals",
   expect_error(plot_device_comparison(sprint_mix_paired, signal = "heartrate"))
 })
 
+test_that("compare_sprint_power_sources has 4 panels and 3 sources", {
+  d <- compare_sprint_power_sources(ten_200_sprints_paired, sprint_id = 1, body_mass = 67)
+  expect_s3_class(d, "tbl_df")
+  expect_setequal(levels(d$panel),
+                  c("Speed (m/s)", "Acceleration (m/s^2)",
+                    "Metabolic power (W/kg)", "External power (W/kg)"))
+  expect_setequal(as.character(unique(d$source)), c("watch", "gps", "stryd"))
+  # Stryd appears only in the external-power panel
+  expect_true(all(as.character(d$panel[d$source == "stryd"]) == "External power (W/kg)"))
+})
+
+test_that("the Stryd channel scales inversely with body_mass", {
+  s <- function(bm) {
+    d <- compare_sprint_power_sources(ten_200_sprints_paired, sprint_id = 1, body_mass = bm)
+    mean(d$value[d$source == "stryd"], na.rm = TRUE)
+  }
+  expect_equal(s(80), s(67) * 67 / 80, tolerance = 1e-6)
+})
+
+test_that("compare_sprint_power_sources / plot validate and return", {
+  expect_error(compare_sprint_power_sources(mtcars), "source")
+  expect_error(compare_sprint_power_sources(ten_200_sprints_paired, body_mass = -1), "positive")
+  expect_s3_class(plot_sprint_power_sources(ten_200_sprints_paired, sprint_id = 1), "ggplot")
+})
+
 test_that("shared plot style helpers behave", {
   expect_length(runrgetics_pal(4), 4)
   expect_true(all(grepl("^#", runrgetics_pal(4))))

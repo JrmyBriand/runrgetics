@@ -9,6 +9,7 @@ analyze_sprint_bioenergetics(
   maximal_aerobic_power = 27,
   trim = TRUE,
   decel_threshold = 1,
+  launch_accel = 0.5,
   cost_running_flat = 3.6,
   slope_equation = "extended",
   mu = -0.4,
@@ -25,9 +26,12 @@ with \code{\link[=compute_metabolic_running_power]{compute_metabolic_running_pow
 \item{maximal_aerobic_power}{Maximal aerobic power, MAP (W/kg). Use 27 for the
 \code{sprint_mix} / \code{ten_200_sprints} sessions.}
 
-\item{trim}{If \code{TRUE} (default), trim the end-of-effort deceleration before fitting.}
+\item{trim}{If \code{TRUE} (default), trim the pre-launch lead-in and the
+end-of-effort deceleration before fitting.}
 
-\item{decel_threshold}{Deceleration threshold (m/s^2) for the trim.}
+\item{decel_threshold}{Deceleration threshold (m/s^2) for the end-of-effort trim.}
+
+\item{launch_accel}{Acceleration threshold (m/s^2) for the launch trim.}
 
 \item{cost_running_flat}{Flat-terrain cost of running (J/kg/m).}
 
@@ -44,10 +48,11 @@ model fit fails.
 }
 \description{
 Computes metabolic power over a sprint (if not already present), trims the
-end-of-effort deceleration (\code{\link[=trim_sprint_deceleration]{trim_sprint_deceleration()}}), fits the sprint
-bioenergetic model (\code{\link[=sprint_bioenergetic_model_fit]{sprint_bioenergetic_model_fit()}}) with the supplied
-maximal aerobic power, and returns the alactic / lactic / aerobic peak powers,
-energies and percentage contributions.
+pre-launch lead-in (\code{\link[=trim_sprint_launch]{trim_sprint_launch()}}) and the end-of-effort deceleration
+(\code{\link[=trim_sprint_deceleration]{trim_sprint_deceleration()}}), fits the sprint bioenergetic model
+(\code{\link[=sprint_bioenergetic_model_fit]{sprint_bioenergetic_model_fit()}}) with the supplied maximal aerobic power, and
+returns the alactic / lactic / aerobic peak powers, energies and percentage
+contributions.
 }
 \examples{
 gpexe <- subset(ten_200_sprints_paired, source == "gpexe")

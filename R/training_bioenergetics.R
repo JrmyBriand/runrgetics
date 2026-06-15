@@ -2,7 +2,102 @@
 # sprints to split metabolic power into alactic / lactic / aerobic contributions.
 # The model is only valid up to the "sprint finish" (the onset of the abrupt,
 # end-of-effort deceleration), so each sprint is trimmed there before fitting; the
-# gradual in-sprint (natural) deceleration is kept.
+# gradual in-sprint (natural) deceleration is kept. The pre-launch lead-in is also
+# trimmed so the model's t = 0 sits at the start of the acceleration burst (which
+# keeps the alactic peak aligned with the real launch).
+
+#' @importFrom utils globalVariables
+utils::globalVariables(c("power", "component"))
+
+#' Trim a sprint's pre-launch lead-in
+#'
+#' Drops the low-speed lead-in before the acceleration burst so that the sprint
+#' starts at the launch. The launch is the first sample (up to the peak velocity)
+#' whose smoothed acceleration exceeds `launch_accel`; one sample before it is kept
+#' so the very start of the burst is included.
+#'
+#' @param sprint_df A single sprint's data frame with `time` (s) and `velocity`
+#'   (m/s) columns (an `acceleration` column is used if present).
+#' @param launch_accel Acceleration (m/s^2) marking the launch onset.
+#'
+#' @returns The input data frame truncated at its start to begin at the launch.
+#' @export
+#'
+#' @examples
+#' gpexe <- subset(ten_200_sprints_paired, source == "gpexe")
+#' sprints <- detect_sprints(gpexe)
+#' one <- gpexe[sprints$start_index[1]:sprints$end_index[1], ]
+#' nrow(trim_sprint_launch(one))
+trim_sprint_launch <- function(sprint_df, launch_accel = 0.5) {
+  if (!is.data.frame(sprint_df) || !all(c("time", "velocity") %in% names(sprint_df))) {
+    stop("`sprint_df` must be a data frame with `time` and `velocity` columns.")
+  }
+  if (nrow(sprint_df) < 3L) return(sprint_df)
+  dt <- stats::median(diff(sprint_df$time), na.rm = TRUE)
+  k <- max(1L, round(1 / dt))
+  v <- roll_smooth(sprint_df$velocity, k)
+  a <- if ("acceleration" %in% names(sprint_df)) {
+    roll_smooth(sprint_df$acceleration, k)
+  } else {
+    roll_smooth(central_diff(v, dt), k)
+  }
+  peak <- which.max(v)
+  if (peak <= 1) return(sprint_df)
+  rise <- which(a[seq_len(peak)] > launch_accel)
+  if (length(rise) == 0) return(sprint_df)
+  onset <- max(1L, rise[1] - 1L)
+  sprint_df[onset:nrow(sprint_df), , drop = FALSE]
+}
+
+#' Modeled bioenergetic series for one sprint
+#'
+#' Trims, computes metabolic power, fits the model and returns the measured and
+#' modeled (total / alactic / lactic / aerobic) power time series. The fitted peak
+#' alactic and lactic powers are attached as attributes. Returns model columns of
+#' `NA` if the fit fails. Internal helper shared by the analysis and plot.
+#' @noRd
+sprint_bioenergetic_series <- function(sprint_df, maximal_aerobic_power = 27, trim = TRUE,
+                                       decel_threshold = 1.0, launch_accel = 0.5,
+                                       cost_running_flat = 3.6, slope_equation = "extended",
+                                       mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35) {
+  if (trim) {
+    sprint_df <- trim_sprint_launch(sprint_df, launch_accel)
+    sprint_df <- trim_sprint_deceleration(sprint_df, decel_threshold)
+  }
+  if (!"metabolic_power" %in% names(sprint_df)) {
+    sprint_df <- compute_metabolic_running_power(
+      sprint_df[, c("time", "velocity")],
+      cost_running_flat = cost_running_flat, slope_equation = slope_equation)
+  }
+  md <- tibble::tibble(time = sprint_df$time - min(sprint_df$time),
+                       power = sprint_df$metabolic_power)
+  fit <- tryCatch(
+    sprint_bioenergetic_model_fit(md, mu = mu, sigma = sigma, k1 = k1, k2 = k2,
+                                  maximal_aerobic_power = maximal_aerobic_power),
+    error = function(e) NULL)
+
+  out <- tibble::tibble(time = md$time, measured = md$power,
+                        alactic = NA_real_, lactic = NA_real_,
+                        aerobic = NA_real_, total = NA_real_)
+  max_al <- NA_real_; max_la <- NA_real_
+  if (!is.null(fit)) {
+    cf <- stats::coef(fit)
+    max_al <- unname(cf[["maximal_alactic_power"]])
+    max_la <- unname(cf[["maximal_lactic_power"]])
+    model_at <- function(o) {
+      sprint_bioenergetic_model(md$time, max_al, max_la, mu = mu, sigma = sigma,
+                                k1 = k1, k2 = k2,
+                                maximal_aerobic_power = maximal_aerobic_power, output = o)
+    }
+    out$alactic <- model_at("alactic power")
+    out$lactic <- model_at("lactic power")
+    out$aerobic <- model_at("aerobic power")
+    out$total <- out$alactic + out$lactic + out$aerobic
+  }
+  attr(out, "maximal_alactic_power") <- max_al
+  attr(out, "maximal_lactic_power") <- max_la
+  out
+}
 
 #' Trim a sprint's end-of-effort deceleration
 #'
@@ -49,18 +144,21 @@ trim_sprint_deceleration <- function(sprint_df, decel_threshold = 1.0) {
 #' Bioenergetic analysis of a single sprint
 #'
 #' Computes metabolic power over a sprint (if not already present), trims the
-#' end-of-effort deceleration ([trim_sprint_deceleration()]), fits the sprint
-#' bioenergetic model ([sprint_bioenergetic_model_fit()]) with the supplied
-#' maximal aerobic power, and returns the alactic / lactic / aerobic peak powers,
-#' energies and percentage contributions.
+#' pre-launch lead-in ([trim_sprint_launch()]) and the end-of-effort deceleration
+#' ([trim_sprint_deceleration()]), fits the sprint bioenergetic model
+#' ([sprint_bioenergetic_model_fit()]) with the supplied maximal aerobic power, and
+#' returns the alactic / lactic / aerobic peak powers, energies and percentage
+#' contributions.
 #'
 #' @param sprint_df A single sprint's data frame with `time` (s) and `velocity`
 #'   (m/s); a `metabolic_power` column is used if present, otherwise it is computed
 #'   with [compute_metabolic_running_power()].
 #' @param maximal_aerobic_power Maximal aerobic power, MAP (W/kg). Use 27 for the
 #'   `sprint_mix` / `ten_200_sprints` sessions.
-#' @param trim If `TRUE` (default), trim the end-of-effort deceleration before fitting.
-#' @param decel_threshold Deceleration threshold (m/s^2) for the trim.
+#' @param trim If `TRUE` (default), trim the pre-launch lead-in and the
+#'   end-of-effort deceleration before fitting.
+#' @param decel_threshold Deceleration threshold (m/s^2) for the end-of-effort trim.
+#' @param launch_accel Acceleration threshold (m/s^2) for the launch trim.
 #' @param cost_running_flat Flat-terrain cost of running (J/kg/m).
 #' @param slope_equation Slope equation passed to [cost_running()].
 #' @param mu,sigma,k1,k2 Sprint bioenergetic model shape parameters
@@ -81,64 +179,41 @@ analyze_sprint_bioenergetics <- function(sprint_df,
                                          maximal_aerobic_power = 27,
                                          trim = TRUE,
                                          decel_threshold = 1.0,
+                                         launch_accel = 0.5,
                                          cost_running_flat = 3.6,
                                          slope_equation = "extended",
                                          mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35) {
   if (!is.data.frame(sprint_df) || !all(c("time", "velocity") %in% names(sprint_df))) {
     stop("`sprint_df` must be a data frame with `time` and `velocity` columns.")
   }
-  if (trim) sprint_df <- trim_sprint_deceleration(sprint_df, decel_threshold)
+  ser <- sprint_bioenergetic_series(
+    sprint_df, maximal_aerobic_power = maximal_aerobic_power, trim = trim,
+    decel_threshold = decel_threshold, launch_accel = launch_accel,
+    cost_running_flat = cost_running_flat, slope_equation = slope_equation,
+    mu = mu, sigma = sigma, k1 = k1, k2 = k2)
+  duration <- max(ser$time)
 
-  # metabolic power (reuse the engine if not already computed)
-  if (!"metabolic_power" %in% names(sprint_df)) {
-    sprint_df <- compute_metabolic_running_power(
-      sprint_df[, c("time", "velocity")],
-      cost_running_flat = cost_running_flat, slope_equation = slope_equation)
+  if (all(is.na(ser$total))) {
+    return(tibble::tibble(
+      duration = duration, maximal_alactic_power = NA_real_, maximal_lactic_power = NA_real_,
+      peak_power = NA_real_, mean_power = NA_real_,
+      energy_alactic = NA_real_, energy_lactic = NA_real_, energy_aerobic = NA_real_,
+      energy_total = NA_real_, pct_alactic = NA_real_, pct_lactic = NA_real_,
+      pct_aerobic = NA_real_))
   }
 
-  md <- tibble::tibble(time = sprint_df$time - min(sprint_df$time),
-                       power = sprint_df$metabolic_power)
-  duration <- max(md$time)
-
-  na_row <- tibble::tibble(
-    duration = duration, maximal_alactic_power = NA_real_, maximal_lactic_power = NA_real_,
-    peak_power = NA_real_, mean_power = NA_real_,
-    energy_alactic = NA_real_, energy_lactic = NA_real_, energy_aerobic = NA_real_,
-    energy_total = NA_real_, pct_alactic = NA_real_, pct_lactic = NA_real_,
-    pct_aerobic = NA_real_
-  )
-
-  fit <- tryCatch(
-    sprint_bioenergetic_model_fit(md, mu = mu, sigma = sigma, k1 = k1, k2 = k2,
-                                  maximal_aerobic_power = maximal_aerobic_power),
-    error = function(e) NULL)
-  if (is.null(fit)) return(na_row)
-
-  cf <- stats::coef(fit)
-  max_al <- unname(cf[["maximal_alactic_power"]])
-  max_la <- unname(cf[["maximal_lactic_power"]])
-  tt <- md$time
-  model_at <- function(out) {
-    sprint_bioenergetic_model(tt, max_al, max_la, mu = mu, sigma = sigma,
-                              k1 = k1, k2 = k2,
-                              maximal_aerobic_power = maximal_aerobic_power, output = out)
-  }
-  p_al <- model_at("alactic power")
-  p_la <- model_at("lactic power")
-  p_aer <- model_at("aerobic power")
-  p_tot <- p_al + p_la + p_aer
-
-  e_al <- pracma::trapz(tt, p_al)
-  e_la <- pracma::trapz(tt, p_la)
-  e_aer <- pracma::trapz(tt, p_aer)
+  tt <- ser$time
+  e_al <- pracma::trapz(tt, ser$alactic)
+  e_la <- pracma::trapz(tt, ser$lactic)
+  e_aer <- pracma::trapz(tt, ser$aerobic)
   e_tot <- e_al + e_la + e_aer
 
   tibble::tibble(
     duration = duration,
-    maximal_alactic_power = max_al,
-    maximal_lactic_power = max_la,
-    peak_power = max(p_tot, na.rm = TRUE),
-    mean_power = mean(p_tot, na.rm = TRUE),
+    maximal_alactic_power = attr(ser, "maximal_alactic_power"),
+    maximal_lactic_power = attr(ser, "maximal_lactic_power"),
+    peak_power = max(ser$total, na.rm = TRUE),
+    mean_power = mean(ser$total, na.rm = TRUE),
     energy_alactic = e_al,
     energy_lactic = e_la,
     energy_aerobic = e_aer,
@@ -147,6 +222,66 @@ analyze_sprint_bioenergetics <- function(sprint_df,
     pct_lactic = 100 * e_la / e_tot,
     pct_aerobic = 100 * e_aer / e_tot
   )
+}
+
+#' Plot a sprint's bioenergetic decomposition
+#'
+#' Decomposes one sprint of a workout into its alactic, lactic and aerobic
+#' metabolic-power contributions and plots them together with the observed and
+#' modeled total metabolic power, in the shared package style. The sprint is
+#' extracted over its full effort and launch-aligned, so the alactic peak matches
+#' the real acceleration burst.
+#'
+#' @param motion_data A workout data frame with `time` (s) and `velocity` (m/s).
+#' @param sprint_id Which detected sprint to plot (its `sprint_id`).
+#' @param sprints Optional sprint table from [detect_sprints()]; if `NULL` (default),
+#'   sprints are detected with [detect_sprints()].
+#' @inheritParams analyze_sprint_bioenergetics
+#'
+#' @returns A ggplot object.
+#' @export
+#'
+#' @examples
+#' gpexe <- subset(ten_200_sprints_paired, source == "gpexe")
+#' plot_sprint_bioenergetics(gpexe, sprint_id = 1, maximal_aerobic_power = 27)
+plot_sprint_bioenergetics <- function(motion_data, sprint_id = 1, sprints = NULL,
+                                      maximal_aerobic_power = 27, trim = TRUE,
+                                      decel_threshold = 1.0, launch_accel = 0.5,
+                                      cost_running_flat = 3.6, slope_equation = "extended",
+                                      mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35) {
+  if (is.null(sprints)) sprints <- detect_sprints(motion_data)
+  series <- workout_sprint_series(motion_data, sprints,
+                                  cost_running_flat = cost_running_flat,
+                                  slope_equation = slope_equation)
+  s <- series[series$sprint_id == sprint_id, , drop = FALSE]
+  if (nrow(s) == 0) stop("`sprint_id` not found in the detected sprints.")
+
+  ser <- sprint_bioenergetic_series(
+    s, maximal_aerobic_power = maximal_aerobic_power, trim = trim,
+    decel_threshold = decel_threshold, launch_accel = launch_accel,
+    cost_running_flat = cost_running_flat, slope_equation = slope_equation,
+    mu = mu, sigma = sigma, k1 = k1, k2 = k2)
+  if (all(is.na(ser$total))) stop("The bioenergetic model fit failed for this sprint.")
+
+  lev <- c("Observed metabolic power", "Modeled metabolic power",
+           "Alactic power", "Lactic power", "Aerobic power")
+  plot_data <- rbind(
+    data.frame(time = ser$time, power = ser$measured, component = lev[1]),
+    data.frame(time = ser$time, power = ser$total,    component = lev[2]),
+    data.frame(time = ser$time, power = ser$alactic,  component = lev[3]),
+    data.frame(time = ser$time, power = ser$lactic,   component = lev[4]),
+    data.frame(time = ser$time, power = ser$aerobic,  component = lev[5])
+  )
+  plot_data$component <- factor(plot_data$component, levels = lev)
+  cols <- stats::setNames(
+    c("grey60", "#0072B2", "#D55E00", "#009E73", "#E69F00"), lev)
+
+  ggplot2::ggplot(plot_data, ggplot2::aes(x = time, y = power, colour = component)) +
+    ggplot2::geom_line(linewidth = 0.7) +
+    ggplot2::scale_colour_manual(values = cols) +
+    ggplot2::labs(title = paste("Sprint", sprint_id, "bioenergetic decomposition"),
+                  x = "Time (s)", y = "Power (W/kg)", colour = NULL) +
+    theme_runrgetics()
 }
 
 #' Bioenergetic analysis of a sprint-training workout
@@ -176,6 +311,7 @@ analyze_training_bioenergetics <- function(motion_data,
                                            maximal_aerobic_power = 27,
                                            trim = TRUE,
                                            decel_threshold = 1.0,
+                                           launch_accel = 0.5,
                                            cost_running_flat = 3.6,
                                            slope_equation = "extended",
                                            mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35,
@@ -189,7 +325,8 @@ analyze_training_bioenergetics <- function(motion_data,
   parts <- lapply(split(series, series$sprint_id), function(s) {
     res <- analyze_sprint_bioenergetics(
       s, maximal_aerobic_power = maximal_aerobic_power, trim = trim,
-      decel_threshold = decel_threshold, cost_running_flat = cost_running_flat,
+      decel_threshold = decel_threshold, launch_accel = launch_accel,
+      cost_running_flat = cost_running_flat,
       slope_equation = slope_equation, mu = mu, sigma = sigma, k1 = k1, k2 = k2)
     cbind(data.frame(sprint_id = s$sprint_id[1]), as.data.frame(res))
   })

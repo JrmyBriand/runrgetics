@@ -38,6 +38,22 @@ test_that("higher MAP increases the aerobic contribution", {
   expect_gt(hi$pct_aerobic, lo$pct_aerobic)
 })
 
+test_that("trim_sprint_launch drops the pre-launch lead-in", {
+  t <- seq(0, 30, by = 0.2)
+  v <- ifelse(t < 2, 0.1, ifelse(t < 5, (t - 2) * 2.5, 7.5))  # flat lead-in, ramp, plateau
+  trimmed <- trim_sprint_launch(data.frame(time = t, velocity = v), launch_accel = 0.5)
+  expect_gt(min(trimmed$time), 0)        # leading flat removed
+  expect_lt(nrow(trimmed), length(t))
+  expect_error(trim_sprint_launch(data.frame(time = 1:5)), "velocity")
+})
+
+test_that("plot_sprint_bioenergetics returns a ggplot", {
+  g <- subset(ten_200_sprints_paired, source == "gpexe")
+  expect_s3_class(plot_sprint_bioenergetics(g, sprint_id = 1, maximal_aerobic_power = 27),
+                  "ggplot")
+  expect_error(plot_sprint_bioenergetics(g, sprint_id = 999), "not found")
+})
+
 test_that("analyze_training_bioenergetics summarises the whole workout", {
   res <- analyze_training_bioenergetics(gpexe_ten200(), maximal_aerobic_power = 27)
   expect_named(res, c("per_sprint", "summary"))
