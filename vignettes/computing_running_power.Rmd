@@ -1,0 +1,195 @@
+---
+title: "Computing Running Power"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Computing Running Power}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(runrgetics)
+library(FITfileR)
+library(dplyr)
+library(readr)
+```
+
+The package provide functions to compute running power from instantaneous velocity and acceleration. The energy cost of running on flat terrain can be computed according to the method proposed by di Prampero et al. (2005 and 2018), which assimilates the energy cost of accelerated running on flat terrain to the energy cost of running uphill at constant speed. The forward acceleration can be associated to an equivalent slope, which is then used to compute the energy cost of accelerated running on flat terrain. The equations relating to equivalent slopes refer to the experimental data of Minetti et al. (2002). More recently, Minetti and Pavei (2018) proposed updated equations for higher slopes that weren't explored in Minetti's et al. (2002) original work. The energy cost of running on flat terrain can be computed using the `cost_running` function.
+The parameter `slope_equation` can be set to "original" to use the original equations from Minetti et al. (2002) and di Prampero and Osgnach (2018) adjustement for high equivalent slopes or to "extended" to use the updated equations from Minetti and Pavei (2018).
+
+In this vignette, we explore how running power can be computed using `runrgetics` package functions based on GPS data collected during a running workout on flat terrain.
+
+## Package GPS watch running data
+
+The package includes a sample GPS watch data set collected during a running workout on flat terrain. The data can be accessed from the following functions.
+
+```{r}
+
+run_data_fit <- system.file("extdata", "activities", "sample_run.fit", package = "runrgetics")
+
+run_data_csv <- system.file("extdata", "activities", "sample_run.csv", package = "runrgetics")
+
+```
+
+We can visualize the format of the data using the csv file.
+
+```{r}
+run_data <- readr::read_csv(run_data_csv)
+head(run_data)
+```
+
+The csv has a column `time` that contains the time in seconds since the start of the activity, a column `velocity` that contains the instantaneous velocity in m/s.
+
+Similarly with the FIT file, we can extract the same data using the `FITfileR` package.
+
+```{r}
+run_dat_fit <- get_fit_data_frame(run_data_fit)
+
+head(run_dat_fit)
+```
+
+Note that the fit file returns a data frame with time stamps and a column speed. The function `reformat_fit_data_frame` can be used to translate time stamps into a `time` column and a `velocity` column as presented in the csv file of the same activity.
+
+```{r}
+reformat_fit_data <- reformat_fit_data_frame(run_dat_fit)
+head(reformat_fit_data)
+
+```
+
+
+## Computing Metabolic Running Power
+
+The metabolic running power can be computed using the `compute_metabolic_running_power` function. The function takes as input a data frame with columns `time` and `velocity`, computes acceleration before estimating running metabolic power from velocity and acceleration data, using the approaches referred to previously obtain cost of running from velocity and acceleration. 
+
+
+```{r}
+metabolic_power_data <- compute_metabolic_running_power(run_data, cost_running_flat = 3.6, slope_equation = "original", smoothing = "none")
+head(metabolic_power_data)
+```
+
+```{r}
+plot_running_metabolic_power(metabolic_power_data)
+```
+
+We can also apply a simple butterworth low pass filter to smooth out the velocity data and obtain a cleaner metabolic power. The low pass filter removes the high frequency data associated to noise in the gps measurements. 
+
+```{r}
+smooth_metabolic_power_data <- compute_metabolic_running_power(run_data, cost_running_flat = 3.6, slope_equation = "original", smoothing = "butterworth")
+head(metabolic_power_data)
+
+
+
+```
+
+We can plot the smoothed metabolic power
+
+```{r}
+plot_running_metabolic_power(smooth_metabolic_power_data)
+```
+
+
+## Plot Metabolic Power Data From File
+
+The metabolic power data can be directly ploted from the file path using `plot_activity_metabolic_power`.
+
+```{r}
+
+plot_activity_metabolic_power(
+  file_path = run_data_fit,
+  file_type = "fit",
+  cost_running_flat = 3.6,
+  slope_equation = "original",
+  smoothing = "butterworth",
+  order = 2,
+  cfreq = 0.1
+)
+```
+
+
+## External Power
+
+The external power corresponds to the mechanical power required to move the center of mass. It can be computed using the function `compute_external_running_power`, and can be plotted as for the metabolic power using the function `plot_running_external_power`.
+
+The same filters can be applied to smooth out GPS data.
+
+```{r}
+external_power_data <- compute_external_running_power(run_data,
+                                                      smoothing = "butterworth")
+```
+
+We can look at the plot. 
+
+```{r}
+plot_running_external_power(external_power_data)
+```
+
+The external mechanical efficiency is the ratio of the metabolic power that is used to produce external work. It can be computed if the external and metabolic power are known.
+
+```{r}
+power_efficiency_data <- compute_external_mechanical_efficiency(run_data, cost_running_flat = 3.6, slope_equation = "original", smoothing = "butterworth")
+
+```
+
+We can plot mechanical efficiency over time.
+
+```{r}
+plot_external_mechanical_efficiency(power_efficiency_data)
+
+```
+Note that high mechanical efficiency can result from artifacts in the gps data. 
+We can do a power analysis to evaluate the time course of metabolic and external power, long with the external mechanical efficiency.
+
+```{r}
+plot_metabolic_external_power_comparison(power_efficiency_data)
+```
+
+### Plotting external power from input file
+
+As with metabolic power, the functions can be used by directly including `fit` or `csv` files. 
+
+```{r}
+plot_activity_external_power(
+  file_path = run_data_fit,
+  file_type = "fit",
+  smoothing = "butterworth",
+  order = 2,
+  cfreq = 0.1
+)
+```
+
+```{r}
+plot_activity_power_analysis(
+  file_path = run_data_fit,
+  file_type = "fit",
+  cost_running_flat = 3.6,
+  slope_equation = "original",
+  smoothing = "butterworth",
+  order = 2,
+  cfreq = 0.1
+)
+```
+
+
+## Activity Analysis
+
+Finally, a complete analysis of the workout can be plotted, displaying the power (external and metabolic), the velocity and acceleration, as well as efficiency information. 
+
+```{r}
+plot_activity_running_analysis(
+  file_path = run_data_fit,
+  file_type = "fit",
+  cost_running_flat = 3.6,
+  slope_equation = "original",
+  smoothing = "butterworth",
+  order = 2,
+  cfreq = 0.1
+)
+```
+

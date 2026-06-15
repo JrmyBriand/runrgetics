@@ -17,3 +17,6 @@ data-raw/*.fit
 # Local-only athlete data and build diagnostics (never commit)
 data-raw/SLS/
 data-raw/diagnostics/
+
+# knitr figure artifacts from local vignette validation
+figure/

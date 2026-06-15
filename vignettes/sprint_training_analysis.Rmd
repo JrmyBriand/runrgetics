@@ -1,0 +1,174 @@
+---
+title: "Sprint Training Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Sprint Training Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+```{r setup}
+library(runrgetics)
+library(dplyr)
+library(ggplot2)
+```
+
+This vignette walks through the sprint-training analysis tools of `runrgetics`
+end to end, using two track sessions that were recorded **simultaneously** by a
+gpexe local-positioning unit and a Polar/Stryd watch. Starting from the raw paired
+recordings we filter the noisier watch signal, compare the two devices, detect the
+individual sprints of a workout, compare them, and finally decompose each sprint's
+metabolic power into its aerobic, anaerobic-alactic and anaerobic-lactic
+contributions following di Prampero (2005, 2018) and Briand et al. (2025).
+
+## The paired datasets
+
+The package ships two paired-device sessions as lazy-loaded datasets: a mixed
+sprint session (`sprint_mix_paired`) and a session of ten 200 m sprints
+(`ten_200_sprints_paired`). Each is a tidy long table with a `source` column
+identifying the device, a synchronized `time` (s) and, where available, velocity,
+position and power channels (see `?sprint_mix_paired`).
+
+```{r}
+head(ten_200_sprints_paired)
+
+table(ten_200_sprints_paired$source)
+```
+
+The gpexe unit samples faster and applies its own onboard filtering, so it is
+treated as the reference signal; the watch (`polar_stryd`) is noisier and is what
+we filter below.
+
+## Filtering the watch signal
+
+`filter_watch_motion()` low-pass filters the watch data so that its speed,
+acceleration and distance approximate the gpexe-filtered reference. By default it
+applies a zero-phase Butterworth filter (cut-off 0.175 Hz), resamples to a uniform
+grid and derives a clean acceleration and cumulative distance.
+
+```{r}
+watch <- ten_200_sprints_paired |> filter(source == "polar_stryd")
+
+filtered_watch <- filter_watch_motion(watch)
+
+head(filtered_watch)
+```
+
+## Comparing the devices
+
+`compare_devices()` filters the watch, derives matched motion and power channels
+for both devices on a common grid, and reports their agreement (root-mean-square
+error, bias, correlation and magnitude ratio). gpexe is the reference, so a
+`ratio` above 1 means the watch reads higher.
+
+```{r}
+compare_devices(ten_200_sprints_paired)
+```
+
+`plot_device_comparison()` overlays a chosen signal for the filtered watch and the
+gpexe reference.
+
+```{r}
+plot_device_comparison(ten_200_sprints_paired, signal = "speed")
+```
+
+## Detecting sprints automatically
+
+`detect_sprints()` segments a continuous workout into individual high-intensity
+efforts. By default it flags spans where speed exceeds 5 m/s for at least 2 s,
+merging efforts separated by short recoveries. Here it recovers the ten 200 m
+repetitions of the workout.
+
+```{r}
+gpexe <- ten_200_sprints_paired |> filter(source == "gpexe")
+
+sprints <- detect_sprints(gpexe)
+
+sprints
+```
+
+Each effort comes with its start/end (time and row index), duration, peak and mean
+speed, distance and peak acceleration.
+
+## Comparing a multi-sprint workout
+
+`compare_workout_sprints()` summarises every detected effort for side-by-side
+comparison, and `plot_workout_sprints()` overlays each effort against distance from
+its start (speed by default), reproducing the classic sprint-comparison figure.
+
+```{r}
+compare_workout_sprints(gpexe, sprints = sprints)
+```
+
+```{r}
+plot_workout_sprints(gpexe, sprints = sprints)
+```
+
+The efforts are shown over their full profile, from the launch through the
+deceleration, so the within-workout consistency (and any fatigue) is visible.
+
+## Training bioenergetic analysis
+
+Finally, `analyze_training_bioenergetics()` applies the sprint bioenergetic model
+to each detected sprint and splits its metabolic power into alactic, lactic and
+aerobic contributions. The maximal aerobic power (MAP) is a parameter; for these
+two sessions we use **27 W/kg**. Each sprint's end-of-effort deceleration is
+trimmed automatically before fitting, since the model is only valid up to the
+sprint finish.
+
+```{r}
+bioenergetics <- analyze_training_bioenergetics(
+  gpexe,
+  sprints = sprints,
+  maximal_aerobic_power = 27
+)
+
+bioenergetics$per_sprint
+
+bioenergetics$summary
+```
+
+We can visualise the decomposition for a single sprint. We extract the effort
+(with a short pre-roll to capture the launch), compute its metabolic power and pass
+it to `plot_sprint_bioenergetic_model()`.
+
+```{r}
+sp <- sprints[2, ]
+segment <- gpexe[max(1, sp$start_index - 15):sp$end_index, ]
+
+segment_power <- compute_metabolic_running_power(segment[, c("time", "velocity")])
+
+sprint_md <- tibble(
+  time = segment_power$time - min(segment_power$time),
+  power = segment_power$metabolic_power
+)
+
+plot_sprint_bioenergetic_model(sprint_md, maximal_aerobic_power = 27,
+                               scale_max_power = 60)
+```
+
+Across the ten repetitions, the aerobic and lactic pathways dominate these ~30 s
+efforts, with a smaller alactic contribution concentrated in the acceleration
+phase — as expected for repeated 200 m sprints.
+
+## References
+
+- di Prampero, P. E., et al. (2005). Sprint running: a new energetic approach.
+  *Journal of Experimental Biology*, 208(14), 2809–2816.
+- Osgnach, C., & di Prampero, P. E. (2018). Metabolic power in team sports.
+  *International Journal of Sports Medicine*.
+- Minetti, A. E., et al. (2002). Energy cost of walking and running at extreme
+  uphill and downhill slopes. *Journal of Applied Physiology*.
+- Minetti, A. E., & Pavei, G. (2018). Update and extension of the 'equivalent
+  slope' of speed-changing level locomotion. *Journal of Experimental Biology*.
+- Briand, J., et al. (2025). *European Journal of Applied Physiology*.
+  doi:10.1007/s00421-025-05831-0
