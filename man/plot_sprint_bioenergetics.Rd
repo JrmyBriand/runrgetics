@@ -14,12 +14,13 @@ plot_sprint_bioenergetics(
   launch_accel = 0.5,
   cost_running_flat = 3.6,
   slope_equation = "extended",
-  mu = -0.4,
-  sigma = 1,
+  mu = 0.5,
+  sigma = 0.5,
   k1 = 2.75,
   k2 = 35,
   fit_mu = TRUE,
-  fit_sigma = TRUE
+  fit_sigma = TRUE,
+  fit_k2 = TRUE
 )
 }
 \arguments{
@@ -45,18 +46,21 @@ end-of-effort deceleration before fitting.}
 \item{slope_equation}{Slope equation passed to \code{\link[=cost_running]{cost_running()}}.}
 
 \item{mu, sigma, k1, k2}{Sprint bioenergetic model shape parameters
-(see \code{\link[=sprint_bioenergetic_model]{sprint_bioenergetic_model()}}). \code{mu} is the starting value when \code{fit_mu}
-is \code{TRUE}, otherwise the fixed value.}
+(see \code{\link[=sprint_bioenergetic_model]{sprint_bioenergetic_model()}}). The defaults (\code{mu = 0.5}, \code{sigma = 0.5},
+\code{k2 = 35}) are starting values tuned for gpexe / training sprints; each is the
+fitted starting value when its \verb{fit_*} switch is \code{TRUE}, otherwise the fixed value.}
 
 \item{fit_mu}{If \code{TRUE} (default), also estimate the alactic peak location \code{mu}
-so it adapts to the observed metabolic-power peak (recommended for gpexe /
-training sprints, whose power peaks later than in maximal sprints); if \code{FALSE},
-\code{mu} is held at the published fixed value.}
+so it adapts to the observed metabolic-power peak (training sprints peak later
+than maximal sprints); if \code{FALSE}, \code{mu} is held fixed.}
 
 \item{fit_sigma}{If \code{TRUE} (default), also estimate the alactic width \code{sigma}
-(letting the bump narrow / decay faster); fitting \code{sigma} together with \code{mu}
-keeps the alactic separated from the lactic term and the contributions
-physiological. If \code{FALSE}, \code{sigma} is held fixed.}
+(letting the bump narrow / decay faster); if \code{FALSE}, \code{sigma} is held fixed.}
+
+\item{fit_k2}{If \code{TRUE} (default), also estimate the lactic decay time constant
+\code{k2}. Fitting \code{mu}, \code{sigma} and \code{k2} together (with the tuned starts) gives
+stable, physiological partitions across training sprints; if \code{FALSE}, \code{k2} is
+held fixed.}
 }
 \value{
 A ggplot object.

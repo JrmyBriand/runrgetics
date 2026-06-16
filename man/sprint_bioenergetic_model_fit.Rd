@@ -12,7 +12,8 @@ sprint_bioenergetic_model_fit(
   k2 = 35,
   maximal_aerobic_power = 24.5,
   fit_mu = FALSE,
-  fit_sigma = FALSE
+  fit_sigma = FALSE,
+  fit_k2 = FALSE
 )
 }
 \arguments{
@@ -37,7 +38,12 @@ e.g. GPS/gpexe data); \code{mu} is the starting value and is bounded to \verb{[-
 \item{fit_sigma}{Logical. If \code{FALSE} (default), the alactic width \code{sigma} is held
 fixed at the supplied value. If \code{TRUE}, \code{sigma} is also estimated, letting the
 alactic bump narrow (faster decay) to better separate it from the lactic term;
-\code{sigma} is the starting value and is bounded to \verb{[0.2, 1.5]}.}
+\code{sigma} is the starting value and is bounded to \verb{[0.3, 1.0]}.}
+
+\item{fit_k2}{Logical. If \code{FALSE} (default), the lactic decay time constant \code{k2}
+is held fixed at the supplied value. If \code{TRUE}, \code{k2} is also estimated, letting
+the lactic decay adapt; \code{k2} is the starting value and is bounded to \verb{[10, 80]} s.
+Best used together with \code{fit_mu}/\code{fit_sigma} and sensible starting values.}
 }
 \value{
 An object of class \code{nls} and \code{nls.lm}, as returned by \code{nlsLM()}. This object contains the fitted model and can be used with generic functions like \code{summary()}, \code{predict()}, and \code{coef()}.

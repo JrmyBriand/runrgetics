@@ -63,7 +63,11 @@ sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lacti
 #' @param fit_sigma Logical. If `FALSE` (default), the alactic width `sigma` is held
 #'   fixed at the supplied value. If `TRUE`, `sigma` is also estimated, letting the
 #'   alactic bump narrow (faster decay) to better separate it from the lactic term;
-#'   `sigma` is the starting value and is bounded to `[0.2, 1.5]`.
+#'   `sigma` is the starting value and is bounded to `[0.3, 1.0]`.
+#' @param fit_k2 Logical. If `FALSE` (default), the lactic decay time constant `k2`
+#'   is held fixed at the supplied value. If `TRUE`, `k2` is also estimated, letting
+#'   the lactic decay adapt; `k2` is the starting value and is bounded to `[10, 80]` s.
+#'   Best used together with `fit_mu`/`fit_sigma` and sensible starting values.
 #' @inheritParams sprint_bioenergetic_model
 #'
 #' @returns An object of class \code{nls} and \code{nls.lm}, as returned by \code{nlsLM()}. This object contains the fitted model and can be used with generic functions like \code{summary()}, \code{predict()}, and \code{coef()}.
@@ -93,21 +97,27 @@ sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lacti
 #' fit <- sprint_bioenergetic_model_fit(bolt_100m_motion_data)
 #' fit
 #'
-sprint_bioenergetic_model_fit <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, fit_mu = FALSE, fit_sigma = FALSE) {
+sprint_bioenergetic_model_fit <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, fit_mu = FALSE, fit_sigma = FALSE, fit_k2 = FALSE) {
   start <- list(maximal_alactic_power = 110, maximal_lactic_power = 50)
   lower <- c(maximal_alactic_power = 0, maximal_lactic_power = 0)
   upper <- c(maximal_alactic_power = Inf, maximal_lactic_power = Inf)
   if (fit_mu) {
     # also estimate the alactic peak location; mu (above) is the starting value
     start$mu <- mu
-    lower <- c(lower, mu = -1.5)
-    upper <- c(upper, mu = 1.5)
+    lower <- c(lower, mu = -1)
+    upper <- c(upper, mu = 0.9)
   }
   if (fit_sigma) {
     # also estimate the alactic width; sigma (above) is the starting value
     start$sigma <- sigma
-    lower <- c(lower, sigma = 0.2)
-    upper <- c(upper, sigma = 1.5)
+    lower <- c(lower, sigma = 0.3)
+    upper <- c(upper, sigma = 1.0)
+  }
+  if (fit_k2) {
+    # also estimate the lactic decay time constant; k2 (above) is the starting value
+    start$k2 <- k2
+    lower <- c(lower, k2 = 10)
+    upper <- c(upper, k2 = 80)
   }
 
   fit <- minpack.lm::nlsLM(

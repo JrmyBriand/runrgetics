@@ -72,18 +72,32 @@ test_that("sprint_bioenergetic_model_fit estimates sigma when fit_sigma = TRUE",
     sprint_bioenergetic_model_fit(md, maximal_aerobic_power = 25, fit_sigma = TRUE))))
 })
 
-test_that("fit_mu / fit_sigma control the alactic peak and width", {
+test_that("sprint_bioenergetic_model_fit estimates k2 when fit_k2 = TRUE", {
+  md <- tibble::tibble(time = seq(0.1, 10, by = 0.1))
+  md$power <- sprint_bioenergetic_model(md$time, 100, 50, k2 = 30, maximal_aerobic_power = 25)
+  expect_false("k2" %in% names(stats::coef(
+    sprint_bioenergetic_model_fit(md, maximal_aerobic_power = 25))))
+  expect_true("k2" %in% names(stats::coef(
+    sprint_bioenergetic_model_fit(md, maximal_aerobic_power = 25, fit_k2 = TRUE))))
+})
+
+test_that("fit_mu / fit_sigma / fit_k2 give stable physiological partitions", {
   g <- subset(ten_200_sprints_paired, source == "gpexe")
   sp <- detect_sprints(g)
   fixed  <- analyze_training_bioenergetics(g, sprints = sp, maximal_aerobic_power = 27,
-                                           fit_mu = FALSE, fit_sigma = FALSE)
-  fitted <- analyze_training_bioenergetics(g, sprints = sp, maximal_aerobic_power = 27,
-                                           fit_mu = TRUE, fit_sigma = TRUE)
-  expect_true(all(c("mu", "sigma") %in% names(fitted$per_sprint)))
-  expect_true(all(fixed$per_sprint$mu == -0.4))       # held at the fixed values
-  expect_true(all(fixed$per_sprint$sigma == 1))
-  expect_false(all(fitted$per_sprint$mu == -0.4))     # fitted away
-  expect_false(all(fitted$per_sprint$sigma == 1))
+                                           fit_mu = FALSE, fit_sigma = FALSE, fit_k2 = FALSE)
+  fitted <- analyze_training_bioenergetics(g, sprints = sp, maximal_aerobic_power = 27)
+  expect_true(all(c("mu", "sigma", "k2") %in% names(fitted$per_sprint)))
+  # held at the (gpexe-tuned) fixed starting values when not fitted
+  expect_true(all(fixed$per_sprint$mu == 0.5))
+  expect_true(all(fixed$per_sprint$sigma == 0.5))
+  expect_true(all(fixed$per_sprint$k2 == 35))
+  # fitted away when all three are estimated (default)
+  expect_false(all(fitted$per_sprint$mu == 0.5))
+  expect_false(all(fitted$per_sprint$sigma == 0.5))
+  expect_false(all(fitted$per_sprint$k2 == 35))
+  # all sprints give a physiological alactic share (the degenerate fits are gone)
+  expect_true(all(fitted$per_sprint$pct_alactic < 25))
 })
 
 test_that("analyze_training_bioenergetics summarises the whole workout", {

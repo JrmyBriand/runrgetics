@@ -125,9 +125,12 @@ two sessions we use **27 W/kg**. Each sprint's pre-launch lead-in and end-of-eff
 deceleration are trimmed automatically before fitting (the model is only valid from
 the launch up to the sprint finish), and the metabolic power uses the sprint cost of
 running. Because these training sprints accelerate more gradually than maximal
-sprints, their metabolic-power peak occurs later, so by default the alactic peak
-location `mu` and width `sigma` are also fitted (`fit_mu`/`fit_sigma = TRUE`) for
-gpexe data; the returned `mu` and `sigma` columns report their per-sprint values.
+sprints, their metabolic-power peak occurs later and the energy pathways are
+distributed differently, so by default the alactic peak location `mu`, the alactic
+width `sigma` and the lactic decay constant `k2` are all fitted
+(`fit_mu`/`fit_sigma`/`fit_k2 = TRUE`) from tuned starting values for gpexe data;
+the returned `mu`, `sigma` and `k2` columns report their per-sprint values. Fitting
+the three together gives stable, physiological partitions across the workout.
 
 ```{r}
 bioenergetics <- analyze_training_bioenergetics(
