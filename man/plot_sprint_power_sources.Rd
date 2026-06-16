@@ -2,7 +2,7 @@
 % Please edit documentation in R/device_comparison.R
 \name{plot_sprint_power_sources}
 \alias{plot_sprint_power_sources}
-\title{Plot the watch speed/power source comparison for one sprint}
+\title{Plot the watch vs reference speed/power comparison for one sprint}
 \usage{
 plot_sprint_power_sources(
   paired_data,
@@ -30,9 +30,10 @@ reference); if \code{NULL} (default), sprints are detected.}
 A ggplot object (2x2 facets).
 }
 \description{
-Four-panel comparison for a single sprint of the watch's reported-speed and
-GPS-derived derivations across speed, acceleration, metabolic power and external
-power, with the Stryd-measured external power overlaid on the external-power panel.
+Four-panel comparison for a single sprint of the filtered watch signal against
+the reference (gpexe filtered speed by default, or watch GPS-derived speed)
+across speed, acceleration, metabolic power and external power, with the
+Stryd-measured external power overlaid on the external-power panel.
 }
 \examples{
 plot_sprint_power_sources(ten_200_sprints_paired, sprint_id = 1, body_mass = 67)

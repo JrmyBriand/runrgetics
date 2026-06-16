@@ -9,6 +9,7 @@ compare_sprint_power_sources(
   sprint_id = 1,
   sprints = NULL,
   body_mass = 67,
+  comparison = c("gpexe", "gps"),
   filter_method = "butterworth",
   cutoff = 0.175,
   target_hz = 5,
@@ -31,6 +32,10 @@ reference); if \code{NULL} (default), sprints are detected.}
 
 \item{body_mass}{Athlete body mass (kg) used to convert the Stryd power to W/kg.}
 
+\item{comparison}{Reference signal to compare the watch against: \code{"gpexe"}
+(default, the gpexe filtered speed) or \code{"gps"} (speed derived from the watch's
+raw GPS position via \code{\link[=gps_speed]{gps_speed()}}).}
+
 \item{filter_method, cutoff, target_hz}{Passed to \code{\link[=filter_watch_motion]{filter_watch_motion()}}.}
 
 \item{cost_running_flat}{Flat-terrain cost of running (J/kg/m).}
@@ -44,15 +49,15 @@ reference); if \code{NULL} (default), sprints are detected.}
 }
 \value{
 A \link[tibble:tibble]{tibble} with columns \code{time} (s, from the sprint
-start), \code{panel}, \code{source} (\code{"watch"}, \code{"gps"}, \code{"stryd"}) and \code{value}.
+start), \code{panel}, \code{source} (\code{"watch"}, the comparison signal, \code{"stryd"}) and \code{value}.
 }
 \description{
-For a single detected sprint, derives the watch motion from two sources -
-the watch's reported speed and speed derived from raw GPS position - each
-filtered with \code{\link[=filter_watch_motion]{filter_watch_motion()}}, and assembles a tidy comparison of four
-channels: speed, acceleration, metabolic power (\code{cost_running()}) and external
-power (\code{external_power()}). The external-power panel also includes the Stryd
-unit's measured power (\code{power_w}) expressed per kilogram using \code{body_mass}.
+For a single detected sprint, compares the filtered watch signal against a
+reference - by default the \strong{gpexe} filtered speed, or speed derived from the
+watch's raw GPS position - across four channels: speed, acceleration, metabolic
+power (\code{cost_running()}) and external power (\code{external_power()}). The
+external-power panel also includes the Stryd unit's measured power (\code{power_w})
+expressed per kilogram using \code{body_mass}.
 }
 \examples{
 compare_sprint_power_sources(ten_200_sprints_paired, sprint_id = 1, body_mass = 67)

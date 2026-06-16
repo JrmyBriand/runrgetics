@@ -29,15 +29,19 @@ test_that("plot_device_comparison returns a ggplot and rejects unknown signals",
   expect_error(plot_device_comparison(sprint_mix_paired, signal = "heartrate"))
 })
 
-test_that("compare_sprint_power_sources has 4 panels and 3 sources", {
+test_that("compare_sprint_power_sources has 4 panels; default reference is gpexe", {
   d <- compare_sprint_power_sources(ten_200_sprints_paired, sprint_id = 1, body_mass = 67)
   expect_s3_class(d, "tbl_df")
   expect_setequal(levels(d$panel),
                   c("Speed (m/s)", "Acceleration (m/s^2)",
                     "Metabolic power (W/kg)", "External power (W/kg)"))
-  expect_setequal(as.character(unique(d$source)), c("watch", "gps", "stryd"))
+  expect_setequal(as.character(unique(d$source)), c("watch", "gpexe", "stryd"))
   # Stryd appears only in the external-power panel
   expect_true(all(as.character(d$panel[d$source == "stryd"]) == "External power (W/kg)"))
+  # the GPS-derived comparison is still available
+  d_gps <- compare_sprint_power_sources(ten_200_sprints_paired, sprint_id = 1,
+                                        comparison = "gps")
+  expect_setequal(as.character(unique(d_gps$source)), c("watch", "gps", "stryd"))
 })
 
 test_that("the Stryd channel scales inversely with body_mass", {

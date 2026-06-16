@@ -194,12 +194,12 @@ metabolic_power_vec <- function(acceleration, velocity, cost_running_flat, slope
 
 #' Compare watch speed/power derivations for one sprint
 #'
-#' For a single detected sprint, derives the watch motion from two sources -
-#' the watch's reported speed and speed derived from raw GPS position - each
-#' filtered with [filter_watch_motion()], and assembles a tidy comparison of four
-#' channels: speed, acceleration, metabolic power (`cost_running()`) and external
-#' power (`external_power()`). The external-power panel also includes the Stryd
-#' unit's measured power (`power_w`) expressed per kilogram using `body_mass`.
+#' For a single detected sprint, compares the filtered watch signal against a
+#' reference - by default the **gpexe** filtered speed, or speed derived from the
+#' watch's raw GPS position - across four channels: speed, acceleration, metabolic
+#' power (`cost_running()`) and external power (`external_power()`). The
+#' external-power panel also includes the Stryd unit's measured power (`power_w`)
+#' expressed per kilogram using `body_mass`.
 #'
 #' @param paired_data A paired-device data frame with a `source` column (e.g.
 #'   [ten_200_sprints_paired]); the device rows must carry a `power_w` (Stryd, W)
@@ -208,6 +208,9 @@ metabolic_power_vec <- function(acceleration, velocity, cost_running_flat, slope
 #' @param sprints Optional sprint table from [detect_sprints()] (detected on the
 #'   reference); if `NULL` (default), sprints are detected.
 #' @param body_mass Athlete body mass (kg) used to convert the Stryd power to W/kg.
+#' @param comparison Reference signal to compare the watch against: `"gpexe"`
+#'   (default, the gpexe filtered speed) or `"gps"` (speed derived from the watch's
+#'   raw GPS position via [gps_speed()]).
 #' @param filter_method,cutoff,target_hz Passed to [filter_watch_motion()].
 #' @param cost_running_flat Flat-terrain cost of running (J/kg/m).
 #' @param slope_equation Slope equation passed to [cost_running()].
@@ -216,18 +219,19 @@ metabolic_power_vec <- function(acceleration, velocity, cost_running_flat, slope
 #' @param margin Seconds of data to include on each side of the detected sprint.
 #'
 #' @returns A [tibble][tibble::tibble] with columns `time` (s, from the sprint
-#'   start), `panel`, `source` (`"watch"`, `"gps"`, `"stryd"`) and `value`.
+#'   start), `panel`, `source` (`"watch"`, the comparison signal, `"stryd"`) and `value`.
 #' @export
 #'
 #' @examples
 #' compare_sprint_power_sources(ten_200_sprints_paired, sprint_id = 1, body_mass = 67)
 compare_sprint_power_sources <- function(paired_data, sprint_id = 1, sprints = NULL,
-                                         body_mass = 67,
+                                         body_mass = 67, comparison = c("gpexe", "gps"),
                                          filter_method = "butterworth", cutoff = 0.175,
                                          target_hz = 5, cost_running_flat = 3.6,
                                          slope_equation = "extended",
                                          reference = "gpexe", device = "polar_stryd",
                                          margin = 3) {
+  comparison <- match.arg(comparison)
   if (!is.data.frame(paired_data) || !"source" %in% names(paired_data)) {
     stop("`paired_data` must be a data frame with a `source` column.")
   }
@@ -243,46 +247,62 @@ compare_sprint_power_sources <- function(paired_data, sprint_id = 1, sprints = N
   sp <- sprints[sprints$sprint_id == sprint_id, , drop = FALSE]
   if (nrow(sp) == 0) stop("`sprint_id` not found in the detected sprints.")
 
-  win <- w[w$time >= sp$start_time - margin & w$time <= sp$end_time + margin, , drop = FALSE]
+  in_win <- function(d) d[d$time >= sp$start_time - margin & d$time <= sp$end_time + margin, , drop = FALSE]
+  win <- in_win(w)
   if (nrow(win) < 5L) stop("Too few watch samples in the selected sprint window.")
 
-  wf_rep <- filter_watch_motion(win, method = filter_method, cutoff = cutoff,
-                                target_hz = target_hz, speed_source = "reported")
-  wf_gps <- filter_watch_motion(win, method = filter_method, cutoff = cutoff,
-                                target_hz = target_hz, speed_source = "gps")
+  # filtered watch (reported speed)
+  wf <- filter_watch_motion(win, method = filter_method, cutoff = cutoff,
+                            target_hz = target_hz, speed_source = "reported")
 
-  met_rep <- metabolic_power_vec(wf_rep$acceleration, wf_rep$velocity, cost_running_flat, slope_equation)
-  met_gps <- metabolic_power_vec(wf_gps$acceleration, wf_gps$velocity, cost_running_flat, slope_equation)
-  ext_rep <- external_power(wf_rep$acceleration, wf_rep$velocity)
-  ext_gps <- external_power(wf_gps$acceleration, wf_gps$velocity)
-  stryd <- stats::approx(win$time, win$power_w, xout = wf_rep$time, rule = 2)$y / body_mass
+  # comparison signal: gpexe filtered speed, or watch GPS-derived speed
+  if (comparison == "gpexe") {
+    gw <- in_win(g)
+    if (nrow(gw) < 5L) stop("Too few gpexe samples in the selected sprint window.")
+    comp_time <- gw$time; comp_v <- gw$velocity; comp_label <- "gpexe"
+  } else {
+    cf <- filter_watch_motion(win, method = filter_method, cutoff = cutoff,
+                              target_hz = target_hz, speed_source = "gps")
+    comp_time <- cf$time; comp_v <- cf$velocity; comp_label <- "gps"
+  }
 
-  t0 <- min(wf_rep$time)
-  mk <- function(panel, source, time, value) {
-    tibble::tibble(time = time - t0, panel = panel, source = source, value = value)
+  # common grid over the overlap, derive matched channels for both signals
+  dt <- 1 / target_hz
+  grid <- seq(max(min(wf$time), min(comp_time)), min(max(wf$time), max(comp_time)), by = dt)
+  chan <- function(time, velocity) {
+    v <- stats::approx(time, velocity, xout = grid, rule = 2)$y
+    a <- central_diff(v, dt)
+    list(v = v, a = a,
+         met = metabolic_power_vec(a, v, cost_running_flat, slope_equation),
+         ext = external_power(a, v))
+  }
+  cw <- chan(wf$time, wf$velocity)
+  cc <- chan(comp_time, comp_v)
+  stryd <- stats::approx(win$time, win$power_w, xout = grid, rule = 2)$y / body_mass
+
+  t0 <- min(grid)
+  mk <- function(panel, source, value) {
+    tibble::tibble(time = grid - t0, panel = panel, source = source, value = value)
   }
   out <- dplyr::bind_rows(
-    mk("Speed (m/s)", "watch", wf_rep$time, wf_rep$velocity),
-    mk("Speed (m/s)", "gps", wf_gps$time, wf_gps$velocity),
-    mk("Acceleration (m/s^2)", "watch", wf_rep$time, wf_rep$acceleration),
-    mk("Acceleration (m/s^2)", "gps", wf_gps$time, wf_gps$acceleration),
-    mk("Metabolic power (W/kg)", "watch", wf_rep$time, met_rep),
-    mk("Metabolic power (W/kg)", "gps", wf_gps$time, met_gps),
-    mk("External power (W/kg)", "watch", wf_rep$time, ext_rep),
-    mk("External power (W/kg)", "gps", wf_gps$time, ext_gps),
-    mk("External power (W/kg)", "stryd", wf_rep$time, stryd)
+    mk("Speed (m/s)", "watch", cw$v),               mk("Speed (m/s)", comp_label, cc$v),
+    mk("Acceleration (m/s^2)", "watch", cw$a),      mk("Acceleration (m/s^2)", comp_label, cc$a),
+    mk("Metabolic power (W/kg)", "watch", cw$met),  mk("Metabolic power (W/kg)", comp_label, cc$met),
+    mk("External power (W/kg)", "watch", cw$ext),   mk("External power (W/kg)", comp_label, cc$ext),
+    mk("External power (W/kg)", "stryd", stryd)
   )
   out$panel <- factor(out$panel, levels = c("Speed (m/s)", "Acceleration (m/s^2)",
                                             "Metabolic power (W/kg)", "External power (W/kg)"))
-  out$source <- factor(out$source, levels = c("watch", "gps", "stryd"))
+  out$source <- factor(out$source, levels = c("watch", comp_label, "stryd"))
   out
 }
 
-#' Plot the watch speed/power source comparison for one sprint
+#' Plot the watch vs reference speed/power comparison for one sprint
 #'
-#' Four-panel comparison for a single sprint of the watch's reported-speed and
-#' GPS-derived derivations across speed, acceleration, metabolic power and external
-#' power, with the Stryd-measured external power overlaid on the external-power panel.
+#' Four-panel comparison for a single sprint of the filtered watch signal against
+#' the reference (gpexe filtered speed by default, or watch GPS-derived speed)
+#' across speed, acceleration, metabolic power and external power, with the
+#' Stryd-measured external power overlaid on the external-power panel.
 #'
 #' @inheritParams compare_sprint_power_sources
 #' @param ... Additional arguments passed to [compare_sprint_power_sources()].
@@ -300,7 +320,7 @@ plot_sprint_power_sources <- function(paired_data, sprint_id = 1, sprints = NULL
     ggplot2::geom_line(linewidth = 0.5) +
     ggplot2::facet_wrap(~panel, scales = "free_y", ncol = 2) +
     ggplot2::scale_colour_manual(values = stats::setNames(
-      runrgetics_pal(3), c("watch", "gps", "stryd"))) +
+      runrgetics_pal(nlevels(d$source)), levels(d$source))) +
     ggplot2::labs(title = paste("Sprint", sprint_id, "- speed and power sources"),
                   x = "Time (s)", y = NULL, colour = NULL) +
     theme_runrgetics()

@@ -159,20 +159,44 @@ Across the ten repetitions, the aerobic and lactic pathways dominate these ~30 s
 efforts, with a smaller alactic contribution concentrated in the acceleration
 phase — as expected for repeated 200 m sprints.
 
+## Energy expenditure by pathway
+
+Integrating each pathway's power over the sprint gives the **energy** (J/kg) it
+supplies. `plot_sprint_energy()` shows the cumulative energy of each pathway as
+stacked areas against distance, so the top of the stack at any point is the
+cumulative total energy expended so far.
+
+```{r}
+plot_sprint_energy(gpexe, sprint_id = 1, sprints = sprints, maximal_aerobic_power = 27)
+```
+
+The alactic band stops thickening once its store is spent (early in the effort),
+while the lactic and aerobic contributions keep accumulating. `plot_workout_energy()`
+superposes the workout's sprints, one line per sprint, faceted by pathway, so we can
+compare how energy builds with distance.
+
+```{r, fig.height = 6}
+plot_workout_energy(gpexe, sprints = sprints, maximal_aerobic_power = 27)
+```
+
+The aerobic curves nearly superimpose across sprints (similar duration and maximal
+aerobic power), while the anaerobic pathways carry the inter-sprint differences.
+
 ## Comparing speed and power sources
 
-The watch gives us two independent ways to recover motion: its **reported speed**
-and a **GPS-position-derived speed**. `plot_sprint_power_sources()` compares the two
-(each filtered) for a single sprint across speed, acceleration, metabolic power and
-external power. The external-power panel also overlays the **Stryd unit's measured
-power**, converted to W/kg with the athlete's body mass (here 67 kg).
+We can also check the watch against the gpexe reference. `plot_sprint_power_sources()`
+compares, for a single sprint, the **filtered watch** signal against the **gpexe**
+filtered speed across speed, acceleration, metabolic power and external power. The
+external-power panel also overlays the **Stryd unit's measured power**, converted to
+W/kg with the athlete's body mass (here 67 kg). (Set `comparison = "gps"` to instead
+contrast the watch's reported speed with its raw-GPS-derived speed.)
 
 ```{r, fig.height = 6}
 plot_sprint_power_sources(ten_200_sprints_paired, sprint_id = 1, body_mass = 67)
 ```
 
-The reported-speed channel is smoother, while the GPS-derived channel is wavier;
-the externally measured Stryd power gives an independent reference for the computed
+The watch signal is smoother (more heavily filtered), while gpexe retains more of the
+stride-level detail; the Stryd power gives an independent reference for the computed
 external power.
 
 ## References

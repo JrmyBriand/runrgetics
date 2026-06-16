@@ -87,7 +87,9 @@ sprint_bioenergetic_series <- function(sprint_df, maximal_aerobic_power = 27, tr
                                   fit_mu = fit_mu, fit_sigma = fit_sigma, fit_k2 = fit_k2),
     error = function(e) NULL)
 
-  out <- tibble::tibble(time = md$time, measured = md$power,
+  out <- tibble::tibble(time = md$time, velocity = sprint_df$velocity,
+                        distance = cumdist(sprint_df$velocity, dt),
+                        measured = md$power,
                         alactic = NA_real_, lactic = NA_real_,
                         aerobic = NA_real_, total = NA_real_)
   max_al <- NA_real_; max_la <- NA_real_
