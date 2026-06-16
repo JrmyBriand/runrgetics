@@ -121,9 +121,13 @@ deceleration, so the within-workout consistency (and any fatigue) is visible.
 Finally, `analyze_training_bioenergetics()` applies the sprint bioenergetic model
 to each detected sprint and splits its metabolic power into alactic, lactic and
 aerobic contributions. The maximal aerobic power (MAP) is a parameter; for these
-two sessions we use **27 W/kg**. Each sprint's end-of-effort deceleration is
-trimmed automatically before fitting, since the model is only valid up to the
-sprint finish.
+two sessions we use **27 W/kg**. Each sprint's pre-launch lead-in and end-of-effort
+deceleration are trimmed automatically before fitting (the model is only valid from
+the launch up to the sprint finish), and the metabolic power uses the sprint cost of
+running. Because these training sprints accelerate more gradually than maximal
+sprints, their metabolic-power peak occurs later, so by default the alactic peak
+location `mu` is also fitted (`fit_mu = TRUE`) for gpexe data; the returned `mu`
+column reports its value per sprint.
 
 ```{r}
 bioenergetics <- analyze_training_bioenergetics(

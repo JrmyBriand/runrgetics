@@ -54,6 +54,27 @@ test_that("plot_sprint_bioenergetics returns a ggplot", {
   expect_error(plot_sprint_bioenergetics(g, sprint_id = 999), "not found")
 })
 
+test_that("sprint_bioenergetic_model_fit estimates mu when fit_mu = TRUE", {
+  md <- tibble::tibble(time = seq(0.1, 10, by = 0.1))
+  md$power <- sprint_bioenergetic_model(md$time, 100, 50, maximal_aerobic_power = 25)
+  expect_false("mu" %in% names(stats::coef(
+    sprint_bioenergetic_model_fit(md, maximal_aerobic_power = 25))))
+  expect_true("mu" %in% names(stats::coef(
+    sprint_bioenergetic_model_fit(md, maximal_aerobic_power = 25, fit_mu = TRUE))))
+})
+
+test_that("fit_mu controls the alactic peak location in the training analysis", {
+  g <- subset(ten_200_sprints_paired, source == "gpexe")
+  sp <- detect_sprints(g)
+  fixed  <- analyze_training_bioenergetics(g, sprints = sp, maximal_aerobic_power = 27,
+                                           fit_mu = FALSE)
+  fitted <- analyze_training_bioenergetics(g, sprints = sp, maximal_aerobic_power = 27,
+                                           fit_mu = TRUE)
+  expect_true("mu" %in% names(fitted$per_sprint))
+  expect_true(all(fixed$per_sprint$mu == -0.4))       # held at the fixed value
+  expect_false(all(fitted$per_sprint$mu == -0.4))     # fitted away for >= 1 sprint
+})
+
 test_that("analyze_training_bioenergetics summarises the whole workout", {
   res <- analyze_training_bioenergetics(gpexe_ten200(), maximal_aerobic_power = 27)
   expect_named(res, c("per_sprint", "summary"))

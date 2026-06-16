@@ -55,6 +55,11 @@ sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lacti
 #' Fit Sprint Bioenergetic Model to Sprint Motion Data
 #'
 #' @param sprint_motion_data A tibble with the following columns: time (s), velocity (m/s), acceleration (m/s^2), distance (m), cost of running (J/kg/m) and power (W/kg).
+#' @param fit_mu Logical. If `FALSE` (default), the alactic peak location `mu` is
+#'   held fixed at the supplied value (the parameterisation published in Briand et
+#'   al., 2025). If `TRUE`, `mu` is also estimated, letting the alactic peak shift
+#'   to match the observed metabolic-power peak (useful for slower training sprints,
+#'   e.g. GPS/gpexe data); `mu` is the starting value and is bounded to `[-1.5, 1.5]`.
 #' @inheritParams sprint_bioenergetic_model
 #'
 #' @returns An object of class \code{nls} and \code{nls.lm}, as returned by \code{nlsLM()}. This object contains the fitted model and can be used with generic functions like \code{summary()}, \code{predict()}, and \code{coef()}.
@@ -84,13 +89,23 @@ sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lacti
 #' fit <- sprint_bioenergetic_model_fit(bolt_100m_motion_data)
 #' fit
 #'
-sprint_bioenergetic_model_fit <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5) {
+sprint_bioenergetic_model_fit <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, fit_mu = FALSE) {
+  start <- list(maximal_alactic_power = 110, maximal_lactic_power = 50)
+  lower <- c(maximal_alactic_power = 0, maximal_lactic_power = 0)
+  upper <- c(maximal_alactic_power = Inf, maximal_lactic_power = Inf)
+  if (fit_mu) {
+    # also estimate the alactic peak location; mu (above) is the starting value
+    start$mu <- mu
+    lower <- c(lower, mu = -1.5)
+    upper <- c(upper, mu = 1.5)
+  }
+
   fit <- minpack.lm::nlsLM(
     power ~ sprint_bioenergetic_model(time, maximal_alactic_power, maximal_lactic_power, mu = mu, sigma = sigma, k1 = k1, k2 = k2, maximal_aerobic_power = maximal_aerobic_power),
     data = sprint_motion_data,
-    start = list(maximal_alactic_power = 110, maximal_lactic_power = 50),
-    lower = c(maximal_alactic_power = 0, maximal_lactic_power = 0),
-    upper = c(maximal_alactic_power = Inf, maximal_lactic_power = Inf)
+    start = start,
+    lower = lower,
+    upper = upper
   )
 
   return(fit)

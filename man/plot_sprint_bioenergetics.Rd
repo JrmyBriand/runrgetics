@@ -17,7 +17,8 @@ plot_sprint_bioenergetics(
   mu = -0.4,
   sigma = 1,
   k1 = 2.75,
-  k2 = 35
+  k2 = 35,
+  fit_mu = TRUE
 )
 }
 \arguments{
@@ -43,7 +44,13 @@ end-of-effort deceleration before fitting.}
 \item{slope_equation}{Slope equation passed to \code{\link[=cost_running]{cost_running()}}.}
 
 \item{mu, sigma, k1, k2}{Sprint bioenergetic model shape parameters
-(see \code{\link[=sprint_bioenergetic_model]{sprint_bioenergetic_model()}}).}
+(see \code{\link[=sprint_bioenergetic_model]{sprint_bioenergetic_model()}}). \code{mu} is the starting value when \code{fit_mu}
+is \code{TRUE}, otherwise the fixed value.}
+
+\item{fit_mu}{If \code{TRUE} (default), also estimate the alactic peak location \code{mu}
+so it adapts to the observed metabolic-power peak (recommended for gpexe /
+training sprints, whose power peaks later than in maximal sprints); if \code{FALSE},
+\code{mu} is held at the published fixed value.}
 }
 \value{
 A ggplot object.

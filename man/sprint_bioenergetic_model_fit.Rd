@@ -10,7 +10,8 @@ sprint_bioenergetic_model_fit(
   sigma = 1,
   k1 = 2.75,
   k2 = 35,
-  maximal_aerobic_power = 24.5
+  maximal_aerobic_power = 24.5,
+  fit_mu = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,12 @@ sprint_bioenergetic_model_fit(
 \item{k2}{A double. Time constant of the second decaying exponential (s). Default is 35}
 
 \item{maximal_aerobic_power}{A double. Maximal aerobic power (W/kg). Default is 24.5}
+
+\item{fit_mu}{Logical. If \code{FALSE} (default), the alactic peak location \code{mu} is
+held fixed at the supplied value (the parameterisation published in Briand et
+al., 2025). If \code{TRUE}, \code{mu} is also estimated, letting the alactic peak shift
+to match the observed metabolic-power peak (useful for slower training sprints,
+e.g. GPS/gpexe data); \code{mu} is the starting value and is bounded to \verb{[-1.5, 1.5]}.}
 }
 \value{
 An object of class \code{nls} and \code{nls.lm}, as returned by \code{nlsLM()}. This object contains the fitted model and can be used with generic functions like \code{summary()}, \code{predict()}, and \code{coef()}.
