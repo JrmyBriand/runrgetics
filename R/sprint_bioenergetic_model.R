@@ -60,6 +60,10 @@ sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lacti
 #'   al., 2025). If `TRUE`, `mu` is also estimated, letting the alactic peak shift
 #'   to match the observed metabolic-power peak (useful for slower training sprints,
 #'   e.g. GPS/gpexe data); `mu` is the starting value and is bounded to `[-1.5, 1.5]`.
+#' @param fit_sigma Logical. If `FALSE` (default), the alactic width `sigma` is held
+#'   fixed at the supplied value. If `TRUE`, `sigma` is also estimated, letting the
+#'   alactic bump narrow (faster decay) to better separate it from the lactic term;
+#'   `sigma` is the starting value and is bounded to `[0.2, 1.5]`.
 #' @inheritParams sprint_bioenergetic_model
 #'
 #' @returns An object of class \code{nls} and \code{nls.lm}, as returned by \code{nlsLM()}. This object contains the fitted model and can be used with generic functions like \code{summary()}, \code{predict()}, and \code{coef()}.
@@ -89,7 +93,7 @@ sprint_bioenergetic_model <- function(time, maximal_alactic_power, maximal_lacti
 #' fit <- sprint_bioenergetic_model_fit(bolt_100m_motion_data)
 #' fit
 #'
-sprint_bioenergetic_model_fit <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, fit_mu = FALSE) {
+sprint_bioenergetic_model_fit <- function(sprint_motion_data, mu = -0.4, sigma = 1, k1 = 2.75, k2 = 35, maximal_aerobic_power = 24.5, fit_mu = FALSE, fit_sigma = FALSE) {
   start <- list(maximal_alactic_power = 110, maximal_lactic_power = 50)
   lower <- c(maximal_alactic_power = 0, maximal_lactic_power = 0)
   upper <- c(maximal_alactic_power = Inf, maximal_lactic_power = Inf)
@@ -98,6 +102,12 @@ sprint_bioenergetic_model_fit <- function(sprint_motion_data, mu = -0.4, sigma =
     start$mu <- mu
     lower <- c(lower, mu = -1.5)
     upper <- c(upper, mu = 1.5)
+  }
+  if (fit_sigma) {
+    # also estimate the alactic width; sigma (above) is the starting value
+    start$sigma <- sigma
+    lower <- c(lower, sigma = 0.2)
+    upper <- c(upper, sigma = 1.5)
   }
 
   fit <- minpack.lm::nlsLM(

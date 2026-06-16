@@ -126,8 +126,8 @@ deceleration are trimmed automatically before fitting (the model is only valid f
 the launch up to the sprint finish), and the metabolic power uses the sprint cost of
 running. Because these training sprints accelerate more gradually than maximal
 sprints, their metabolic-power peak occurs later, so by default the alactic peak
-location `mu` is also fitted (`fit_mu = TRUE`) for gpexe data; the returned `mu`
-column reports its value per sprint.
+location `mu` and width `sigma` are also fitted (`fit_mu`/`fit_sigma = TRUE`) for
+gpexe data; the returned `mu` and `sigma` columns report their per-sprint values.
 
 ```{r}
 bioenergetics <- analyze_training_bioenergetics(

@@ -63,16 +63,27 @@ test_that("sprint_bioenergetic_model_fit estimates mu when fit_mu = TRUE", {
     sprint_bioenergetic_model_fit(md, maximal_aerobic_power = 25, fit_mu = TRUE))))
 })
 
-test_that("fit_mu controls the alactic peak location in the training analysis", {
+test_that("sprint_bioenergetic_model_fit estimates sigma when fit_sigma = TRUE", {
+  md <- tibble::tibble(time = seq(0.1, 10, by = 0.1))
+  md$power <- sprint_bioenergetic_model(md$time, 100, 50, sigma = 0.6, maximal_aerobic_power = 25)
+  expect_false("sigma" %in% names(stats::coef(
+    sprint_bioenergetic_model_fit(md, maximal_aerobic_power = 25))))
+  expect_true("sigma" %in% names(stats::coef(
+    sprint_bioenergetic_model_fit(md, maximal_aerobic_power = 25, fit_sigma = TRUE))))
+})
+
+test_that("fit_mu / fit_sigma control the alactic peak and width", {
   g <- subset(ten_200_sprints_paired, source == "gpexe")
   sp <- detect_sprints(g)
   fixed  <- analyze_training_bioenergetics(g, sprints = sp, maximal_aerobic_power = 27,
-                                           fit_mu = FALSE)
+                                           fit_mu = FALSE, fit_sigma = FALSE)
   fitted <- analyze_training_bioenergetics(g, sprints = sp, maximal_aerobic_power = 27,
-                                           fit_mu = TRUE)
-  expect_true("mu" %in% names(fitted$per_sprint))
-  expect_true(all(fixed$per_sprint$mu == -0.4))       # held at the fixed value
-  expect_false(all(fitted$per_sprint$mu == -0.4))     # fitted away for >= 1 sprint
+                                           fit_mu = TRUE, fit_sigma = TRUE)
+  expect_true(all(c("mu", "sigma") %in% names(fitted$per_sprint)))
+  expect_true(all(fixed$per_sprint$mu == -0.4))       # held at the fixed values
+  expect_true(all(fixed$per_sprint$sigma == 1))
+  expect_false(all(fitted$per_sprint$mu == -0.4))     # fitted away
+  expect_false(all(fitted$per_sprint$sigma == 1))
 })
 
 test_that("analyze_training_bioenergetics summarises the whole workout", {

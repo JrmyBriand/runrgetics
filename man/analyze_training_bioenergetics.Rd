@@ -18,6 +18,7 @@ analyze_training_bioenergetics(
   k1 = 2.75,
   k2 = 35,
   fit_mu = TRUE,
+  fit_sigma = TRUE,
   ...
 )
 }
@@ -49,6 +50,11 @@ is \code{TRUE}, otherwise the fixed value.}
 so it adapts to the observed metabolic-power peak (recommended for gpexe /
 training sprints, whose power peaks later than in maximal sprints); if \code{FALSE},
 \code{mu} is held at the published fixed value.}
+
+\item{fit_sigma}{If \code{TRUE} (default), also estimate the alactic width \code{sigma}
+(letting the bump narrow / decay faster); fitting \code{sigma} together with \code{mu}
+keeps the alactic separated from the lactic term and the contributions
+physiological. If \code{FALSE}, \code{sigma} is held fixed.}
 
 \item{...}{Passed to \code{\link[=detect_sprints]{detect_sprints()}} when \code{sprints} is \code{NULL}.}
 }

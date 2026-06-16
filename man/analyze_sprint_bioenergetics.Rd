@@ -16,7 +16,8 @@ analyze_sprint_bioenergetics(
   sigma = 1,
   k1 = 2.75,
   k2 = 35,
-  fit_mu = TRUE
+  fit_mu = TRUE,
+  fit_sigma = TRUE
 )
 }
 \arguments{
@@ -46,12 +47,17 @@ is \code{TRUE}, otherwise the fixed value.}
 so it adapts to the observed metabolic-power peak (recommended for gpexe /
 training sprints, whose power peaks later than in maximal sprints); if \code{FALSE},
 \code{mu} is held at the published fixed value.}
+
+\item{fit_sigma}{If \code{TRUE} (default), also estimate the alactic width \code{sigma}
+(letting the bump narrow / decay faster); fitting \code{sigma} together with \code{mu}
+keeps the alactic separated from the lactic term and the contributions
+physiological. If \code{FALSE}, \code{sigma} is held fixed.}
 }
 \value{
 A one-row \link[tibble:tibble]{tibble} with \code{duration}, \code{maximal_alactic_power},
-\code{maximal_lactic_power}, \code{mu} (the alactic peak location used), peak and mean
-total power, the alactic / lactic / aerobic energies (J/kg) and their
-percentage contributions, or a row of \code{NA}s if the model fit fails.
+\code{maximal_lactic_power}, \code{mu} and \code{sigma} (the alactic peak location and width
+used), peak and mean total power, the alactic / lactic / aerobic energies
+(J/kg) and their percentage contributions, or a row of \code{NA}s if the fit fails.
 }
 \description{
 Trims the pre-launch lead-in (\code{\link[=trim_sprint_launch]{trim_sprint_launch()}}) and the end-of-effort
