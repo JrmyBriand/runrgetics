@@ -17,6 +17,8 @@ data-raw/*.fit
 # Local-only athlete data and build diagnostics (never commit)
 data-raw/SLS/
 data-raw/diagnostics/
+# Local SLS batch run: per-athlete config, results and reports (never commit)
+sls_analysis/
 
 # knitr figure artifacts from local vignette validation
 figure/

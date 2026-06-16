@@ -46,6 +46,17 @@
   pathway power into cumulative energy (J/kg) versus distance, as stacked areas per
   sprint and superposed across a workout (`sprint_ids` for a subset).
 
+### Session analysis and dashboard
+
+* `read_gpexe_csv()` reads a gpexe CSV export into a tidy motion data frame, and
+  `analyze_sprint_session()` runs the whole pipeline (detection, workout comparison,
+  bioenergetic decomposition) on one session in a single call.
+* `batch_sprint_analysis()` processes a folder of gpexe sessions, writing per-session
+  tables and figures plus a run log; files that error are logged and skipped.
+* `launch_sprint_dashboard()` starts an interactive Shiny (shinydashboard) app for
+  coaches to browse a folder of sessions and explore sprint kinematics and the
+  bioenergetic partition (requires the suggested `shiny`, `shinydashboard`, `DT`).
+
 ### Shared plotting style
 
 * `theme_runrgetics()`, `runrgetics_pal()` and `scale_colour_runrgetics()` give the new
