@@ -51,7 +51,7 @@ lowpass_filter <- function(x, method = c("butterworth", "savitzky_golay", "movin
 
 #' Validate the inputs shared by the watch-filter functions
 #' @noRd
-validate_motion_df <- function(data, need_speed, need_position) {
+validate_watch_data <- function(data, need_speed, need_position) {
   if (!is.data.frame(data)) stop("`data` must be a data frame.")
   if (!"time" %in% names(data)) stop("`data` must contain a numeric `time` column (s).")
   if (!is.numeric(data$time)) stop("`time` must be numeric (seconds).")
@@ -137,7 +137,7 @@ filter_watch_motion <- function(data,
                                 speed_source = c("reported", "gps")) {
   method <- match.arg(method)
   speed_source <- match.arg(speed_source)
-  validate_motion_df(data, need_speed = speed_source == "reported",
+  validate_watch_data(data, need_speed = speed_source == "reported",
                      need_position = speed_source == "gps")
   if (!is.numeric(target_hz) || target_hz <= 0) stop("`target_hz` must be a positive number.")
 
