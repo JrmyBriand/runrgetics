@@ -35,3 +35,15 @@ test_that("plot_workout_sprints returns a ggplot for each signal/axis", {
                                        signal = "metabolic_power", x = "time"), "ggplot")
   expect_error(plot_workout_sprints(g, sprints = sprints, signal = "heartrate"))
 })
+
+test_that("plot_workout_sprints honours sprint_ids and rejects unknown ids", {
+  g <- gpexe_ten200()
+  sprints <- detect_sprints(g)
+  expect_s3_class(plot_workout_sprints(g, sprints = sprints, sprint_ids = c(1, 5, 9)), "ggplot")
+  expect_error(plot_workout_sprints(g, sprints = sprints, sprint_ids = 999), "match")
+})
+
+test_that("workout functions validate motion_data", {
+  sprints <- detect_sprints(gpexe_ten200())
+  expect_error(compare_workout_sprints(data.frame(x = 1:5), sprints = sprints), "velocity")
+})

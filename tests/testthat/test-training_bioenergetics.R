@@ -31,6 +31,12 @@ test_that("analyze_sprint_bioenergetics returns sensible contributions", {
   expect_gt(res$maximal_lactic_power, 0)
 })
 
+test_that("maximal_aerobic_power must be a positive number", {
+  one <- one_sprint()
+  expect_error(analyze_sprint_bioenergetics(one, maximal_aerobic_power = 0), "positive")
+  expect_error(analyze_sprint_bioenergetics(one, maximal_aerobic_power = -5), "positive")
+})
+
 test_that("higher MAP increases the aerobic contribution", {
   one <- one_sprint()
   lo <- analyze_sprint_bioenergetics(one, maximal_aerobic_power = 15)

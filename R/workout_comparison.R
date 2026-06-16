@@ -12,6 +12,7 @@ utils::globalVariables(c("axis_value", "signal_value", "sprint_label"))
 workout_sprint_series <- function(motion_data, sprints,
                                   cost_running_flat = 3.6, slope_equation = "extended",
                                   full_effort = TRUE) {
+  validate_motion_data(motion_data)
   motion_data <- motion_data[order(motion_data$time), , drop = FALSE]
   t_all <- motion_data$time
   v_all <- motion_data$velocity
@@ -32,9 +33,6 @@ workout_sprint_series <- function(motion_data, sprints,
     tt <- t_all[idx] - t_all[idx[1]]
     vv <- v_all[idx]
     aa <- a_all[idx]
-    cr <- vapply(seq_along(vv),
-                 function(j) cost_running(aa[j], vv[j], cost_running_flat, slope_equation),
-                 numeric(1))
     tibble::tibble(
       sprint_id       = sprints$sprint_id[i],
       sprint_label    = paste("Sprint", sprints$sprint_id[i]),
@@ -43,7 +41,7 @@ workout_sprint_series <- function(motion_data, sprints,
       velocity        = vv,
       acceleration    = aa,
       external_power  = external_power(aa, vv),
-      metabolic_power = cr * vv
+      metabolic_power = metabolic_power_vec(aa, vv, cost_running_flat, slope_equation)
     )
   })
   out <- dplyr::bind_rows(series)
@@ -113,22 +111,28 @@ compare_workout_sprints <- function(motion_data, sprints = NULL,
 #'   `"metabolic_power"`.
 #' @param x Horizontal axis: `"distance"` (m, default) or `"time"` (s), measured
 #'   from each sprint's start.
+#' @param sprint_ids Optional vector of `sprint_id`s to display; if `NULL` (default),
+#'   all detected sprints are shown.
 #'
 #' @returns A ggplot object.
 #' @export
 #'
 #' @examples
 #' gpexe <- subset(ten_200_sprints_paired, source == "gpexe")
-#' plot_workout_sprints(gpexe)
+#' plot_workout_sprints(gpexe, sprint_ids = c(1, 5, 9))
 plot_workout_sprints <- function(motion_data, sprints = NULL,
                                  signal = c("speed", "external_power", "metabolic_power"),
-                                 x = c("distance", "time"),
+                                 x = c("distance", "time"), sprint_ids = NULL,
                                  cost_running_flat = 3.6, slope_equation = "extended",
                                  ...) {
   signal <- match.arg(signal)
   x <- match.arg(x)
   if (is.null(sprints)) sprints <- detect_sprints(motion_data, ...)
   if (nrow(sprints) == 0) stop("No sprints detected; adjust detection settings.")
+  if (!is.null(sprint_ids)) {
+    sprints <- sprints[sprints$sprint_id %in% sprint_ids, , drop = FALSE]
+    if (nrow(sprints) == 0) stop("None of `sprint_ids` match the detected sprints.")
+  }
   series <- workout_sprint_series(motion_data, sprints,
                                   cost_running_flat = cost_running_flat,
                                   slope_equation = slope_equation)

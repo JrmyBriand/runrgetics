@@ -33,14 +33,6 @@ detection_metric <- function(motion_data, metric, dt) {
   stop("`metric` must be one of \"speed\", \"power\", \"acceleration\".")
 }
 
-#' Centered rolling-mean smoother (edges extended)
-#' @noRd
-roll_smooth <- function(x, k) {
-  if (k %% 2 == 0) k <- k + 1L
-  if (k <= 1) return(x)
-  as.numeric(zoo::na.fill(zoo::rollmean(x, k = k, fill = NA, align = "center"), "extend"))
-}
-
 #' Contiguous runs where a logical vector is TRUE
 #' @noRd
 runs_above_threshold <- function(above) {

@@ -9,6 +9,7 @@ plot_workout_sprints(
   sprints = NULL,
   signal = c("speed", "external_power", "metabolic_power"),
   x = c("distance", "time"),
+  sprint_ids = NULL,
   cost_running_flat = 3.6,
   slope_equation = "extended",
   ...
@@ -25,6 +26,9 @@ sprints are detected with \code{\link[=detect_sprints]{detect_sprints()}}.}
 
 \item{x}{Horizontal axis: \code{"distance"} (m, default) or \code{"time"} (s), measured
 from each sprint's start.}
+
+\item{sprint_ids}{Optional vector of \code{sprint_id}s to display; if \code{NULL} (default),
+all detected sprints are shown.}
 
 \item{cost_running_flat}{Flat-terrain cost of running (J/kg/m) for metabolic power.}
 
@@ -43,5 +47,5 @@ classic sprint-comparison figure.
 }
 \examples{
 gpexe <- subset(ten_200_sprints_paired, source == "gpexe")
-plot_workout_sprints(gpexe)
+plot_workout_sprints(gpexe, sprint_ids = c(1, 5, 9))
 }

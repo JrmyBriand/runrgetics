@@ -33,3 +33,10 @@ test_that("energy plots return ggplots", {
   expect_s3_class(plot_workout_energy(g, sprints = sp), "ggplot")
   expect_error(sprint_energy_data(g, sprint_id = 999, sprints = sp), "not found")
 })
+
+test_that("plot_workout_energy honours sprint_ids and rejects unknown ids", {
+  g <- gpexe_ten200()
+  sp <- detect_sprints(g)
+  expect_s3_class(plot_workout_energy(g, sprints = sp, sprint_ids = c(1, 2)), "ggplot")
+  expect_error(plot_workout_energy(g, sprints = sp, sprint_ids = 999), "match")
+})

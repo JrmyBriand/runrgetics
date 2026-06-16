@@ -61,6 +61,7 @@ sprint_bioenergetic_series <- function(sprint_df, maximal_aerobic_power = 27, tr
                                        cost_running_flat = 3.6, slope_equation = "extended",
                                        mu = 0.5, sigma = 0.5, k1 = 2.75, k2 = 35,
                                        fit_mu = TRUE, fit_sigma = TRUE, fit_k2 = TRUE) {
+  check_positive(maximal_aerobic_power, "maximal_aerobic_power")
   if (trim) {
     sprint_df <- trim_sprint_launch(sprint_df, launch_accel)
     sprint_df <- trim_sprint_deceleration(sprint_df, decel_threshold)

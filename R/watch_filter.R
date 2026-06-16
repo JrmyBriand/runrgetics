@@ -12,55 +12,8 @@
 # GPS-shape fidelity while reducing that distance bias.
 
 # ---- internal helpers --------------------------------------------------------
-
-#' Great-circle distance in metres between WGS84 points
-#' @param lat1,lon1,lat2,lon2 numeric vectors of coordinates (degrees)
-#' @returns numeric vector of distances (m)
-#' @noRd
-haversine_m <- function(lat1, lon1, lat2, lon2) {
-  R <- 6371000
-  rad <- pi / 180
-  dlat <- (lat2 - lat1) * rad
-  dlon <- (lon2 - lon1) * rad
-  a <- sin(dlat / 2)^2 + cos(lat1 * rad) * cos(lat2 * rad) * sin(dlon / 2)^2
-  2 * R * asin(pmin(1, sqrt(a)))
-}
-
-#' Root-mean-square error over jointly finite values
-#' @noRd
-rmse <- function(a, b) {
-  ok <- is.finite(a) & is.finite(b)
-  sqrt(mean((a[ok] - b[ok])^2))
-}
-
-#' Central-difference derivative on a uniform grid
-#' @param x numeric vector; dt numeric time step (s)
-#' @returns numeric vector of the same length (m/s per s for a velocity input)
-#' @noRd
-central_diff <- function(x, dt) {
-  n <- length(x)
-  if (n < 2) return(rep(NA_real_, n))
-  a <- numeric(n)
-  a[1] <- (x[2] - x[1]) / dt
-  a[n] <- (x[n] - x[n - 1]) / dt
-  if (n > 2) a[2:(n - 1)] <- (x[3:n] - x[1:(n - 2)]) / (2 * dt)
-  a
-}
-
-#' Cumulative trapezoidal integral on a uniform grid
-#' @noRd
-cumdist <- function(x, dt) {
-  n <- length(x)
-  if (n < 2) return(rep(0, n))
-  c(0, cumsum((x[-1] + x[-n]) / 2 * dt))
-}
-
-#' Resample an irregular series onto a uniform grid by linear interpolation
-#' @noRd
-resample_uniform <- function(time, x, target_hz) {
-  grid <- seq(min(time), max(time), by = 1 / target_hz)
-  list(time = grid, x = stats::approx(time, x, xout = grid, rule = 2)$y)
-}
+# Shared numeric helpers (haversine_m, rmse, central_diff, cumdist,
+# resample_uniform) now live in R/utils-motion.R.
 
 #' Apply a low-pass filter to a uniformly-sampled signal
 #'

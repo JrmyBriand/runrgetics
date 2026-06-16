@@ -98,6 +98,9 @@ plot_sprint_energy <- function(motion_data, sprint_id = 1, sprints = NULL,
 #' @inheritParams plot_sprint_energy
 #' @param sprints Optional sprint table from [detect_sprints()]; if `NULL` (default),
 #'   sprints are detected.
+#' @param sprint_ids Optional vector of `sprint_id`s to display; if `NULL` (default),
+#'   all detected sprints are shown. Use a subset (e.g. `c(1, 5, 9)`) to keep the
+#'   figure readable.
 #' @param ... Additional arguments passed to [sprint_energy_data()].
 #'
 #' @returns A ggplot object (faceted by pathway).
@@ -105,11 +108,16 @@ plot_sprint_energy <- function(motion_data, sprint_id = 1, sprints = NULL,
 #'
 #' @examples
 #' gpexe <- subset(ten_200_sprints_paired, source == "gpexe")
-#' plot_workout_energy(gpexe, maximal_aerobic_power = 27)
-plot_workout_energy <- function(motion_data, sprints = NULL, maximal_aerobic_power = 27,
+#' plot_workout_energy(gpexe, sprint_ids = c(1, 5, 9), maximal_aerobic_power = 27)
+plot_workout_energy <- function(motion_data, sprints = NULL, sprint_ids = NULL,
+                                maximal_aerobic_power = 27,
                                 x = c("distance", "time"), ...) {
   x <- match.arg(x)
   if (is.null(sprints)) sprints <- detect_sprints(motion_data)
+  if (!is.null(sprint_ids)) {
+    sprints <- sprints[sprints$sprint_id %in% sprint_ids, , drop = FALSE]
+    if (nrow(sprints) == 0) stop("None of `sprint_ids` match the detected sprints.")
+  }
   parts <- lapply(sprints$sprint_id, function(id) {
     tryCatch(
       sprint_energy_data(motion_data, sprint_id = id, sprints = sprints,

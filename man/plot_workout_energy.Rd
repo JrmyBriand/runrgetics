@@ -7,6 +7,7 @@
 plot_workout_energy(
   motion_data,
   sprints = NULL,
+  sprint_ids = NULL,
   maximal_aerobic_power = 27,
   x = c("distance", "time"),
   ...
@@ -17,6 +18,10 @@ plot_workout_energy(
 
 \item{sprints}{Optional sprint table from \code{\link[=detect_sprints]{detect_sprints()}}; if \code{NULL} (default),
 sprints are detected.}
+
+\item{sprint_ids}{Optional vector of \code{sprint_id}s to display; if \code{NULL} (default),
+all detected sprints are shown. Use a subset (e.g. \code{c(1, 5, 9)}) to keep the
+figure readable.}
 
 \item{maximal_aerobic_power}{Maximal aerobic power, MAP (W/kg). Use 27 for the
 \code{sprint_mix} / \code{ten_200_sprints} sessions.}
@@ -37,5 +42,5 @@ the inter-sprint differences.
 }
 \examples{
 gpexe <- subset(ten_200_sprints_paired, source == "gpexe")
-plot_workout_energy(gpexe, maximal_aerobic_power = 27)
+plot_workout_energy(gpexe, sprint_ids = c(1, 5, 9), maximal_aerobic_power = 27)
 }

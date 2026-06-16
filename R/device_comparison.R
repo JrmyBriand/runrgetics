@@ -59,20 +59,14 @@ device_comparison_series <- function(paired_data,
               min(max(g$time), max(wf$time)), by = dt)
 
   channels <- function(time, velocity) {
-    v <- stats::approx(time, velocity, xout = grid, rule = 2)$y
-    a <- central_diff(v, dt)
-    # cost_running() is scalar (it branches on acceleration sign), so apply it
-    # element-wise; external_power() is already vectorised.
-    cr <- vapply(seq_along(v),
-                 function(i) cost_running(a[i], v[i], cost_running_flat, slope_equation),
-                 numeric(1))
+    ch <- motion_channels(time, velocity, grid, dt, cost_running_flat, slope_equation)
     tibble::tibble(
       time            = grid,
-      velocity        = v,
-      acceleration    = a,
-      distance        = cumdist(v, dt),
-      external_power  = external_power(a, v),
-      metabolic_power = cr * v
+      velocity        = ch$velocity,
+      acceleration    = ch$acceleration,
+      distance        = cumdist(ch$velocity, dt),
+      external_power  = ch$external_power,
+      metabolic_power = ch$metabolic_power
     )
   }
 
@@ -182,16 +176,6 @@ plot_device_comparison <- function(paired_data,
     theme_runrgetics()
 }
 
-#' Element-wise metabolic power from acceleration and velocity
-#' @noRd
-metabolic_power_vec <- function(acceleration, velocity, cost_running_flat, slope_equation) {
-  cr <- vapply(seq_along(velocity),
-               function(i) cost_running(acceleration[i], velocity[i],
-                                        cost_running_flat, slope_equation),
-               numeric(1))
-  cr * velocity
-}
-
 #' Compare watch speed/power derivations for one sprint
 #'
 #' For a single detected sprint, compares the filtered watch signal against a
@@ -269,15 +253,8 @@ compare_sprint_power_sources <- function(paired_data, sprint_id = 1, sprints = N
   # common grid over the overlap, derive matched channels for both signals
   dt <- 1 / target_hz
   grid <- seq(max(min(wf$time), min(comp_time)), min(max(wf$time), max(comp_time)), by = dt)
-  chan <- function(time, velocity) {
-    v <- stats::approx(time, velocity, xout = grid, rule = 2)$y
-    a <- central_diff(v, dt)
-    list(v = v, a = a,
-         met = metabolic_power_vec(a, v, cost_running_flat, slope_equation),
-         ext = external_power(a, v))
-  }
-  cw <- chan(wf$time, wf$velocity)
-  cc <- chan(comp_time, comp_v)
+  cw <- motion_channels(wf$time, wf$velocity, grid, dt, cost_running_flat, slope_equation)
+  cc <- motion_channels(comp_time, comp_v, grid, dt, cost_running_flat, slope_equation)
   stryd <- stats::approx(win$time, win$power_w, xout = grid, rule = 2)$y / body_mass
 
   t0 <- min(grid)
@@ -285,10 +262,10 @@ compare_sprint_power_sources <- function(paired_data, sprint_id = 1, sprints = N
     tibble::tibble(time = grid - t0, panel = panel, source = source, value = value)
   }
   out <- dplyr::bind_rows(
-    mk("Speed (m/s)", "watch", cw$v),               mk("Speed (m/s)", comp_label, cc$v),
-    mk("Acceleration (m/s^2)", "watch", cw$a),      mk("Acceleration (m/s^2)", comp_label, cc$a),
-    mk("Metabolic power (W/kg)", "watch", cw$met),  mk("Metabolic power (W/kg)", comp_label, cc$met),
-    mk("External power (W/kg)", "watch", cw$ext),   mk("External power (W/kg)", comp_label, cc$ext),
+    mk("Speed (m/s)", "watch", cw$velocity),              mk("Speed (m/s)", comp_label, cc$velocity),
+    mk("Acceleration (m/s^2)", "watch", cw$acceleration), mk("Acceleration (m/s^2)", comp_label, cc$acceleration),
+    mk("Metabolic power (W/kg)", "watch", cw$metabolic_power), mk("Metabolic power (W/kg)", comp_label, cc$metabolic_power),
+    mk("External power (W/kg)", "watch", cw$external_power),   mk("External power (W/kg)", comp_label, cc$external_power),
     mk("External power (W/kg)", "stryd", stryd)
   )
   out$panel <- factor(out$panel, levels = c("Speed (m/s)", "Acceleration (m/s^2)",

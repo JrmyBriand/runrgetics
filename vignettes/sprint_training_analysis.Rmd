@@ -173,10 +173,12 @@ plot_sprint_energy(gpexe, sprint_id = 1, sprints = sprints, maximal_aerobic_powe
 The alactic band stops thickening once its store is spent (early in the effort),
 while the lactic and aerobic contributions keep accumulating. `plot_workout_energy()`
 superposes the workout's sprints, one line per sprint, faceted by pathway, so we can
-compare how energy builds with distance.
+compare how energy builds with distance. Pass `sprint_ids` to show a readable subset
+(here three of the ten repetitions).
 
 ```{r, fig.height = 6}
-plot_workout_energy(gpexe, sprints = sprints, maximal_aerobic_power = 27)
+plot_workout_energy(gpexe, sprints = sprints, sprint_ids = c(1, 5, 9),
+                    maximal_aerobic_power = 27)
 ```
 
 The aerobic curves nearly superimpose across sprints (similar duration and maximal
