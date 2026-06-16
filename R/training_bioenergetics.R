@@ -64,13 +64,22 @@ sprint_bioenergetic_series <- function(sprint_df, maximal_aerobic_power = 27, tr
     sprint_df <- trim_sprint_launch(sprint_df, launch_accel)
     sprint_df <- trim_sprint_deceleration(sprint_df, decel_threshold)
   }
-  if (!"metabolic_power" %in% names(sprint_df)) {
-    sprint_df <- compute_metabolic_running_power(
-      sprint_df[, c("time", "velocity")],
-      cost_running_flat = cost_running_flat, slope_equation = slope_equation)
+  # Metabolic power for the bioenergetic model: use the SPRINT cost of running
+  # (cost_running_sprint clamps negative acceleration to 0, so the natural
+  # in-sprint slowdown does not drop the power), consistent with the validated
+  # sprint pipeline. Acceleration is smoothed (~1 s) to limit derivative noise.
+  dt <- stats::median(diff(sprint_df$time), na.rm = TRUE)
+  k <- max(1L, round(1 / dt))
+  acc <- if ("acceleration" %in% names(sprint_df)) {
+    sprint_df$acceleration
+  } else {
+    central_diff(sprint_df$velocity, dt)
   }
-  md <- tibble::tibble(time = sprint_df$time - min(sprint_df$time),
-                       power = sprint_df$metabolic_power)
+  acc <- roll_smooth(acc, k)
+  mp <- cost_running_sprint(acc, sprint_df$velocity,
+                            cost_running_flat = cost_running_flat,
+                            slope_equation = slope_equation) * sprint_df$velocity
+  md <- tibble::tibble(time = sprint_df$time - min(sprint_df$time), power = mp)
   fit <- tryCatch(
     sprint_bioenergetic_model_fit(md, mu = mu, sigma = sigma, k1 = k1, k2 = k2,
                                   maximal_aerobic_power = maximal_aerobic_power),
@@ -143,16 +152,16 @@ trim_sprint_deceleration <- function(sprint_df, decel_threshold = 1.0) {
 
 #' Bioenergetic analysis of a single sprint
 #'
-#' Computes metabolic power over a sprint (if not already present), trims the
-#' pre-launch lead-in ([trim_sprint_launch()]) and the end-of-effort deceleration
-#' ([trim_sprint_deceleration()]), fits the sprint bioenergetic model
-#' ([sprint_bioenergetic_model_fit()]) with the supplied maximal aerobic power, and
-#' returns the alactic / lactic / aerobic peak powers, energies and percentage
-#' contributions.
+#' Trims the pre-launch lead-in ([trim_sprint_launch()]) and the end-of-effort
+#' deceleration ([trim_sprint_deceleration()]), computes the sprint metabolic power
+#' (sprint cost of running, [cost_running_sprint()], on smoothed acceleration), fits
+#' the sprint bioenergetic model ([sprint_bioenergetic_model_fit()]) with the
+#' supplied maximal aerobic power, and returns the alactic / lactic / aerobic peak
+#' powers, energies and percentage contributions.
 #'
 #' @param sprint_df A single sprint's data frame with `time` (s) and `velocity`
-#'   (m/s); a `metabolic_power` column is used if present, otherwise it is computed
-#'   with [compute_metabolic_running_power()].
+#'   (m/s); an `acceleration` column is used if present, otherwise acceleration is
+#'   derived from velocity. Metabolic power is computed with [cost_running_sprint()].
 #' @param maximal_aerobic_power Maximal aerobic power, MAP (W/kg). Use 27 for the
 #'   `sprint_mix` / `ten_200_sprints` sessions.
 #' @param trim If `TRUE` (default), trim the pre-launch lead-in and the

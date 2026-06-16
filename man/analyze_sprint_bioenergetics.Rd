@@ -20,8 +20,8 @@ analyze_sprint_bioenergetics(
 }
 \arguments{
 \item{sprint_df}{A single sprint's data frame with \code{time} (s) and \code{velocity}
-(m/s); a \code{metabolic_power} column is used if present, otherwise it is computed
-with \code{\link[=compute_metabolic_running_power]{compute_metabolic_running_power()}}.}
+(m/s); an \code{acceleration} column is used if present, otherwise acceleration is
+derived from velocity. Metabolic power is computed with \code{\link[=cost_running_sprint]{cost_running_sprint()}}.}
 
 \item{maximal_aerobic_power}{Maximal aerobic power, MAP (W/kg). Use 27 for the
 \code{sprint_mix} / \code{ten_200_sprints} sessions.}
@@ -47,12 +47,12 @@ energies (J/kg) and their percentage contributions, or a row of \code{NA}s if th
 model fit fails.
 }
 \description{
-Computes metabolic power over a sprint (if not already present), trims the
-pre-launch lead-in (\code{\link[=trim_sprint_launch]{trim_sprint_launch()}}) and the end-of-effort deceleration
-(\code{\link[=trim_sprint_deceleration]{trim_sprint_deceleration()}}), fits the sprint bioenergetic model
-(\code{\link[=sprint_bioenergetic_model_fit]{sprint_bioenergetic_model_fit()}}) with the supplied maximal aerobic power, and
-returns the alactic / lactic / aerobic peak powers, energies and percentage
-contributions.
+Trims the pre-launch lead-in (\code{\link[=trim_sprint_launch]{trim_sprint_launch()}}) and the end-of-effort
+deceleration (\code{\link[=trim_sprint_deceleration]{trim_sprint_deceleration()}}), computes the sprint metabolic power
+(sprint cost of running, \code{\link[=cost_running_sprint]{cost_running_sprint()}}, on smoothed acceleration), fits
+the sprint bioenergetic model (\code{\link[=sprint_bioenergetic_model_fit]{sprint_bioenergetic_model_fit()}}) with the
+supplied maximal aerobic power, and returns the alactic / lactic / aerobic peak
+powers, energies and percentage contributions.
 }
 \examples{
 gpexe <- subset(ten_200_sprints_paired, source == "gpexe")
