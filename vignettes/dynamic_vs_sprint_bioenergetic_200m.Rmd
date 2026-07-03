@@ -1,0 +1,195 @@
+---
+title: "Dynamic vs sprint bioenergetic model on a 200 m sprint"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Dynamic vs sprint bioenergetic model on a 200 m sprint}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+```{r setup}
+library(runrgetics)
+library(dplyr)
+library(ggplot2)
+```
+
+## Two models, one sprint
+
+`runrgetics` decomposes a sprint's metabolic power into aerobic,
+anaerobic-alactic and anaerobic-lactic contributions with the **sprint
+bioenergetic model** (`analyze_sprint_bioenergetics()`): a set of empirical
+power-time curves (a log-normal alactic bump, a bi-exponential lactic term and an
+exponential aerobic rise) fitted to the di Prampero metabolic-power demand.
+
+This vignette adds a second, mechanistically different lens on the same data: a
+**dynamic Mader-style metabolic model**, ported from the
+[MuscleEdot](https://github.com/) package into `runrgetics`
+(`simulate_dynamic_bioenergetics()`). Instead of fitting empirical curves, it
+*integrates a 5-state system of ordinary differential equations* (high-energy
+phosphates, muscle oxygen uptake, muscle and blood lactate, cumulative ATP demand)
+driven by the measured power demand, with oxidative phosphorylation, glycolysis
+and lactate oxidation controlled by the cytosolic phosphorylation state (free
+ADP) and muscle pH. It then reads off the instantaneous aerobic, glycolytic and
+alactic power the same way the ECSS energy-partition figure does.
+
+The two models are driven by **exactly the same observed signal** — the di
+Prampero sprint cost of running times velocity — so their partitions are directly
+comparable. VO2max is fixed and VLamax is tuned to the demand. The question is
+whether a dynamic, ADP/pH-regulated model recovers a partition comparable to the
+empirical sprint model on a real 200 m repetition.
+
+## The target sprint
+
+We use the ten-200 m paired session and its gpexe reference signal, and take the
+first detected repetition (`sprint_id = 1`), exactly as the sprint bioenergetic
+model does. Body mass for this athlete is 67 kg; the session maximal aerobic
+power (MAP) is 27 W/kg.
+
+```{r detect}
+gpexe <- subset(ten_200_sprints_paired, source == "gpexe")
+sprints <- detect_sprints(gpexe)
+sprints[1, c("sprint_id", "duration", "distance", "peak_speed")]
+```
+
+The sprint bioenergetic model's decomposition of this sprint:
+
+```{r sprint-model}
+plot_sprint_bioenergetics(gpexe, sprint_id = 1, maximal_aerobic_power = 27)
+```
+
+## Parameters of the dynamic model
+
+The dynamic model works in the same units as the rest of `runrgetics` (power in
+W/kg, time in s), and takes systemic VO2max (mL/kg/min) and VLamax (mmol/kg/s),
+converting them to muscle-specific values internally.
+
+* **VO2max is fixed.** The athlete's measured VO2max is 75 mL/kg/min. The dynamic
+  model's VO2max corresponds to the measured value over-estimated by ~5 % (the
+  model's oxidative machinery never quite reaches the whole-body plateau), i.e.
+  `75 * 1.05 = 78.75` mL/kg/min.
+* **VLamax is the free parameter**, tuned to minimise the RMSE between the
+  dynamic model's total metabolic power and the di Prampero demand.
+* **SC, SA and M_active** are held at the MuscleEdot defaults (25 mmol/kg,
+  7 mmol/kg and 0.25).
+
+## Tuning VLamax to the di Prampero demand
+
+`tune_dynamic_vlamax()` does a 1-D optimisation of VLamax against the sprint's
+metabolic-power demand. `compare_bioenergetic_models()` wraps the whole pipeline
+(detect the sprint, build the demand, fit the sprint model, tune and run the
+dynamic model) and, when `vlamax` is left `NULL`, tunes it for us.
+
+```{r compare}
+vo2max <- 75 * 1.05 # ~78.75 mL/kg/min, fixed
+cmp <- compare_bioenergetic_models(
+  gpexe, sprint_id = 1, maximal_aerobic_power = 27, vo2max = vo2max
+)
+
+tuned_vlamax <- attr(cmp, "vlamax")
+tuned_rmse <- attr(cmp, "rmse")
+c(vlamax = tuned_vlamax, rmse = tuned_rmse)
+```
+
+The tuned VLamax lands in the low-to-mid physiological range, and the dynamic
+model's total metabolic power tracks the di Prampero demand to within an RMSE of
+about `r round(tuned_rmse, 2)` W/kg over the whole sprint.
+
+## Side-by-side partition
+
+`compare_bioenergetic_models()` returns a tidy table of each pathway's energy
+(J/kg) and percentage share for both models.
+
+```{r table}
+cmp
+```
+
+```{r table-wide}
+# a compact per-pathway comparison of the two models' percentage shares
+sprint_pct <- with(cmp[cmp$model == "sprint", ], stats::setNames(pct, pathway))
+dynamic_pct <- with(cmp[cmp$model == "dynamic", ], stats::setNames(pct, pathway))
+data.frame(
+  pathway = levels(cmp$pathway),
+  sprint_pct = round(sprint_pct[levels(cmp$pathway)], 1),
+  dynamic_pct = round(dynamic_pct[levels(cmp$pathway)], 1),
+  row.names = NULL
+)
+```
+
+## Overlaying the power-time curves
+
+```{r plot-overlay}
+plot_bioenergetic_comparison(
+  gpexe, sprint_id = 1, maximal_aerobic_power = 27, vo2max = vo2max
+)
+```
+
+## Where the models agree and diverge
+
+Two things stand out on this 200 m sprint:
+
+* **Total energy and the aerobic share agree well.** Both models reconstruct a
+  similar total metabolic energy for the sprint, and both attribute a comparable
+  fraction (~40 %) to aerobic metabolism — a reassuring, model-independent result
+  given how differently the aerobic term is built (an empirical exponential rise
+  vs. an ADP-driven Hill function with first-order VO2 kinetics).
+
+* **They split the anaerobic budget differently.** The empirical sprint model is
+  *lactic-heavy* (a large bi-exponential lactic term, a small alactic bump),
+  whereas the dynamic model is *alactic-heavy*: its phosphocreatine pool covers
+  most of the early, high-power transient before glycolysis and oxidative
+  phosphorylation take over. This is the expected signature of the two
+  formulations. The sprint model places the alactic contribution in a narrow
+  log-normal bump around the launch, while the dynamic model lets PCr deplete
+  continuously for as long as the phosphorylation state demands it — so more of
+  the sustained sprint power is booked as alactic and less as lactic.
+
+The upshot: a mechanistic, ADP/pH-regulated dynamic model, driven by the same
+di Prampero demand and with only VLamax tuned, reproduces the **magnitude** of
+the sprint's energy expenditure and its **aerobic** share, but partitions the
+**anaerobic** energy along different lines than the empirical sprint model. The
+two are best read as complementary views: the sprint model gives a compact,
+fittable summary of the pathway peaks and time constants, while the dynamic model
+adds an internally-consistent account of the phosphate and lactate dynamics that
+produce them.
+
+## The building blocks directly
+
+Under the hood, `compare_bioenergetic_models()` builds the di Prampero demand for
+the sprint, tunes VLamax with `tune_dynamic_vlamax()`, and integrates the model
+with `simulate_dynamic_bioenergetics()`. We can call those exported building
+blocks ourselves. Here we rebuild the demand for the trimmed sprint window with
+the exported sprint-cost helpers, then drive the dynamic model directly.
+
+```{r direct}
+# extract and trim the sprint exactly as the sprint pipeline does
+one <- gpexe[sprints$start_index[1]:sprints$end_index[1], ]
+one <- trim_sprint_deceleration(trim_sprint_launch(one))
+
+dt <- stats::median(diff(one$time))
+demand <- cost_running_sprint(one$acc, one$velocity) * one$velocity
+time <- one$time - min(one$time)
+
+# tune VLamax to this demand (VO2max fixed), then simulate
+tuned <- tune_dynamic_vlamax(demand, time, vo2max = vo2max)
+sim <- simulate_dynamic_bioenergetics(demand, time, vo2max = vo2max,
+                                      vlamax = tuned$vlamax)
+
+c(vlamax = tuned$vlamax, rmse = tuned$rmse)
+attr(sim, "energy_total")
+head(sim)
+```
+
+`simulate_dynamic_bioenergetics()` returns the instantaneous partition (`alactic`,
+`lactic`, `aerobic`, `total`, all W/kg) alongside the observed `measured` demand,
+with the integrated energies (J/kg) attached as attributes — the same quantities
+the comparison table aggregates.
+

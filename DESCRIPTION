@@ -28,7 +28,8 @@ Config/testthat/edition: 3
 Depends:
     R (>= 4.1)
 LazyData: true
-Imports: 
+Imports:
+    deSolve,
     dplyr,
     FITfileR (>= 0.1.11),
     ggplot2,
