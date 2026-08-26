@@ -4,3 +4,5 @@
 ^data-raw$
 ^README\.Rmd$
 ^tools$
+^\.claude$
+^CLAUDE\.md$

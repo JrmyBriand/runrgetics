@@ -15,6 +15,9 @@
 #' cost_running_sprint(acceleration = c(2, 4, 5), velocity = c(2, 4, 5))
 #'
 cost_running_sprint <- function(acceleration, velocity, cost_running_flat = 3.6, slope_equation = "original") {
+  if (length(acceleration) != length(velocity)) {
+    stop("acceleration and velocity must have the same length")
+  }
   # Set negative accelerations to zero
   acc_modified <- pmax(acceleration, 0)
   # Calculate Effective Slope
@@ -65,6 +68,9 @@ cost_running_sprint <- function(acceleration, velocity, cost_running_flat = 3.6,
 #' cost_running(acceleration = c(2, 4, 5), velocity = c(2, 4, 5))
 #'
 cost_running <- function(acceleration, velocity, cost_running_flat = 3.6, slope_equation = "original") {
+  if (length(acceleration) != length(velocity)) {
+    stop("acceleration and velocity must have the same length")
+  }
   # Calculate effective slope
   effective_slope <- acceleration / 9.8
   # Calculate effective mass

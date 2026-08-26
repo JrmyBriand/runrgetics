@@ -107,20 +107,10 @@ sprint_alactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixd
   # events
   events <- unique(dat$event)
 
-
-  # initialize table
-
-  table <- tibble::tibble(
-    duration = numeric(),
-    alactic_energy = numeric(),
-    alactic_power = numeric(),
-    athlete_sex = character()
-  )
-
-  for (i in events) {
+  # compute alactic energy vs duration for each event
+  results <- purrr::map(events, function(i) {
     event_data <- dat |>
       dplyr::filter(event == i)
-
 
     sprint_data <- sprint_motion_model_data(
       mean_velocity_splits = event_data$velocity,
@@ -133,7 +123,6 @@ sprint_alactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixd
       slope_equation = slope_equation
     )
 
-
     sprint_power_data <- sprint_bioenergetic_model_data(sprint_data,
       mu = mu,
       sigma = sigma,
@@ -142,17 +131,11 @@ sprint_alactic_energy_duration_graubner_nixdorf <- function(data = graubner_nixd
       maximal_aerobic_power = map
     )
 
-    # compute alactic energy vs duration for each event
-
-    sprint_alactic_energy_duration_data <- sprint_alactic_energy_duration(sprint_power_data) |>
+    sprint_alactic_energy_duration(sprint_power_data) |>
       dplyr::mutate(athlete_sex = athlete_sex)
+  })
 
-    # add to table
-
-    table <- dplyr::bind_rows(table, sprint_alactic_energy_duration_data)
-  }
-
-  return(table)
+  dplyr::bind_rows(results)
 }
 
 
@@ -279,7 +262,8 @@ sprint_alactic_capacity <- function(alactic_power_duration, mu_al = 1.75, sigma_
 #' @inheritParams sprint_alactic_duration_model
 #'
 #'
-#' @returns A numeric value representing the maximal lactic power (in W/kg) that can be sustained over the given sprint duration.
+#' @returns A numeric value representing the maximal alactic power (in W/kg) that can be sustained over the given sprint duration.
+#' @keywords internal
 #' @export
 #'
 #' @examples

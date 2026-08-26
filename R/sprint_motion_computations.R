@@ -116,7 +116,7 @@ sprint_dec_velocity_model <- function(time, maximal_velocity, time_maximal_veloc
 
 
 
-#' Instantaneous Distance During Sprint Running Decceleration Phase
+#' Instantaneous Distance During Sprint Running Deceleration Phase
 #'
 #' Estimates the instantaneous distance during the deceleration phase of a sprint run. The model is based on a constant rate of deceleration.
 #'

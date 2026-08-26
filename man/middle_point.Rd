@@ -21,3 +21,4 @@ Calculates the midpoint time within a given time interval.
 middle_point(2, 4)
 
 }
+\keyword{internal}

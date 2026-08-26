@@ -27,7 +27,7 @@ find_max_al(
 \item{sigma_al}{A double representing the decay of the log-normal distribution. Default is 1.5.}
 }
 \value{
-A numeric value representing the maximal lactic power (in W/kg) that can be sustained over the given sprint duration.
+A numeric value representing the maximal alactic power (in W/kg) that can be sustained over the given sprint duration.
 }
 \description{
 Knowing an athlete maximal alactic capacity, the function finds
@@ -41,3 +41,4 @@ alactic_capacity <- 350
 find_max_al(duration, alactic_capacity)
 
 }
+\keyword{internal}

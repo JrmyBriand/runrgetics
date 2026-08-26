@@ -316,38 +316,21 @@ sprint_simulation_metrics_briand_article <- function( male_alactic_capacity = 32
                                                       cost_running_flat = 3.8,
                                                       slope_equation = "original"){
 
-  #initalize performance table
-
-  perf_table <- tibble::tibble(
-    event = character(),
-    time_performance = numeric(),
-    distance = numeric(),
-    distance_estimated = numeric(),
-    distance_error = numeric(),
-    total_energy = numeric(),
-    alactic_energy = numeric(),
-    lactic_energy = numeric(),
-    aerobic_energy = numeric()
-  )
-
-
   # get performance table
-
   perf_data <- graubner_nixdorf_perf_from_splits()
 
-  for(i in perf_data$event){
-
+  # compute metrics for each event
+  results <- purrr::map(unique(perf_data$event), function(i) {
     sub_data <- perf_data |>
       dplyr::filter(event == i)
 
     sex <- unique(sub_data$sex)
 
-    if(sex == "male"){
+    if (sex == "male") {
       alactic_capacity <- male_alactic_capacity
       lactic_capacity <- male_lactic_capacity
       maximal_aerobic_power <- male_maximal_aerobic_power
-    }
-    if(sex == "female"){
+    } else {
       alactic_capacity <- female_alactic_capacity
       lactic_capacity <- female_lactic_capacity
       maximal_aerobic_power <- female_maximal_aerobic_power
@@ -366,22 +349,19 @@ sprint_simulation_metrics_briand_article <- function( male_alactic_capacity = 32
       dt = dt,
       mu = mu,
       sigma = sigma,
-      k1 =k1,
+      k1 = k1,
       k2 = k2,
       cost_running_flat = cost_running_flat,
       slope_equation = slope_equation
     )
 
     # add event name as first element
-    metrics <- metrics |>
+    metrics |>
       dplyr::mutate(event = i) |>
-      dplyr::select(event, everything())
+      dplyr::select(event, dplyr::everything())
+  })
 
-    # append to performance table
-
-    perf_table <- dplyr::bind_rows(perf_table, metrics)
-
-  }
+  perf_table <- dplyr::bind_rows(results)
 
   # rename all the columns
 
